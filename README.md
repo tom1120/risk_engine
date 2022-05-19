@@ -86,6 +86,7 @@ curl -XPOST  -v  http://localhost:8889/run -H'Context-Type:application/json'
 
 ### 决策引擎架构图
 ![决策引擎架构图](https://i.loli.net/2021/01/21/bOR1tyVPnCZNGoi.png)
+tips：本代码为决策引擎系统代码，不包括可视化管理后台部分。完整风控架构可能由更多系统组成，可参考系列文章实现。
 
 ### 代码解读
 [智能风控决策引擎系统架构设计总纲](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484064&idx=1&sn=fecd2c7379208e84e7e3cd4eb1abfb6c&chksm=e8215db0df56d4a623bd6be2a706c0220952f0e045b0d6d9646616ee3aae742c574335fa228a&token=221471496&lang=zh_CN#rd)
@@ -102,6 +103,13 @@ curl -XPOST  -v  http://localhost:8889/run -H'Context-Type:application/json'
 [智能风控决策引擎系统可落地实现方案（五）评分卡实现](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247483860&idx=1&sn=45bfbf4e436001dc060d5d4718688e9b&chksm=e8215ec4df56d7d2396c6024b49fc67eb25ee5754da9ddd40365f72abd5c1535a45218ea79b1&token=1239858205&lang=zh_CN#rd)
 
 [智能风控决策引擎系统可落地实现方案（六）风控监控大盘实现](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247483882&idx=1&sn=cb1142ea342b03f2f4ada44383e4bcbe&chksm=e8215efadf56d7ecae2159b7f742678d6036e6df046513ccce0efb052029d13b4c7b67ae1bc6&token=290046129&lang=zh_CN#rd)
+
+
+[金融智能风控系统演进开发实践](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484207&idx=1&sn=9ef3c9a1b9f6ca0ad6fca1072925b15d&chksm=e8215c3fdf56d529b23975054a36b3186303400fedd90daa2298dd23c09779895204bc58655d&token=2012091003&lang=zh_CN#rd)
+
+[金融风控领域的 DDD 与中台思考](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484233&idx=1&sn=59f68324e1b35c3ea2bc642edc21b004&chksm=e8215c59df56d54f9846cb218069451dc247dab2b815a0cdcc044886cb738e1372e2d25ba864&scene=178&cur_album_id=1519884739007053825#rd)
+
+[金融风控系统的演进与升级:从第一代到第四代](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484409&idx=1&sn=5b646fc06bdf7256f4ff341610878bbd&chksm=e8215ce9df56d5ff9e45b00ca2cbbe8bdc7cc46e3e0c759f5de44118312301677dac7f4807ea&token=2012091003&lang=zh_CN#rd)
 
 
 扫码关注微信公众号 ***技术岁月*** 支持：
