@@ -1,4 +1,6 @@
 # 风控决策引擎系统
+[![License](https://img.shields.io/:license-apache%202-blue.svg)](https://opensource.org/licenses/Apache-2.0)  
+
 ### 决策引擎系统介绍
 
 风控决策引擎系统是在大数据支撑下，根据行业专家经验制定规则策略、以及机器学习/深度学习/AI领域建立的模型运算，对当前的业务风险进行全面的评估，并给出决策结果的一套系统。
