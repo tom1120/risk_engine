@@ -2,7 +2,6 @@ package core
 
 import (
 	//	"github.com/skyhackvip/risk_engine/configs"
-	"github.com/skyhackvip/risk_engine/internal/dto"
 	"github.com/skyhackvip/risk_engine/internal/errcode"
 	"log"
 	//	"sort"
@@ -28,10 +27,16 @@ func (node RulesetNode) GetKind() NodeType {
 	return node.Kind
 }
 
+func (node RulesetNode) GetLabel() string {
+	return node.Label
+}
+
+func (node RulesetNode) GetTag() string {
+	return node.Tag
+}
+
 func (ruleset RulesetNode) Parse(ctx *PipelineContext) (interface{}, error) {
 	log.Printf("====[trace]ruleset %s start=====\n", ruleset.Name)
-
-	nodeResult := dto.NewNodeResult(ruleset.Name)
 
 	var ruleResult = make([]Decision, 0)
 
@@ -51,7 +56,7 @@ func (ruleset RulesetNode) Parse(ctx *PipelineContext) (interface{}, error) {
 
 				//ruleDecision := configs.NilDecision todo nil
 				if rs.(bool) { //HIT
-					nodeResult.Hits = append(nodeResult.Hits, rule.Name)
+					//nodeResult.Hits = append(nodeResult.Hits, rule.Name)
 					//ruleDecision = configs.DecisionMap[rule.Decision]
 					//assign
 				}
@@ -59,7 +64,7 @@ func (ruleset RulesetNode) Parse(ctx *PipelineContext) (interface{}, error) {
 			}(rule)
 		}
 		wg.Wait()
-	} else {
+	} else { //串行执行
 		for _, rule := range ruleset.Rules {
 			rs, err := rule.Parse(ctx)
 			if err != nil {
@@ -67,15 +72,12 @@ func (ruleset RulesetNode) Parse(ctx *PipelineContext) (interface{}, error) {
 			}
 			//ruleDecision := configs.NilDecision
 			if rs.(bool) { //HIT
-				nodeResult.Hits = append(nodeResult.Hits, rule.Name)
+				//append hit rule
+				//		nodeResult.Hits = append(nodeResult.Hits, rule.Name)
 				//ruleDecision = configs.DecisionMap[rule.Decision]
 			}
 			ruleResult = append(ruleResult, rule.Decision)
 		}
-	}
-
-	for k, v := range ruleResult {
-		log.Println(k, v)
 	}
 
 	if len(ruleResult) == 0 {

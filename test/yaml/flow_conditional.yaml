@@ -88,28 +88,36 @@ rulesets:
       decision: reject 
 conditionals:
   - conditional:
-    conditional_name: conditional_1 
+    name: conditional_1 
+    tag: conditional_1
+    label: 条件网关
+    kind: conditional
     depends: [feature_4]
     branchs:
     - branch:
       branch_name: branch_1
       conditions:
         - condition:
+          name: c1
           feature: feature_4
           operator: GT
           value: 5
         - condition:
+          name: c2
           feature: feature_4
           operator: LE
           value: 10
-      logic: AND
-      decision: ruleset_1
+      decision:
+        logic: c1 && c2
+        output: [ruleset_1, ruleset]
     - branch:
       branch_name: branch_2
       conditions:
         - condition:
+          name: c3
           feature: feature_4
           operator: GT
           value: 10
-      logic: ""
-      decision: ruleset_2
+      decision:
+        logic: c3
+        output: [ruleset_2, ruleset]

@@ -61,7 +61,7 @@ rulesets:
         #break
         assign:
           frozen_period: 5
-          test_in: test 
+          test_in: 6
     - rule:
       name: rule_2
       tag: 10002
@@ -82,7 +82,7 @@ rulesets:
     tag: model
     label: 规则集2
     kind: ruleset
-    depends: [feature_4]
+    depends: [test_in]
     exec_plan: serial
     rules: 
     - rule:
@@ -92,7 +92,7 @@ rulesets:
       conditions:
       - condition:
         name: c1
-        feature: feature_4
+        feature: test_in 
         operator: GT
         value: 5
       decision: 

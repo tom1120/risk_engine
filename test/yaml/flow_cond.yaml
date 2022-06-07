@@ -1,16 +1,16 @@
-key: flow_abtest
+key: flow_conditional
 version: 1.0
-label: abtest决策流
+label: 条件决策流
 metadata:
 decision_flow:
   - flow_node:
     node_name: start_1
     node_type: start
-    next_node_name: abtest_1
-    next_node_type: abtest
+    next_node_name: conditional_1
+    next_node_type: conditional
   - flow_node:
-    node_name: abtest_1
-    node_type: abtest
+    node_name: conditional_1
+    node_type: conditional
     next_node_name:
     next_node_type:
   - flow_node:

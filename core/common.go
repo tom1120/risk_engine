@@ -24,24 +24,21 @@ func (rule *Rule) Parse(ctx *PipelineContext) (interface{}, error) {
 	}
 	var conditionRet = make(map[string]interface{}, 0)
 	for _, condition := range rule.Conditions {
-		if data, ok := ctx.GetFeature(condition.Feature); ok {
-			if data.Name == "" {
-				log.Println("data error : data name is empty")
-				continue
-			}
-			rs, err := operator.Compare(condition.Operator, data.Value, condition.Value)
+		if feature, ok := ctx.GetFeature(condition.Feature); ok {
+			value, _ := feature.GetValue() //是否使用default
+			rs, err := operator.Compare(condition.Operator, value, condition.Value)
 			if err != nil {
 				return nil, err
 			}
 			conditionRet[condition.Name] = rs
 		} else {
-			//lack of feature
+			//lack of feature  whether ignore
 			log.Printf("error lack of feature: %s\n", condition.Feature)
 			continue
 		}
 	}
 	if len(conditionRet) == 0 {
-		return nil, errors.New(fmt.Sprintf("rule (%s) condition is empty", rule.Name))
+		return nil, errors.New(fmt.Sprintf("rule (%s) condition result error", rule.Name))
 	}
 
 	//rule.Decision
@@ -51,6 +48,18 @@ func (rule *Rule) Parse(ctx *PipelineContext) (interface{}, error) {
 		return nil, err
 	}
 	log.Printf("rule %s (%s) decision is: %v\n", rule.Label, rule.Name, logicRet)
+
+	//assign
+	if len(rule.Decision.Assign) > 0 {
+		features := make(map[string]*Feature)
+		for name, value := range rule.Decision.Assign {
+			feature := NewFeature(name, TypeString, "") //string
+			feature.SetValue(value)
+			features[name] = feature
+		}
+		ctx.SetFeatures(features)
+	}
+	log.Println(ctx.GetAllFeatures())
 	return logicRet, nil
 }
 

@@ -78,6 +78,7 @@ func (flow *DecisionFlow) Run(ctx *PipelineContext) (err error) {
 //parse current node and return next node
 func (flow *DecisionFlow) parseNode(curNode *FlowNode, ctx *PipelineContext) (*FlowNode, bool) {
 	//parse current node
+	ctx.AddTrack(curNode.GetElem())
 	res, err := curNode.Parse(ctx)
 	if err != nil {
 		log.Println(err)
@@ -94,7 +95,7 @@ func (flow *DecisionFlow) parseNode(curNode *FlowNode, ctx *PipelineContext) (*F
 	default: //start
 		return flow.GetNode(curNode.NextNodeName, curNode.NextNodeType)
 	}
-	return nextNode, false
+	//return nextNode, false
 }
 
 type FlowNode struct {
@@ -110,6 +111,10 @@ type FlowNode struct {
 
 func (flowNode *FlowNode) SetElem(elem INode) {
 	flowNode.elem = elem
+}
+
+func (flowNode *FlowNode) GetElem() INode {
+	return flowNode.elem
 }
 
 func (flowNode *FlowNode) Parse(ctx *PipelineContext) (interface{}, error) {

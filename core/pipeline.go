@@ -18,39 +18,62 @@ type PipelineContext struct {
 
 	//proccess result
 
-	//track
+	tMutex sync.RWMutex
+	tracks []*Track
 
-	mutex sync.RWMutex
+	fMutex   sync.RWMutex
+	features map[string]*Feature
+}
 
-	features map[string]Feature
+type Track struct {
+	name  string
+	label string
+	tag   string
+	kind  NodeType
 }
 
 func NewPipelineContext() *PipelineContext {
-	return &PipelineContext{features: make(map[string]Feature)}
+	return &PipelineContext{features: make(map[string]*Feature)}
 }
 
-func (ctx *PipelineContext) SetFeatures(features map[string]Feature) {
+func (ctx *PipelineContext) AddTrack(node INode) {
+	ctx.tMutex.Lock()
+	defer ctx.tMutex.Unlock()
+	ctx.tracks = append(ctx.tracks, &Track{name: node.GetName(),
+		label: node.GetLabel(),
+		tag:   node.GetTag(),
+		kind:  node.GetKind(),
+	})
+}
+
+func (ctx *PipelineContext) GetTracks() []*Track {
+	ctx.tMutex.RLock()
+	defer ctx.tMutex.RUnlock()
+	return ctx.tracks
+}
+
+func (ctx *PipelineContext) SetFeatures(features map[string]*Feature) {
 	if len(features) == 0 {
 		return
 	}
-	ctx.mutex.Lock()
-	defer ctx.mutex.Unlock()
+	ctx.fMutex.Lock()
+	defer ctx.fMutex.Unlock()
 	for k, v := range features {
 		ctx.features[k] = v //override the same key feature
 	}
 }
 
-func (ctx *PipelineContext) SetFeature(name string, value Feature) {
-	ctx.mutex.Lock()
-	defer ctx.mutex.Unlock()
-	ctx.features[name] = value //override the same key feature
+func (ctx *PipelineContext) SetFeature(feature *Feature) {
+	ctx.fMutex.Lock()
+	defer ctx.fMutex.Unlock()
+	ctx.features[feature.GetName()] = feature //override the same key feature
 }
 
-func (ctx *PipelineContext) GetFeature(name string) (result Feature, ok bool) {
+func (ctx *PipelineContext) GetFeature(name string) (result *Feature, ok bool) {
 	//local
-	ctx.mutex.RLock()
+	ctx.fMutex.RLock()
 	localFeatures := ctx.features
-	ctx.mutex.RUnlock()
+	ctx.fMutex.RUnlock()
 	if result, ok = localFeatures[name]; ok {
 		return
 	}
@@ -59,15 +82,15 @@ func (ctx *PipelineContext) GetFeature(name string) (result Feature, ok bool) {
 	return
 }
 
-func (ctx *PipelineContext) GetFeatures(depends []string) (result map[string]Feature) {
+func (ctx *PipelineContext) GetFeatures(depends []string) (result map[string]*Feature) {
 	if len(depends) == 0 {
 		return
 	}
 
 	//from local
-	ctx.mutex.RLock()
+	ctx.fMutex.RLock()
 	localFeatures := ctx.features
-	ctx.mutex.RUnlock()
+	ctx.fMutex.RUnlock()
 
 	remoteList := make([]string, 0)
 	for _, name := range depends {
@@ -87,9 +110,9 @@ func (ctx *PipelineContext) GetFeatures(depends []string) (result map[string]Fea
 	return
 }
 
-func (ctx *PipelineContext) GetAllFeatures() map[string]Feature {
-	ctx.mutex.RLock()
+func (ctx *PipelineContext) GetAllFeatures() map[string]*Feature {
+	ctx.fMutex.RLock()
 	features := ctx.features
-	ctx.mutex.RUnlock()
+	ctx.fMutex.RUnlock()
 	return features
 }

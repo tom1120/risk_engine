@@ -4,6 +4,8 @@ package core
 type INode interface {
 	GetName() string
 	GetKind() NodeType
+	GetLabel() string
+	GetTag() string
 	Parse(*PipelineContext) (interface{}, error)
 }
 

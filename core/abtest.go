@@ -10,9 +10,11 @@ import (
 
 type AbtestNode struct {
 	Name       string   `yaml:"name"`
+	Label      string   `yaml:"label"`
+	Tag        string   `yaml:"tag"`
 	Kind       NodeType `yaml:"kind"`
-	Branchs    []Branch `yaml:"branchs,flow"`
 	OutputName string   `yaml:"output_name"`
+	Branchs    []Branch `yaml:"branchs,flow"`
 }
 
 func (abtest AbtestNode) GetName() string {
@@ -21,6 +23,14 @@ func (abtest AbtestNode) GetName() string {
 
 func (abtest AbtestNode) GetKind() NodeType {
 	return abtest.Kind
+}
+
+func (abtest AbtestNode) GetLabel() string {
+	return abtest.Label
+}
+
+func (abtest AbtestNode) GetTag() string {
+	return abtest.Tag
 }
 
 func (abtest AbtestNode) Parse(ctx *PipelineContext) (interface{}, error) {
