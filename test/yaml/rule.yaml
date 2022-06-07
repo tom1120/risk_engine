@@ -1,0 +1,20 @@
+rule: 
+  rule_name: "my_rule"
+  conditions:
+  - condition:
+    feature: sumAmount
+    operator: GT
+    value: 5000.0
+    label: A
+  - condition:
+    feature: loanNum
+    operator: GT
+    value: 3
+    label: B
+  - condition:
+    feature: salary
+    operator: LE
+    value: 8000
+    label: C
+  logic: (A OR B) AND C
+  decision: reject

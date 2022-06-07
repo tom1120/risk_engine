@@ -9,30 +9,22 @@ import (
 )
 
 type AbtestNode struct {
-	Name       string `yaml:"name"`
-	Type       NodeType
+	Name       string   `yaml:"name"`
+	Kind       NodeType `yaml:"kind"`
 	Branchs    []Branch `yaml:"branchs,flow"`
 	OutputName string   `yaml:"output_name"`
-	//	OutputType string   `yaml:"output_type"` //[]interface{}
 }
 
-/*func NewAbtestNode(name string, branch []string) *AbtestNode {
-	return &AbtestNode{
-		Name: name,
-		Type: TypeAbtest,
-	}
-}*/
-
-func (node AbtestNode) GetName() string {
-	return node.Name
+func (abtest AbtestNode) GetName() string {
+	return abtest.Name
 }
 
-func (node AbtestNode) GetType() NodeType {
-	return node.Type
+func (abtest AbtestNode) GetKind() NodeType {
+	return abtest.Kind
 }
 
 func (abtest AbtestNode) Parse(ctx *PipelineContext) (interface{}, error) {
-	log.Println("====trace==abtest=")
+	log.Println("====[trace] abtest========")
 	rand.Seed(time.Now().UnixNano())
 	winNum := rand.Float64() * 100
 	var counter float64 = 0

@@ -6,14 +6,14 @@ import (
 )
 
 type EndNode struct {
-	Name string
-	Type NodeType
+	Name string   `yaml:"name"`
+	Kind NodeType `yaml:"kind"`
 }
 
 func NewEndNode(name string) *EndNode {
 	return &EndNode{
 		Name: name,
-		Type: TypeEnd,
+		Kind: TypeEnd,
 	}
 }
 
@@ -21,11 +21,11 @@ func (node *EndNode) GetName() string {
 	return node.Name
 }
 
-func (node *EndNode) GetType() NodeType {
-	return node.Type
+func (node *EndNode) GetKind() NodeType {
+	return node.Kind
 }
 
 func (node *EndNode) Parse(ctx *PipelineContext) (interface{}, error) {
-	log.Println("End parse" + node.Name)
+	log.Println("======[trace]End=====" + node.Name)
 	return nil, nil
 }

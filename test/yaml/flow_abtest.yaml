@@ -1,29 +1,29 @@
 workflow:
   - node:
     node_name: start_1
-    category: start
+    node_type: start
     next_node_name: abtest_1
-    next_category: abtest
+    next_node_type: abtest
   - node:
     node_name: abtest_1
-    category: abtest
+    node_type: abtest
     next_node_name: ""
-    next_category: ""
+    next_node_type: ""
   - node:
     node_name: ruleset_1
-    category: ruleset
+    node_type: ruleset
     next_node_name: end_1
-    next_category: end
+    next_node_type: end
   - node:
     node_name: ruleset_2
-    category: ruleset
+    node_type: ruleset
     next_node_name: end_1
-    next_category: end
+    next_node_type: end
   - node:
     node_name: end_1
-    category: end
+    node_type: end
     next_node_name: ""
-    next_category: ""
+    next_node_type: ""
 rulesets:
   - ruleset:
     ruleset_name: ruleset_1
@@ -80,12 +80,17 @@ rulesets:
 abtests:
   - abtest:
     name: abtest_1 
+    type: abtest
+    output_name: my_abtest_1
+    output_type: "[]interface{}"
     branchs:
     - branch:
       branch_name: branch_1
       percent: 44.5
-      decision: ruleset_1
+      decision:
+        output: [ruleset_1, ruleset]
     - branch:
       branch_name: branch_2
       percent: 55.5
-      decision: ruleset_2
+      decision:
+        output: [ruleset_2, ruleset]

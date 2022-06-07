@@ -7,10 +7,13 @@ import (
 )
 
 type Dsl struct {
-	Workflow []FlowNode    `yaml:"workflow,flow"`
-	Rulesets []RulesetNode `yaml:"rulesets,flow"`
+	Key          string                 `yaml:"key"`
+	Version      string                 `yaml:"version"`
+	Metadata     map[string]interface{} `yaml:"metadata"`
+	DecisionFlow []FlowNode             `yaml:"decision_flow,flow"`
+	Rulesets     []RulesetNode          `yaml:"rulesets,flow"`
+	Abtests      []AbtestNode           `yaml:"abtests,flow"`
 	//	Conditionals    []Conditional    `yaml:"conditionals,flow"`
-	Abtests []AbtestNode `yaml:"abtests,flow"`
 	//	DecisionTrees   []DecisionTree   `yaml:"decisiontrees,flow"`
 	//	DecisionMatrixs []DecisionMatrix `yaml:"decisionmatrixs,flow"`
 	//	ScoreCards      []ScoreCard      `yaml:"scorecards,flow"`

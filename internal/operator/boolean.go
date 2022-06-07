@@ -3,7 +3,6 @@ package operator
 import (
 	"errors"
 	"fmt"
-	"github.com/Knetic/govaluate"
 	"github.com/skyhackvip/risk_engine/configs"
 )
 
@@ -23,13 +22,9 @@ func Boolean(result []bool, logic string) (bool, error) {
 			exprStr += fmt.Sprintf(" %s", configs.LogicMap[logic])
 		}
 	}
-	expr, _ := govaluate.NewEvaluableExpression(exprStr)
-	eval, err := expr.Evaluate(nil)
-	if err != nil {
-		return false, err
-	}
-	if result, ok := eval.(bool); ok {
-		return result, nil
-	}
-	return false, errors.New("convert error")
+	return BooleanExpr(exprStr)
+}
+
+func BooleanExpr(expr string) (bool, error) {
+	return Evaluate(expr, nil)
 }

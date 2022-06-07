@@ -7,13 +7,13 @@ import (
 
 type StartNode struct {
 	Name string
-	Type NodeType
+	Kind NodeType
 }
 
 func NewStartNode(name string) *StartNode {
 	return &StartNode{
 		Name: name,
-		Type: TypeStart,
+		Kind: TypeStart,
 	}
 }
 
@@ -21,11 +21,11 @@ func (node *StartNode) GetName() string {
 	return node.Name
 }
 
-func (node *StartNode) GetType() NodeType {
-	return node.Type
+func (node *StartNode) GetKind() NodeType {
+	return node.Kind
 }
 
 func (node *StartNode) Parse(ctx *PipelineContext) (interface{}, error) {
-	log.Println("====trace===start parse=", node.Name)
+	log.Println("====[trace]start=====", node.Name)
 	return nil, nil
 }

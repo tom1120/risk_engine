@@ -6,7 +6,6 @@ import (
 
 type PipelineContext struct {
 	//dsl
-
 	currentNode INode
 
 	gotoNext bool

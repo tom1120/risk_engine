@@ -1,75 +1,102 @@
-workflow:
-  - node:
+key: flow_simple
+version: 1.0
+label: 简单决策流
+metadata:
+  author: hepeng
+  group: github
+decision_flow:
+  - flow_node:
     node_name: start_1
-    category: start
+    node_type: start
     next_node_name: ruleset_1
-    next_category: ruleset
-  - node:
+    next_node_type: ruleset
+  - flow_node:
     node_name: ruleset_1
-    category: ruleset
+    node_type: ruleset
     next_node_name: ruleset_2
-    next_category: ruleset
-  - node:
+    next_node_type: ruleset
+  - flow_node:
     node_name: ruleset_2
-    category: ruleset
+    node_type: ruleset
     next_node_name: end_1
-    next_category: end
-  - node:
+    next_node_type: end
+  - flow_node:
     node_name: end_1
-    category: end
-    next_node_name: ""
-    next_category: ""
+    node_type: end
+    next_node_name: 
+    next_node_type: 
 rulesets:
-  - ruleset_name: ruleset_1
-    ruleset_category: internal
+  - ruleset: 
+    name: ruleset_1
+    tag: internal
+    label: 内部规则集1
+    kind: ruleset
     depends: [feature_1,feature_2,feature_3]
+    exec_plan: parallel
     rules: 
     - rule:
-      rule_name: rule_1
+      name: rule_1
+      tag: 10001
+      label: 复杂规则1
       conditions:
       - condition:
+        name: c1
         feature: feature_1
         operator: GT
         value: 50
-      logic: AND 
-      decision: reject
+      - condition:
+        name: c2
+        feature: feature_2
+        operator: LE
+        value: 5
+      - condition:
+        name: c3
+        feature: feature_3
+        operator: GE
+        value: 2
+      decision: 
+        depends: [c1, c2, c3]
+        logic: (c1 || c2) && c3
+        output: reject  #hit strategy
+        #break
+        assign:
+          frozen_period: 5
+          test_in: test 
     - rule:
-      rule_name: rule_2
+      name: rule_2
+      tag: 10002
+      labe: 简单规则2
       conditions:
       - condition:
+        name: c1
         feature: feature_2
         operator: LT
         value: 18
-      - condition:
-        feature: feature_3
-        operator: GT
-        value: 50
-      logic: OR
-      decision: reject 
-  - ruleset_name: ruleset_2
-    ruleset_category: internal
-    rule_exec: allrun
-    depends: [feature_4,feature_5,feature_6]
+      decision: 
+        depends: [c1]
+        logic: c1
+        output: record
+        assign:
+  - ruleset: 
+    name: ruleset_2
+    tag: model
+    label: 规则集2
+    kind: ruleset
+    depends: [feature_4]
+    exec_plan: serial
     rules: 
     - rule:
-      rule_name: rule_3
+      name: rule_3
+      tag: 10003
+      label: 简单规则3
       conditions:
       - condition:
+        name: c1
         feature: feature_4
         operator: GT
         value: 5
-      logic: AND 
-      decision: reject
-    - rule:
-      rule_name: rule_4
-      conditions:
-      - condition:
-        feature: feature_5
-        operator: LT
-        value: 19
-      - condition:
-        feature: feature_6
-        operator: GT
-        value: 58
-      logic: OR
-      decision: reject 
+      decision: 
+        depends: [c1]
+        logic: c1
+        output: record
+        assign:

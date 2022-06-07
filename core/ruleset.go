@@ -1,57 +1,81 @@
 package core
 
 import (
-	"github.com/skyhackvip/risk_engine/configs"
+	//	"github.com/skyhackvip/risk_engine/configs"
 	"github.com/skyhackvip/risk_engine/internal/dto"
 	"github.com/skyhackvip/risk_engine/internal/errcode"
 	"log"
-	"sort"
+	//	"sort"
+	"sync"
 )
 
 type RulesetNode struct {
-	Name     string   `yaml:"ruleset_name"`
-	Type     NodeType `yaml:"node_type"`
-	Category string   `yaml:"ruleset_category"`
-	RuleExec string   `yaml:"rule_exec"`
-	Rules    []Rule   `yaml:"rules,flow"`
+	Name     string   `yaml:"name"`
+	Kind     NodeType `yaml:"kind"`
+	Tag      string   `yaml:"tag"`
+	Label    string   `yaml:"label"`
+	ExecPlan string   `yaml:"exec_plan"`
 	Depends  []string `yaml:"depends,flow"`
-}
-
-func NewRulesetNode(name string) RulesetNode {
-	return RulesetNode{
-		Name: name,
-		Type: TypeRuleset,
-	}
+	Rules    []Rule   `yaml:"rules,flow"`
+	decision Decision `yaml:"decision"`
 }
 
 func (node RulesetNode) GetName() string {
 	return node.Name
 }
 
-func (node RulesetNode) GetType() NodeType {
-	return node.Type
+func (node RulesetNode) GetKind() NodeType {
+	return node.Kind
 }
 
 func (ruleset RulesetNode) Parse(ctx *PipelineContext) (interface{}, error) {
-	log.Printf("====trace : ruleset %s start=====\n", ruleset.Name)
+	log.Printf("====[trace]ruleset %s start=====\n", ruleset.Name)
 
 	nodeResult := dto.NewNodeResult(ruleset.Name)
 
-	var ruleResult = make([]int, 0)
+	var ruleResult = make([]Decision, 0)
+
+	//ruleset 批量调用特征
 	//depends := ctx.GetFeatures(ruleset.Depends) //global.Features.Get(ruleset.Depends)
 
-	//nodeResult.AddFactor(depends)
-	for _, rule := range ruleset.Rules {
-		rs, err := rule.Parse(ctx)
-		if err != nil {
-			return nil, err
+	if ruleset.ExecPlan == "parallel" { //并发执行规则
+		var wg sync.WaitGroup
+		for _, rule := range ruleset.Rules {
+			wg.Add(1)
+			go func(rule Rule) { //rule
+				defer wg.Done()
+				rs, err := rule.Parse(ctx)
+				if err != nil {
+					log.Println(err)
+				}
+
+				//ruleDecision := configs.NilDecision todo nil
+				if rs.(bool) { //HIT
+					nodeResult.Hits = append(nodeResult.Hits, rule.Name)
+					//ruleDecision = configs.DecisionMap[rule.Decision]
+					//assign
+				}
+				ruleResult = append(ruleResult, rule.Decision)
+			}(rule)
 		}
-		ruleDecision := configs.NilDecision
-		if rs.(bool) { //HIT
-			nodeResult.Hits = append(nodeResult.Hits, rule.RuleName)
-			ruleDecision = configs.DecisionMap[rule.Decision]
+		wg.Wait()
+	} else {
+		for _, rule := range ruleset.Rules {
+			rs, err := rule.Parse(ctx)
+			if err != nil {
+				return nil, err
+			}
+			//ruleDecision := configs.NilDecision
+			if rs.(bool) { //HIT
+				nodeResult.Hits = append(nodeResult.Hits, rule.Name)
+				//ruleDecision = configs.DecisionMap[rule.Decision]
+			}
+			ruleResult = append(ruleResult, rule.Decision)
 		}
-		ruleResult = append(ruleResult, ruleDecision)
+	}
+
+	for k, v := range ruleResult {
+		log.Println(k, v)
 	}
 
 	if len(ruleResult) == 0 {
@@ -60,12 +84,13 @@ func (ruleset RulesetNode) Parse(ctx *PipelineContext) (interface{}, error) {
 	}
 
 	//get max value result, reject is 100, record is 1, pass or no result is 0
-	sort.Sort(sort.Reverse(sort.IntSlice(ruleResult)))
-	log.Printf("ruleset %s result is :%v\n", ruleset.Name, ruleResult[0])
-	nodeResult.Decision = ruleResult[0]
+	/*	sort.Sort(sort.Reverse(sort.IntSlice(ruleResult)))
+		log.Printf("ruleset %s result is :%v\n", ruleset.Name, ruleResult[0])
+		nodeResult.Decision = ruleResult[0]
+	*/
 
 	//result.AddDetail(*nodeResult)
 
-	log.Printf("====trace : ruleset %s end=====\n", ruleset.Name)
+	log.Printf("====[trace]ruleset %s end=====\n", ruleset.Name)
 	return ruleResult[0], nil
 }
