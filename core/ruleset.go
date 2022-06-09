@@ -9,81 +9,90 @@ import (
 )
 
 type RulesetNode struct {
-	Name     string   `yaml:"name"`
-	Kind     NodeType `yaml:"kind"`
-	Tag      string   `yaml:"tag"`
-	Label    string   `yaml:"label"`
-	ExecPlan string   `yaml:"exec_plan"`
-	Depends  []string `yaml:"depends,flow"`
-	Rules    []Rule   `yaml:"rules,flow"`
-	decision Decision `yaml:"decision"`
+	Info          NodeInfo      `yaml:"info"`
+	ExecPlan      string        `yaml:"exec_plan"`
+	BlockStrategy BlockStrategy `yaml:"block_strategy"`
+	Rules         []Rule        `yaml:"rules,flow"`
 }
 
-func (node RulesetNode) GetName() string {
-	return node.Name
+func (rulesetNode RulesetNode) GetName() string {
+	return rulesetNode.Info.Name
 }
 
-func (node RulesetNode) GetKind() NodeType {
-	return node.Kind
+func (rulesetNode RulesetNode) GetType() NodeType {
+	return GetNodeType(rulesetNode.Info.Kind)
 }
 
-func (node RulesetNode) GetLabel() string {
-	return node.Label
+func (rulesetNode RulesetNode) GetInfo() NodeInfo {
+	return rulesetNode.Info
 }
 
-func (node RulesetNode) GetTag() string {
-	return node.Tag
-}
+func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
+	log.Printf("====[trace]ruleset %s start=====\n", rulesetNode.GetName())
 
-func (ruleset RulesetNode) Parse(ctx *PipelineContext) (interface{}, error) {
-	log.Printf("====[trace]ruleset %s start=====\n", ruleset.Name)
-
-	var ruleResult = make([]Decision, 0)
+	var ruleResult = make([]*Output, 0)
 
 	//ruleset 批量调用特征
 	//depends := ctx.GetFeatures(ruleset.Depends) //global.Features.Get(ruleset.Depends)
 
-	if ruleset.ExecPlan == "parallel" { //并发执行规则
+	if rulesetNode.ExecPlan == "parallel" { //并发执行规则
 		var wg sync.WaitGroup
-		for _, rule := range ruleset.Rules {
+		var mu sync.Mutex
+		for _, rule := range rulesetNode.Rules {
 			wg.Add(1)
 			go func(rule Rule) { //rule
 				defer wg.Done()
-				rs, err := rule.Parse(ctx)
-				if err != nil {
+
+				output, err := rule.Parse(ctx)
+				if err != nil { //todo 报错如何处理
 					log.Println(err)
 				}
+				if output == (*Output)(nil) {
+					return
 
-				//ruleDecision := configs.NilDecision todo nil
-				if rs.(bool) { //HIT
-					//nodeResult.Hits = append(nodeResult.Hits, rule.Name)
-					//ruleDecision = configs.DecisionMap[rule.Decision]
-					//assign
 				}
-				ruleResult = append(ruleResult, rule.Decision)
+
+				//命中规则有结果
+				//加入规则命中列表中，ctx.AddHitRule(rule) rule id,name,tag,label,feature
+				log.Println("命中规则")
+				mu.Lock() //使用channel取代锁
+				ruleResult = append(ruleResult, output)
+				mu.Unlock()
 			}(rule)
 		}
 		wg.Wait()
 	} else { //串行执行
-		for _, rule := range ruleset.Rules {
-			rs, err := rule.Parse(ctx)
+		for _, rule := range rulesetNode.Rules {
+			output, err := rule.Parse(ctx)
 			if err != nil {
-				return nil, err
+				return nil, err //todo报错如何处理
 			}
-			//ruleDecision := configs.NilDecision
-			if rs.(bool) { //HIT
-				//append hit rule
-				//		nodeResult.Hits = append(nodeResult.Hits, rule.Name)
-				//ruleDecision = configs.DecisionMap[rule.Decision]
+			if output == (*Output)(nil) {
+				continue
 			}
-			ruleResult = append(ruleResult, rule.Decision)
+			//命中规则有结果
+			//加入规则命中列表中，ctx.AddHitRule(rule) rule id,name,tag,label,feature
+			log.Println("命中规则")
+			ruleResult = append(ruleResult, output)
 		}
 	}
 
+	//无规则命中
 	if len(ruleResult) == 0 {
-		log.Printf("ruleset %s parse no result\n", ruleset.Name)
-		return nil, errcode.ParseErrorRulesetOutputEmpty
+		log.Printf("ruleset %s parse no result\n", rulesetNode.GetName())
+		return (*NodeResult)(nil), errcode.ParseErrorRulesetOutputEmpty
 	}
+
+	//TypeStrategy
+	//命中阻断规则
+
+	//规则得分
+
+	//最高优先级的规则
+	for _, output := range ruleResult {
+		log.Println(output)
+	}
+	//	log.Println(ruleResult)
 
 	//get max value result, reject is 100, record is 1, pass or no result is 0
 	/*	sort.Sort(sort.Reverse(sort.IntSlice(ruleResult)))
@@ -93,6 +102,6 @@ func (ruleset RulesetNode) Parse(ctx *PipelineContext) (interface{}, error) {
 
 	//result.AddDetail(*nodeResult)
 
-	log.Printf("====[trace]ruleset %s end=====\n", ruleset.Name)
-	return ruleResult[0], nil
+	log.Printf("====[trace]ruleset %s end=====\n", rulesetNode.GetName())
+	return (*NodeResult)(nil), nil
 }

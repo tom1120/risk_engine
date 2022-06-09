@@ -1,41 +1,32 @@
 package core
 
 import (
-	//	"github.com/skyhackvip/risk_engine/configs"
 	"log"
 )
 
 type StartNode struct {
-	Name  string
-	Kind  NodeType
-	Label string
-	Tag   string
+	Info NodeInfo
 }
 
 func NewStartNode(name string) *StartNode {
 	return &StartNode{
-		Name: name,
-		Kind: TypeStart,
+		Info: NodeInfo{Name: name, Kind: TypeStart.String()},
 	}
 }
 
 func (node StartNode) GetName() string {
-	return node.Name
+	return node.Info.Name
 }
 
-func (node StartNode) GetKind() NodeType {
-	return node.Kind
+func (node StartNode) GetType() NodeType {
+	return GetNodeType(node.Info.Kind)
 }
 
-func (node StartNode) GetLabel() string {
-	return node.Label
+func (node StartNode) GetInfo() NodeInfo {
+	return node.Info
 }
 
-func (node StartNode) GetTag() string {
-	return node.Tag
-}
-
-func (node StartNode) Parse(ctx *PipelineContext) (interface{}, error) {
-	log.Println("====[trace]start=====", node.Name)
-	return nil, nil
+func (node StartNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
+	log.Println("====[trace]start=====", node.GetName())
+	return (*NodeResult)(nil), nil
 }

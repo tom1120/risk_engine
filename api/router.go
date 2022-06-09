@@ -7,6 +7,6 @@ import (
 
 func InitRouter() *gin.Engine {
 	router := gin.Default()
-	router.POST("/run", DslRunHandler)
+	router.POST("/engine/run", EngineHandler)
 	return router
 }

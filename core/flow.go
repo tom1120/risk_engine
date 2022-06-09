@@ -11,12 +11,12 @@ type DecisionFlow struct {
 	startNode *FlowNode
 }
 
-func NewFlow() *DecisionFlow {
+func NewDecisionFlow() *DecisionFlow {
 	return &DecisionFlow{flowMap: make(map[string]*FlowNode)}
 }
 
 func (flow *DecisionFlow) AddNode(node *FlowNode) {
-	key := flow.getNodeKey(node.NodeName, node.NodeType)
+	key := flow.getNodeKey(node.NodeName, node.NodeKind)
 	if _, ok := flow.flowMap[key]; !ok {
 		flow.flowMap[key] = node
 	} else {
@@ -86,27 +86,33 @@ func (flow *DecisionFlow) parseNode(curNode *FlowNode, ctx *PipelineContext) (*F
 
 	//get next node
 	nextNode := new(FlowNode)
-	switch curNode.NodeType { //string int
-	case "end": //END:
+	switch curNode.GetNodeType() { //int
+	case TypeEnd: //END:
 		return nextNode, false
-	case "abtest": //ABTEST:
-		next := res.([]interface{})
-		return flow.GetNode(next[0].(string), next[1].(string))
+	case TypeAbtest: //ABTEST:
+		return flow.GetNode(res.NextNodeName, res.NextNodeType)
 	default: //start
-		return flow.GetNode(curNode.NextNodeName, curNode.NextNodeType)
+		return flow.GetNode(curNode.NextNodeName, curNode.NextNodeKind)
 	}
 	//return nextNode, false
 }
 
 type FlowNode struct {
-	NodeName string   `yaml:"node_name"`
-	NodeType NodeType `yaml:"node_type"`
-
-	NextNodeName string   `yaml:"next_node_name"`
-	NextNodeType NodeType `yaml:"next_node_type"`
+	NodeName     string `yaml:"node_name"`
+	NodeKind     string `yaml:"node_kind"`
+	NextNodeName string `yaml:"next_node_name"`
+	NextNodeKind string `yaml:"next_node_kind"`
 
 	elem     INode
 	nextNode *FlowNode
+}
+
+func (flowNode *FlowNode) GetNodeType() NodeType {
+	return GetNodeType(flowNode.NodeKind)
+}
+
+func (flowNode *FlowNode) GetNextNodeType() NodeType {
+	return GetNodeType(flowNode.NextNodeKind)
 }
 
 func (flowNode *FlowNode) SetElem(elem INode) {
@@ -117,7 +123,7 @@ func (flowNode *FlowNode) GetElem() INode {
 	return flowNode.elem
 }
 
-func (flowNode *FlowNode) Parse(ctx *PipelineContext) (interface{}, error) {
+func (flowNode *FlowNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	//hook
 	return flowNode.elem.Parse(ctx)
 }

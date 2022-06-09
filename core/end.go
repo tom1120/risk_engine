@@ -6,36 +6,28 @@ import (
 )
 
 type EndNode struct {
-	Name  string   `yaml:"name"`
-	Kind  NodeType `yaml:"kind"`
-	Tag   string   `"yaml:"tag"`
-	Label string   `yaml:"label"`
+	Info NodeInfo
 }
 
 func NewEndNode(name string) *EndNode {
 	return &EndNode{
-		Name: name,
-		Kind: TypeEnd,
+		Info: NodeInfo{Name: name, Kind: TypeEnd.String()},
 	}
 }
 
 func (node EndNode) GetName() string {
-	return node.Name
+	return node.Info.Name
 }
 
-func (node EndNode) GetKind() NodeType {
-	return node.Kind
+func (node EndNode) GetType() NodeType {
+	return GetNodeType(node.Info.Kind)
 }
 
-func (node EndNode) GetTag() string {
-	return node.Tag
+func (node EndNode) GetInfo() NodeInfo {
+	return node.Info
 }
 
-func (node EndNode) GetLabel() string {
-	return node.Label
-}
-
-func (node EndNode) Parse(ctx *PipelineContext) (interface{}, error) {
-	log.Println("======[trace]End=====" + node.Name)
-	return nil, nil
+func (node EndNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
+	log.Println("======[trace]End=====" + node.GetName())
+	return (*NodeResult)(nil), nil
 }

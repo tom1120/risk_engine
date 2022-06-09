@@ -5,18 +5,12 @@ import (
 )
 
 type PipelineContext struct {
-	//dsl
-	currentNode INode
-
-	gotoNext bool
-
-	nextNodeKey string
-
-	//next node category
-
 	//request params
 
 	//proccess result
+
+	hMutex   sync.RWMutex
+	hitRules map[string]*Rule
 
 	tMutex sync.RWMutex
 	tracks []*Track
@@ -26,10 +20,11 @@ type PipelineContext struct {
 }
 
 type Track struct {
-	name  string
-	label string
-	tag   string
-	kind  NodeType
+	Id    int64
+	Name  string
+	Label string
+	Tag   string
+	Kind  NodeType
 }
 
 func NewPipelineContext() *PipelineContext {
@@ -39,10 +34,11 @@ func NewPipelineContext() *PipelineContext {
 func (ctx *PipelineContext) AddTrack(node INode) {
 	ctx.tMutex.Lock()
 	defer ctx.tMutex.Unlock()
-	ctx.tracks = append(ctx.tracks, &Track{name: node.GetName(),
-		label: node.GetLabel(),
-		tag:   node.GetTag(),
-		kind:  node.GetKind(),
+	ctx.tracks = append(ctx.tracks, &Track{Name: node.GetName(),
+		Id:    node.GetInfo().Id,
+		Label: node.GetInfo().Label,
+		Tag:   node.GetInfo().Tag,
+		Kind:  node.GetType(),
 	})
 }
 
@@ -112,7 +108,32 @@ func (ctx *PipelineContext) GetFeatures(depends []string) (result map[string]*Fe
 
 func (ctx *PipelineContext) GetAllFeatures() map[string]*Feature {
 	ctx.fMutex.RLock()
-	features := ctx.features
-	ctx.fMutex.RUnlock()
-	return features
+	defer ctx.fMutex.RUnlock()
+	return ctx.features
+}
+
+func (ctx *PipelineContext) AddHitRule(rule *Rule) {
+	ctx.tMutex.Lock()
+	defer ctx.tMutex.Unlock()
+	ctx.hitRules[rule.Name] = rule
+}
+
+func (ctx *PipelineContext) GetHitRules() map[string]*Rule {
+	ctx.tMutex.RLock()
+	defer ctx.tMutex.RUnlock()
+	return ctx.hitRules
+}
+
+type DecisionResult struct {
+	HitRules map[string]*Rule
+	Tracks   []*Track
+	Features map[string]*Feature
+}
+
+func (ctx *PipelineContext) GetDecisionResult() *DecisionResult {
+	return &DecisionResult{
+		HitRules: ctx.GetHitRules(),
+		Tracks:   ctx.GetTracks(),
+		Features: ctx.GetAllFeatures(),
+	}
 }

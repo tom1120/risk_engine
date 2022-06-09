@@ -1,0 +1,176 @@
+key: flow_abtest
+version: 1.0
+label: abtest决策流
+metadata:
+decision_flow:
+  - flow_node:
+    node_name: start_1
+    node_kind: start
+    next_node_name: abtest_1
+    next_node_kind: abtest
+  - flow_node:
+    node_name: abtest_1
+    node_kind: abtest
+    next_node_name:
+    next_node_kind:
+  - flow_node:
+    node_name: ruleset_1
+    node_kind: ruleset
+    next_node_name: end_1
+    next_node_kind: end
+  - flow_node:
+    node_name: ruleset_2
+    node_kind: ruleset
+    next_node_name: end_1
+    next_node_kind: end
+  - flow_node:
+    node_name: end_1
+    node_kind: end
+    next_node_name:
+    next_node_kind:
+rulesets:
+  - ruleset:
+    info:
+      id: 111
+      name: ruleset_1
+      tag: internal
+      label: 内部规则集1
+      kind: ruleset
+      depends: [feature_1,feature_2,feature_e]
+    exec_plan: parallel
+    block_strategy:
+      is_block: true
+      hit_rule: [rule_1] #命中该规则就中断
+      operator: GE 
+      value: reject  #=reject中断
+    rules: 
+    - rule: 
+      id: 11
+      name: rule_1
+      tag: tag1
+      label: 规则1
+      conditions:
+      - condition:
+        name: c1
+        feature: feature_1
+        operator: GT
+        value: 50
+      decision:
+        depends: [c1]
+        logic: c1
+        output:
+          name: #rename 如果为空，则给rule.name赋值
+          value: reject
+          kind: TypeStrategy
+        assign:
+          feature_x: 111
+    - rule: 
+      id: 23
+      name: rule_2
+      tag: tag2
+      label: 规则2
+      conditions:
+      - condition:
+        name: c2
+        feature: feature_2
+        operator: LT
+        value: 18
+      - condition:
+        name: c3
+        feature: feature_3
+        operator: GT
+        value: 50
+      decision: 
+        depends: [c2, c3]
+        logic: c2 || c3
+        output:
+          name: 
+          value: record
+          kind: TypeStrategy
+        assign:
+  - ruleset:
+    info:
+      id: 333
+      name: ruleset_2
+      tag: internal
+      label: 内部规则集2
+      kind: ruleset
+      depends: [feature_1,feature_2,feature_3]
+    exec_plan: parallel
+    rules: 
+    - rule: 
+      id: 44
+      name: rule_3
+      tag: rule_3
+      label: 规则3
+      conditions:
+      - condition:
+        name: c3
+        feature: feature_1
+        operator: GT
+        value: 5
+      decision: 
+        depends: [c3]
+        logic: c3
+        output:
+          name:
+          value: record
+          kind: TypeStrategy
+        assign:
+    - rule: 
+      id: 55
+      name: rule_4
+      tag: rule_4
+      label: 规则4
+      conditions:
+      - condition:
+        name: c4
+        feature: feature_2
+        operator: LT
+        value: 8
+      - condition:
+        name: c5
+        feature: feature_3
+        operator: GT
+        value: 9
+      decision: 
+        depends: [c4, c5]
+        logic: c4 || c5
+        output:
+          name:
+          value: record
+          kind: TypeStrategy
+        assign:
+          feat1: aa
+          feat2: bb
+abtests:
+  - abtest:
+    info:
+      id: 11
+      name: abtest_1 
+      tag: tag_ab
+      label: 分流实验
+      kind: abtest
+      depends: 
+    branchs:
+    - branch:
+      name: branch_1
+      percent: 44.5
+      decision:
+        depends:
+        logic: random
+        output:
+          name: 
+          value: ruleset_1
+          kind: ruleset 
+        assign:
+    - branch:
+      name: branch_2
+      percent: 55.5
+      decision:
+        depends:
+        logic: random
+        output:
+          name:
+          value: ruleset_2
+          kind: ruleset

@@ -9,31 +9,23 @@ import (
 )
 
 type AbtestNode struct {
-	Name       string   `yaml:"name"`
-	Label      string   `yaml:"label"`
-	Tag        string   `yaml:"tag"`
-	Kind       NodeType `yaml:"kind"`
-	OutputName string   `yaml:"output_name"`
-	Branchs    []Branch `yaml:"branchs,flow"`
+	Info    NodeInfo `yaml:"info"`
+	Branchs []Branch `yaml:"branchs,flow"`
 }
 
 func (abtest AbtestNode) GetName() string {
-	return abtest.Name
+	return abtest.Info.Name
 }
 
-func (abtest AbtestNode) GetKind() NodeType {
-	return abtest.Kind
+func (abtest AbtestNode) GetType() NodeType {
+	return GetNodeType(abtest.Info.Kind)
 }
 
-func (abtest AbtestNode) GetLabel() string {
-	return abtest.Label
+func (abtest AbtestNode) GetInfo() NodeInfo {
+	return abtest.Info
 }
 
-func (abtest AbtestNode) GetTag() string {
-	return abtest.Tag
-}
-
-func (abtest AbtestNode) Parse(ctx *PipelineContext) (interface{}, error) {
+func (abtest AbtestNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	log.Println("====[trace] abtest========")
 	rand.Seed(time.Now().UnixNano())
 	winNum := rand.Float64() * 100
@@ -41,15 +33,19 @@ func (abtest AbtestNode) Parse(ctx *PipelineContext) (interface{}, error) {
 	for _, branch := range abtest.Branchs {
 		counter += branch.Percent
 		if counter > winNum {
-			//feature global.Features.Set(dto.Feature{Name: abtest.Name, Value: branch.BranchName})
-			log.Printf("abtest %v : %v, %v\n", abtest.Name, branch.BranchName, winNum)
-			if res, ok := branch.Decision.Output.([]interface{}); ok {
+			//feature global.Features.Set(dto.Feature{Name: abtest.Name, Value: branch.Name})
+			log.Printf("abtest %v : %v, %v, output:%v \n", abtest.GetName(), branch.Name, winNum, branch.Decision.Output)
+			nextNodeName := branch.Decision.Output.Value.(string)
+			nextNodeType := GetNodeType(branch.Decision.Output.Kind)
+			nodeResult := NodeResult{NextNodeName: nextNodeName, NextNodeType: nextNodeType}
+			return &nodeResult, nil
+			/*if res, ok := branch.Decision.Output.([]interface{}); ok {
 				if len(res) == 2 {
 					log.Println("abtest result", res)
 					return res, nil
 				}
-			}
+			}*/
 		}
 	}
-	return nil, errcode.ParseErrorNoBranchMatch
+	return (*NodeResult)(nil), errcode.ParseErrorNoBranchMatch
 }

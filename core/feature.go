@@ -8,7 +8,35 @@ const (
 	TypeString
 	TypeBool
 	TypeEnum
+	TypeStrategy //策略结构体
 )
+
+var FeatureTypeMap = map[string]FeatureType{
+	"TypeInt":      TypeInt,
+	"TypeFloat":    TypeFloat,
+	"TypeString":   TypeString,
+	"TypeBool":     TypeBool,
+	"TypeEnum":     TypeEnum,
+	"TypeStrategy": TypeStrategy,
+}
+
+var FeatureStrMap = map[FeatureType]string{
+	TypeInt:      "TypeInt",
+	TypeFloat:    "TypeFloat",
+	TypeString:   "TypeString",
+	TypeBool:     "TypeBool",
+	TypeEnum:     "TypeEnum",
+	TypeStrategy: "TypeStrategy",
+}
+
+func (featureType FeatureType) Get(name string) FeatureType {
+
+	return FeatureTypeMap[name]
+}
+
+func (featureType FeatureType) String() string {
+	return FeatureStrMap[featureType]
+}
 
 type Feature struct {
 	name             string

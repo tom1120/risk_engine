@@ -52,7 +52,7 @@ func (conditional ConditionalNode) Parse(ctx *PipelineContext) (interface{}, err
 		if logicRs { //if true, choose the branch and break
 			//nodeResult.SetDecision(branch.Decision)
 			//result.AddDetail(*nodeResult)
-			return branch.Decision, nil
+			return branch.Decision.Output, nil
 		} else {
 			continue
 		}
