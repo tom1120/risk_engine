@@ -13,6 +13,7 @@
 本项目用于学习和参考，不能直接用于生产环境，转载使用请说明出处。代码不定期迭代更新，可加关注查看。如有交流欢迎加微信号 ***hepenggj*** 
 
 ### 服务测试
+- 编译执行
 ```shell
 git clone https://github.com/skyhackvip/risk_engine
 cd risk_engine/cmd/risk_engine
@@ -114,6 +115,10 @@ i{
 ├── test 测试用例
 │  └── yaml 测试yaml文件
 ```
+
+### DSL 语法结构
+[dsl详解](https://github.com/skyhackvip/risk_engine/tree/master/docs/dsl.md)
+
 
 ### 决策引擎架构图
 ![决策引擎架构图](https://i.loli.net/2021/01/21/bOR1tyVPnCZNGoi.png)
