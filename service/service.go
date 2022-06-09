@@ -21,6 +21,13 @@ func NewEngineService() *EngineService {
 //dto.DslRunResponse
 func (service *EngineService) Run(c *gin.Context, req *dto.EngineRunRequest) (*dto.EngineRunResponse, error) {
 	service.StartTime = time.Now().UnixNano() / 1e6 //ms
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Println(err)
+			}
+		}()
+	}()
 	flow, err := global.GetDecisionFlow(req.Key)
 	if err != nil {
 		return (*dto.EngineRunResponse)(nil), err

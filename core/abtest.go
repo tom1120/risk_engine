@@ -26,7 +26,7 @@ func (abtest AbtestNode) GetInfo() NodeInfo {
 }
 
 func (abtest AbtestNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
-	log.Println("====[trace] abtest========")
+	log.Println("======[trace]abtest start======")
 	rand.Seed(time.Now().UnixNano())
 	winNum := rand.Float64() * 100
 	var counter float64 = 0
@@ -47,5 +47,6 @@ func (abtest AbtestNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 			}*/
 		}
 	}
+	log.Println("======[trace]abtest end======")
 	return (*NodeResult)(nil), errcode.ParseErrorNoBranchMatch
 }

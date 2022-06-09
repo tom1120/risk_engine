@@ -28,7 +28,7 @@ type Track struct {
 }
 
 func NewPipelineContext() *PipelineContext {
-	return &PipelineContext{features: make(map[string]*Feature)}
+	return &PipelineContext{features: make(map[string]*Feature), hitRules: make(map[string]*Rule)}
 }
 
 func (ctx *PipelineContext) AddTrack(node INode) {

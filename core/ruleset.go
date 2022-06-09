@@ -28,7 +28,7 @@ func (rulesetNode RulesetNode) GetInfo() NodeInfo {
 }
 
 func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
-	log.Printf("====[trace]ruleset %s start=====\n", rulesetNode.GetName())
+	log.Printf("======[trace]ruleset(%s) start======\n", rulesetNode.GetName())
 
 	var ruleResult = make([]*Output, 0)
 
@@ -42,19 +42,16 @@ func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) 
 			wg.Add(1)
 			go func(rule Rule) { //rule
 				defer wg.Done()
-
 				output, err := rule.Parse(ctx)
 				if err != nil { //todo 报错如何处理
 					log.Println(err)
 				}
-				if output == (*Output)(nil) {
+				if output == (*Output)(nil) { //未命中
 					return
 
 				}
-
 				//命中规则有结果
-				//加入规则命中列表中，ctx.AddHitRule(rule) rule id,name,tag,label,feature
-				log.Println("命中规则")
+				ctx.AddHitRule(&rule)
 				mu.Lock() //使用channel取代锁
 				ruleResult = append(ruleResult, output)
 				mu.Unlock()
@@ -71,8 +68,7 @@ func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) 
 				continue
 			}
 			//命中规则有结果
-			//加入规则命中列表中，ctx.AddHitRule(rule) rule id,name,tag,label,feature
-			log.Println("命中规则")
+			ctx.AddHitRule(&rule)
 			ruleResult = append(ruleResult, output)
 		}
 	}
@@ -85,8 +81,13 @@ func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) 
 
 	//TypeStrategy
 	//命中阻断规则
+	/*	if rulesetNode.BlockStrategy.IsBlock {
+		if _, ok := global.BlockStrategy[output]; ok {
+			//阻断
+		}
+	}*/
 
-	//规则得分
+	//todo 规则得分
 
 	//最高优先级的规则
 	for _, output := range ruleResult {
@@ -100,8 +101,6 @@ func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) 
 		nodeResult.Decision = ruleResult[0]
 	*/
 
-	//result.AddDetail(*nodeResult)
-
-	log.Printf("====[trace]ruleset %s end=====\n", rulesetNode.GetName())
+	log.Printf("======[trace]ruleset(%s) end======\n", rulesetNode.GetName())
 	return (*NodeResult)(nil), nil
 }

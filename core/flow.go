@@ -50,14 +50,14 @@ func (flow *DecisionFlow) GetStartNode() (*FlowNode, bool) {
 }
 
 func (flow *DecisionFlow) Run(ctx *PipelineContext) (err error) {
-
-	//recover()
-	defer func() {
-		if err := recover(); err != nil {
-			err = err
-			log.Println(err)
-			//return err //errors.New("engine run error")
-		}
+	//recover
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				err = err
+				log.Println(err)
+			}
+		}()
 	}()
 
 	//find StartNode
