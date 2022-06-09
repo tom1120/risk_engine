@@ -15,56 +15,84 @@
 ### 服务测试
 ```shell
 git clone https://github.com/skyhackvip/risk_engine
-cd risk_engine
-go build engine.go
-./engine
+cd risk_engine/cmd/risk_engine
+go build
+./risk_engine
 ```
 
-- 请求接口： flow:决策流，存储在test/yaml中
-```json
-curl -XPOST  -v  http://localhost:8889/run -H'Context-Type:application/json' 
--d'{"flow":"flow_conditional","features":{"feature_1":18,"feature_2":30,"feature_3":20,"feature_4":30}}'
+- 请求接口：
+```shell
+curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "req_id":"123456", "uid":1,"features":{"feature_1":5,"feature_2":3,"feature_3":55,"feature_4":32,"feature_5":33,"feature_6":231,"feature_7":2,"feature_8":4}}'
 ```
+key: 决策流标识，目前支持的决策流以文件形式存在于demo/中，对应的文件名即为key
+
 - 接口返回：
 ```json
-{
-	"flow": "flow_conditional",
+i{
+	"code": 200,
+	"error": "",
 	"result": {
-		"NextNodeName": "",
-		"NextCategory": "",
-		"Decision": null,
-		"Track": ["start_1", "conditional_1", "ruleset_2", "end_2"],
-		"Detail": [{
-			"NodeName": "conditional_1",
-			"Factor": {
-				"feature_4": {
-					"Name": "feature_4",
-					"Type": 0,
-					"Value": 30,
-					"Default": null
-				}
-			},
-			"Hits": null,
-			"Decision": "ruleset_2"
+		"key": "flow_abtest",
+		"req_id": "123456",
+		"uid": 1,
+		"features": [{
+			"isDefault": false,
+			"name": "feature_1",
+			"value": 5
 		}, {
-			"NodeName": "ruleset_2",
-			"Factor": {
-				"feature_1": {
-					"Name": "feature_1",
-					"Type": 0,
-					"Value": 18,
-					"Default": null
-				},
-				"feature_2": {
-					"Name": "feature_2",
-					"Type": 0,
-					"Value": 30,
-					"Default": null
-				}
-			},
-			"Hits": null,
-			"Decision": 0
-		}]
+			"isDefault": false,
+			"name": "feature_2",
+			"value": 3
+		}, {
+			"isDefault": false,
+			"name": "feature_5",
+			"value": 33
+		}, {
+			"isDefault": false,
+			"name": "feature_6",
+			"value": 231
+		}, {
+			"isDefault": false,
+			"name": "feature_7",
+			"value": 2
+		}, {
+			"isDefault": false,
+			"name": "feature_3",
+			"value": 55
+		}, {
+			"isDefault": false,
+			"name": "feature_4",
+			"value": 32
+		}, {
+			"isDefault": false,
+			"name": "feature_8",
+			"value": 4
+		}, {
+			"isDefault": false,
+			"name": "feature_x",
+			"value": 111
+		}],
+		"tracks": [{
+			"index": 1,
+			"label": "",
+			"name": "start_1"
+		}, {
+			"index": 2,
+			"label": "分流实验",
+			"name": "abtest_1"
+		}, {
+			"index": 3,
+			"label": "内部规则集1",
+			"name": "ruleset_1"
+		}, {
+			"index": 4,
+			"label": "",
+			"name": "end_1"
+		}],
+		"rules": [],
+		"start_time": "2022-06-09 21:11:11",
+		"end_time": "2022-06-09 21:11:11",
+		"run_time": 0
 	}
 }
 ```
@@ -74,8 +102,9 @@ curl -XPOST  -v  http://localhost:8889/run -H'Context-Type:application/json'
 ├── api   接口逻辑
 ├── configs  配置文件
 ├── docs 文档
-├── dslparser 决策引擎解析核心目录
-├── engine.go 启动文件
+├── core 决策引擎解析核心目录
+├── service 执行逻辑
+├── cmd 启动文件
 ├── global 全局上下文
 ├── internal
 │  ├── dto 数据传输对象
