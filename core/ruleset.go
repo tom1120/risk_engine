@@ -1,8 +1,9 @@
 package core
 
 import (
-	//	"github.com/skyhackvip/risk_engine/configs"
-	"github.com/skyhackvip/risk_engine/internal/errcode"
+	"github.com/skyhackvip/risk_engine/configs"
+	"github.com/skyhackvip/risk_engine/global"
+	"github.com/skyhackvip/risk_engine/internal/operator"
 	"log"
 	//	"sort"
 	"sync"
@@ -28,10 +29,11 @@ func (rulesetNode RulesetNode) GetInfo() NodeInfo {
 }
 
 func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
-	log.Printf("======[trace]ruleset(%s) start======\n", rulesetNode.GetName())
+	info := rulesetNode.GetInfo()
+	log.Printf("======[trace]ruleset(%s, %s) start======\n", info.Label, rulesetNode.GetName())
+	nodeResult := &NodeResult{Id: info.Id, Name: info.Name, Kind: rulesetNode.GetType(), Tag: info.Tag, Label: info.Label}
 
-	var ruleResult = make([]*Output, 0)
-
+	var ruleOutputs = make(map[string]*Output, 0)
 	//ruleset 批量调用特征
 	//depends := ctx.GetFeatures(ruleset.Depends) //global.Features.Get(ruleset.Depends)
 
@@ -45,15 +47,17 @@ func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) 
 				output, err := rule.Parse(ctx)
 				if err != nil { //todo 报错如何处理
 					log.Println(err)
+					return
 				}
-				if output == (*Output)(nil) { //未命中
+				if !output.GetHit() { //未命中
 					return
 
 				}
+
 				//命中规则有结果
 				ctx.AddHitRule(&rule)
 				mu.Lock() //使用channel取代锁
-				ruleResult = append(ruleResult, output)
+				ruleOutputs[rule.Name] = output
 				mu.Unlock()
 			}(rule)
 		}
@@ -64,43 +68,66 @@ func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) 
 			if err != nil {
 				return nil, err //todo报错如何处理
 			}
-			if output == (*Output)(nil) {
+			if !output.GetHit() {
 				continue
 			}
 			//命中规则有结果
 			ctx.AddHitRule(&rule)
-			ruleResult = append(ruleResult, output)
+			ruleOutputs[rule.Name] = output
 		}
 	}
 
 	//无规则命中
-	if len(ruleResult) == 0 {
-		log.Printf("ruleset %s parse no result\n", rulesetNode.GetName())
-		return (*NodeResult)(nil), errcode.ParseErrorRulesetOutputEmpty
+	if len(ruleOutputs) == 0 {
+		//log.Printf("ruleset %s parse no result\n", rulesetNode.GetName())
+		return nodeResult, nil
 	}
 
-	//TypeStrategy
-	//命中阻断规则
-	/*	if rulesetNode.BlockStrategy.IsBlock {
-		if _, ok := global.BlockStrategy[output]; ok {
-			//阻断
+	hitRules := make(map[string]struct{})
+	if len(rulesetNode.BlockStrategy.HitRule) > 0 {
+		for _, v := range rulesetNode.BlockStrategy.HitRule {
+			hitRules[v] = struct{}{}
 		}
-	}*/
-
-	//todo 规则得分
-
-	//最高优先级的规则
-	for _, output := range ruleResult {
-		log.Println(output)
 	}
-	//	log.Println(ruleResult)
 
-	//get max value result, reject is 100, record is 1, pass or no result is 0
-	/*	sort.Sort(sort.Reverse(sort.IntSlice(ruleResult)))
-		log.Printf("ruleset %s result is :%v\n", ruleset.Name, ruleResult[0])
-		nodeResult.Decision = ruleResult[0]
-	*/
+	var block bool
+	var score int
+	var nodeRt configs.Strategy
+	for name, output := range ruleOutputs {
+		//节点规则得分
+		if s, ok := global.Strategys[output.Value.(string)]; ok {
+			score += s.Score
+			//根据优先级获取结果
+			if nodeRt.Priority < s.Priority { //默认0
+				nodeRt = s
+			}
+		}
+		//是否允许提前中断
+		if rulesetNode.BlockStrategy.IsBlock {
+			//命中规则在 ruleset.block_strategy.hit_rule 列表中
+			if _, ok := hitRules[name]; ok {
+				block = true
+			}
+		}
+	}
+	if rulesetNode.BlockStrategy.IsBlock {
+		ok, _ := operator.Compare(rulesetNode.BlockStrategy.Operator, nodeRt.Name, rulesetNode.BlockStrategy.Value)
+		if ok {
+			block = true
+		}
+	}
+	nodeResult.IsBlock = block
+	nodeResult.Score = score
+	nodeResult.Value = nodeRt.Name
+	log.Printf("======[trace]ruleset(%s, %s) end======\n", info.Label, rulesetNode.GetName())
+	return nodeResult, nil
+}
 
-	log.Printf("======[trace]ruleset(%s) end======\n", rulesetNode.GetName())
-	return (*NodeResult)(nil), nil
+func in(arr []string, str string) bool {
+	for _, v := range arr {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }

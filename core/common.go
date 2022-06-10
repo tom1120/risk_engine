@@ -17,9 +17,9 @@ type NodeInfo struct {
 }
 
 type BlockStrategy struct {
-	IsBock   bool        `yaml:"is_block"`
+	IsBlock  bool        `yaml:"is_block"`
 	HitRule  []string    `yaml:"hit_rule,flow"`
-	Operator string      `yaml:"opeartor"`
+	Operator string      `yaml:"operator"`
 	Value    interface{} `yaml:"value"`
 }
 
@@ -34,6 +34,8 @@ type Rule struct {
 
 //parse rule
 func (rule *Rule) Parse(ctx *PipelineContext) (output *Output, err error) {
+	output = &rule.Decision.Output
+
 	//rule.Conditions
 	if len(rule.Conditions) == 0 {
 		err = errors.New(fmt.Sprintf("rule (%s) condition is empty", rule.Name))
@@ -45,7 +47,7 @@ func (rule *Rule) Parse(ctx *PipelineContext) (output *Output, err error) {
 			value, _ := feature.GetValue() //是否使用default
 			rs, err := operator.Compare(condition.Operator, value, condition.Value)
 			if err != nil {
-				return output, nil
+				return output, nil //value deafult
 			}
 			conditionRet[condition.Name] = rs
 		} else {
@@ -66,6 +68,7 @@ func (rule *Rule) Parse(ctx *PipelineContext) (output *Output, err error) {
 		return
 	}
 	log.Printf("rule %s (%s) decision is: %v, output: %v\n", rule.Label, rule.Name, logicRet, rule.Decision.Output)
+	output.SetHit(logicRet)
 
 	//assign
 	if len(rule.Decision.Assign) > 0 {
@@ -77,7 +80,7 @@ func (rule *Rule) Parse(ctx *PipelineContext) (output *Output, err error) {
 		}
 		ctx.SetFeatures(features)
 	}
-	return &rule.Decision.Output, nil
+	return output, nil
 }
 
 type Condition struct {
@@ -99,6 +102,15 @@ type Output struct {
 	Name  string      `yaml:"name"` //该节点输出值重命名，如果无则以（节点类型+节点名）赋值变量
 	Value interface{} `yaml:"value"`
 	Kind  string      `yaml:"kind"` //nodetype featuretype
+	Hit   bool
+}
+
+func (output *Output) SetHit(hit bool) {
+	output.Hit = hit
+}
+
+func (output *Output) GetHit() bool {
+	return output.Hit
 }
 
 type Branch struct {

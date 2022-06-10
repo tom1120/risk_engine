@@ -28,5 +28,7 @@ func (node StartNode) GetInfo() NodeInfo {
 
 func (node StartNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	log.Println("======[trace]start======")
-	return (*NodeResult)(nil), nil
+	info := node.GetInfo()
+	nodeResult := &NodeResult{Id: info.Id, Name: info.Name, Kind: node.GetType(), Tag: info.Tag, Label: info.Label}
+	return nodeResult, nil
 }

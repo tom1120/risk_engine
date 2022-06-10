@@ -3,24 +3,24 @@ package service
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/skyhackvip/risk_engine/core"
-	"github.com/skyhackvip/risk_engine/global"
 	"github.com/skyhackvip/risk_engine/internal/dto"
 	"log"
 	"time"
 )
 
 type EngineService struct {
-	StartTime int64
-	EndTime   int64
+	startTime int64
+	endTime   int64
+	kernel    *core.Kernel
 }
 
-func NewEngineService() *EngineService {
-	return &EngineService{}
+func NewEngineService(kernel *core.Kernel) *EngineService {
+	return &EngineService{kernel: kernel}
 }
 
 //dto.DslRunResponse
 func (service *EngineService) Run(c *gin.Context, req *dto.EngineRunRequest) (*dto.EngineRunResponse, error) {
-	service.StartTime = time.Now().UnixNano() / 1e6 //ms
+	service.startTime = time.Now().UnixNano() / 1e6 //ms
 	go func() {
 		defer func() {
 			if err := recover(); err != nil {
@@ -28,7 +28,7 @@ func (service *EngineService) Run(c *gin.Context, req *dto.EngineRunRequest) (*d
 			}
 		}()
 	}()
-	flow, err := global.GetDecisionFlow(req.Key)
+	flow, err := service.kernel.GetDecisionFlow(req.Key, req.Version)
 	if err != nil {
 		return (*dto.EngineRunResponse)(nil), err
 	}
@@ -58,10 +58,10 @@ func (service *EngineService) Run(c *gin.Context, req *dto.EngineRunRequest) (*d
 //todo
 func (service *EngineService) dataAdapter(req *dto.EngineRunRequest, result *core.DecisionResult) *dto.EngineRunResponse {
 	resp := &dto.EngineRunResponse{
-		Key:   req.Key,
-		ReqId: req.ReqId,
-		Uid:   req.Uid,
-		//		HitRules: result.HitRules,
+		Key:       req.Key,
+		ReqId:     req.ReqId,
+		Uid:       req.Uid,
+		StartTime: time.Unix(service.startTime/1000, 0).Format("2006-01-02 15:04:05"),
 	}
 	features := make([]map[string]interface{}, 0)
 	for _, feature := range result.Features {
@@ -90,11 +90,24 @@ func (service *EngineService) dataAdapter(req *dto.EngineRunRequest, result *cor
 		})
 	}
 	resp.HitRules = hitRules
-	service.EndTime = time.Now().UnixNano() / 1e6
-	resp.RunTime = service.EndTime - service.StartTime
-	resp.StartTime = time.Unix(service.StartTime/1000, 0).Format("2006-01-02 15:04:05")
-	resp.EndTime = time.Unix(service.EndTime/1000, 0).Format("2006-01-02 15:04:05")
-	log.Println(service.StartTime, service.EndTime)
+	nodeResults := make([]map[string]interface{}, 0)
+	for _, nodeResult := range result.NodeResults {
+		nodeResults = append(nodeResults, map[string]interface{}{
+			"name":    nodeResult.Name,
+			"id":      nodeResult.Id,
+			"Kind":    nodeResult.Kind.String(),
+			"tag":     nodeResult.Tag,
+			"label":   nodeResult.Label,
+			"IsBlock": nodeResult.IsBlock,
+			"Value":   nodeResult.Value,
+			"Score":   nodeResult.Score,
+		})
+		i++
+	}
+	resp.NodeResults = nodeResults
 
+	service.endTime = time.Now().UnixNano() / 1e6
+	resp.RunTime = service.endTime - service.startTime
+	resp.EndTime = time.Unix(service.endTime/1000, 0).Format("2006-01-02 15:04:05")
 	return resp
 }

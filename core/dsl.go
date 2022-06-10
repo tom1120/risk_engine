@@ -1,8 +1,6 @@
 package core
 
 import (
-	yaml "gopkg.in/yaml.v2"
-	"io/ioutil"
 	"log"
 )
 
@@ -19,22 +17,18 @@ type Dsl struct {
 	//	ScoreCards      []ScoreCard      `yaml:"scorecards,flow"`
 }
 
-//load dsl from file
-func LoadDslFromFile(file string) (*Dsl, error) {
-	yamlFile, err := ioutil.ReadFile(file)
-	if err != nil {
-		return (*Dsl)(nil), nil
+func (dsl *Dsl) CheckValid() bool {
+	if dsl.Key == "" {
+		return false
 	}
-	return LoadDsl(yamlFile)
+	if len(dsl.DecisionFlow) == 0 {
+		return false
+	}
+	return true
 }
 
-func LoadDsl(file []byte) (*Dsl, error) {
-	dsl := new(Dsl)
-	err := yaml.Unmarshal(file, dsl)
-	return dsl, err
-}
-
-func (dsl *Dsl) ConvertToDecisionFlow() *DecisionFlow {
+//dsl to decisionflow
+func (dsl *Dsl) ConvertToDecisionFlow() (*DecisionFlow, error) {
 	flow := NewDecisionFlow()
 
 	//map
@@ -50,12 +44,12 @@ func (dsl *Dsl) ConvertToDecisionFlow() *DecisionFlow {
 	//flow
 	for _, flowNode := range dsl.DecisionFlow {
 		newNode := flowNode //need set new variable
-		switch GetNodeType(flowNode.NodeKind) {
+		switch GetNodeType(newNode.NodeKind) {
 		case TypeRuleset:
-			newNode.SetElem(rulesetMap[flowNode.NodeName])
+			newNode.SetElem(rulesetMap[newNode.NodeName])
 			flow.AddNode(&newNode)
 		case TypeAbtest:
-			newNode.SetElem(abtestMap[flowNode.NodeName])
+			newNode.SetElem(abtestMap[newNode.NodeName])
 			flow.AddNode(&newNode)
 		case TypeStart:
 			newNode.SetElem(NewStartNode(newNode.NodeName))
@@ -65,8 +59,8 @@ func (dsl *Dsl) ConvertToDecisionFlow() *DecisionFlow {
 			newNode.SetElem(NewEndNode(newNode.NodeName))
 			flow.AddNode(&newNode)
 		default:
-			log.Println("unkown node type")
+			log.Printf("dsl (%s-%s) convert warning: unkown node type (%s)\n", dsl.Key, dsl.Version, newNode.NodeKind)
 		}
 	}
-	return flow
+	return flow, nil
 }

@@ -10,8 +10,15 @@ type INode interface {
 
 //节点返回内容 是否阻断 下一个节点信息(ab,条件节点）
 type NodeResult struct {
+	Id           int64
+	Name         string
+	Label        string
+	Tag          string
+	Kind         NodeType
 	IsBlock      bool
-	NextNodeName string
+	Score        int
+	Value        interface{}
+	NextNodeName string //ab,条件节点有用
 	NextNodeType NodeType
 }
 

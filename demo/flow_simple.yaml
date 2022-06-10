@@ -7,24 +7,24 @@ metadata:
 decision_flow:
   - flow_node:
     node_name: start_1
-    node_type: start
+    node_kind: start
     next_node_name: ruleset_1
-    next_node_type: ruleset
+    next_node_kind: ruleset
   - flow_node:
     node_name: ruleset_1
-    node_type: ruleset
+    node_kind: ruleset
     next_node_name: ruleset_2
-    next_node_type: ruleset
+    next_node_kind: ruleset
   - flow_node:
     node_name: ruleset_2
-    node_type: ruleset
+    node_kind: ruleset
     next_node_name: end_1
-    next_node_type: end
+    next_node_kind: end
   - flow_node:
     node_name: end_1
-    node_type: end
+    node_kind: end
     next_node_name: 
-    next_node_type: 
+    next_node_kind: 
 rulesets:
   - ruleset: 
     info:
@@ -38,7 +38,7 @@ rulesets:
     block_strategy:
       is_block: true
       hit_rule: [rule_1] #命中该规则就中断
-      operator: GE
+      operator: EQ
       value: reject  #=reject中断
     rules: 
     - rule:
@@ -60,7 +60,7 @@ rulesets:
       - condition:
         name: c3
         feature: feature_3
-        operator: GE
+        operator: EQ
         value: 2
       decision: 
         depends: [c1, c2, c3]
@@ -76,7 +76,7 @@ rulesets:
       id: 2
       name: rule_2
       tag: 10002
-      labe: 简单规则2
+      label: 简单规则2
       conditions:
       - condition:
         name: c1
@@ -88,7 +88,7 @@ rulesets:
         logic: c1
         output:
           name: #rename 如果为空，则给rule.name赋值
-          value: record
+          value: reject
           kind: TypeStrategy
         assign:
   - ruleset: 
@@ -103,7 +103,7 @@ rulesets:
     block_strategy:
       is_block: true
       hit_rule: [rule_1] #命中该规则就中断
-      operator: GE
+      operator: EQ
       value: reject  #=reject中断
     rules: 
     - rule:

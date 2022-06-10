@@ -41,7 +41,7 @@ rulesets:
     block_strategy:
       is_block: true
       hit_rule: [rule_1] #命中该规则就中断
-      operator: GE 
+      operator: EQ
       value: reject  #=reject中断
     rules: 
     - rule: 
@@ -97,6 +97,11 @@ rulesets:
       kind: ruleset
       depends: [feature_1,feature_2,feature_3]
     exec_plan: parallel
+    block_strategy:
+      is_block: true
+      hit_rule: [rule_3] #命中该规则就中断
+      operator: EQ
+      value: reject  #命中规则优先级最高结果=reject 中断
     rules: 
     - rule: 
       id: 44
@@ -138,7 +143,7 @@ rulesets:
         logic: c4 || c5
         output:
           name:
-          value: record
+          value: reject
           kind: TypeStrategy
         assign:
           feat1: aa

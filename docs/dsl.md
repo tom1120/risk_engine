@@ -34,9 +34,9 @@ info:
 ## BlockStrategy
 ```golang
 type BlockStrategy struct {
-    IsBock   bool        `yaml:"is_block"`
+	IsBlock  bool        `yaml:"is_block"`
     HitRule  []string    `yaml:"hit_rule,flow"`
-    Operator string      `yaml:"opeartor"`
+	Operator string      `yaml:"operator"`
     Value    interface{} `yaml:"value"`
 }
 ```
@@ -44,7 +44,7 @@ type BlockStrategy struct {
 block_strategy:
       is_block: true
       hit_rule: [rule_1] #命中该规则就中断
-      operator: GE
+      operator: EQ
       value: reject  #=reject中断
 ```
 
@@ -144,6 +144,7 @@ type Output struct {
     Name  string      `yaml:"name"` //该节点输出值重命名，如果无则以（节点类型+节点名）赋值变量
     Value interface{} `yaml:"value"`
     Kind  string      `yaml:"kind"`
+    Hit   bool  //是否命中
 }
 ```
 ```yaml
@@ -167,8 +168,15 @@ kind 包括 featureType 和 NodeType 两种不同的
 ```golang
 //节点返回内容 是否阻断 下一个节点信息(ab,条件节点）
 type NodeResult struct {
+    Id           int64
+    Name         string
+    Label        string
+    Tag          string
+    Kind         NodeType
     IsBlock      bool
-    NextNodeName string
+    Score        int
+    Value        interface{}
+    NextNodeName string //ab,条件节点有用
     NextNodeType NodeType
 }
 ```
@@ -207,7 +215,7 @@ type RulesetNode struct {
     block_strategy:
       is_block: true
       hit_rule: [rule_1] #命中该规则就中断
-      operator: GE
+      operator: EQ
       value: reject  #=reject中断
     rules:
     - rule:

@@ -15,6 +15,9 @@ type PipelineContext struct {
 	tMutex sync.RWMutex
 	tracks []*Track
 
+	nMutex      sync.RWMutex
+	nodeResults map[string]*NodeResult
+
 	fMutex   sync.RWMutex
 	features map[string]*Feature
 }
@@ -28,7 +31,10 @@ type Track struct {
 }
 
 func NewPipelineContext() *PipelineContext {
-	return &PipelineContext{features: make(map[string]*Feature), hitRules: make(map[string]*Rule)}
+	return &PipelineContext{features: make(map[string]*Feature),
+		hitRules:    make(map[string]*Rule),
+		nodeResults: make(map[string]*NodeResult),
+	}
 }
 
 func (ctx *PipelineContext) AddTrack(node INode) {
@@ -124,16 +130,30 @@ func (ctx *PipelineContext) GetHitRules() map[string]*Rule {
 	return ctx.hitRules
 }
 
+func (ctx *PipelineContext) AddNodeResult(name string, nodeResult *NodeResult) {
+	ctx.nMutex.Lock()
+	defer ctx.nMutex.Unlock()
+	ctx.nodeResults[name] = nodeResult
+}
+
+func (ctx *PipelineContext) GetNodeResults() map[string]*NodeResult {
+	ctx.nMutex.RLock()
+	defer ctx.nMutex.RUnlock()
+	return ctx.nodeResults
+}
+
 type DecisionResult struct {
-	HitRules map[string]*Rule
-	Tracks   []*Track
-	Features map[string]*Feature
+	HitRules    map[string]*Rule
+	Tracks      []*Track
+	Features    map[string]*Feature
+	NodeResults map[string]*NodeResult
 }
 
 func (ctx *PipelineContext) GetDecisionResult() *DecisionResult {
 	return &DecisionResult{
-		HitRules: ctx.GetHitRules(),
-		Tracks:   ctx.GetTracks(),
-		Features: ctx.GetAllFeatures(),
+		HitRules:    ctx.GetHitRules(),
+		Tracks:      ctx.GetTracks(),
+		Features:    ctx.GetAllFeatures(),
+		NodeResults: ctx.GetNodeResults(),
 	}
 }

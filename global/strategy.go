@@ -4,6 +4,7 @@ import (
 	"github.com/skyhackvip/risk_engine/configs"
 )
 
+//from configs
 var Strategys = map[string]configs.Strategy{
 	"reject":  {"reject", 9, 100},
 	"approve": {"approve", 5, 5},
@@ -11,4 +12,4 @@ var Strategys = map[string]configs.Strategy{
 }
 
 //阻断策略
-var BlockStrategy = map[string]struct{}{"reject": struct{}{}}
+var BlockStrategy = map[string]struct{}{"record": struct{}{}}

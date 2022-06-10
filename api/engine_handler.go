@@ -1,4 +1,4 @@
-package handler
+package api
 
 import (
 	"github.com/gin-gonic/gin"
@@ -6,8 +6,6 @@ import (
 	"github.com/skyhackvip/risk_engine/service"
 	"net/http"
 )
-
-var svr = service.NewEngineService()
 
 func EngineHandler(c *gin.Context) {
 	code := 200
@@ -22,6 +20,7 @@ func EngineHandler(c *gin.Context) {
 		})
 		return
 	}
+	svr := service.NewEngineService(kernel)
 	result, err := svr.Run(c, &request)
 	if err != nil {
 		code = 501

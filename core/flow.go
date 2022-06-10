@@ -76,25 +76,33 @@ func (flow *DecisionFlow) Run(ctx *PipelineContext) (err error) {
 }
 
 //parse current node and return next node
-func (flow *DecisionFlow) parseNode(curNode *FlowNode, ctx *PipelineContext) (*FlowNode, bool) {
+func (flow *DecisionFlow) parseNode(curNode *FlowNode, ctx *PipelineContext) (nextNode *FlowNode, gotoNext bool) {
 	//parse current node
 	ctx.AddTrack(curNode.GetElem())
 	res, err := curNode.Parse(ctx)
 	if err != nil {
 		log.Println(err)
 	}
+	ctx.AddNodeResult(curNode.NodeName, res)
 
 	//get next node
-	nextNode := new(FlowNode)
+	if res.IsBlock {
+		gotoNext = !res.IsBlock
+		return
+	}
+
 	switch curNode.GetNodeType() { //int
 	case TypeEnd: //END:
-		return nextNode, false
+		gotoNext = false
+		return
 	case TypeAbtest: //ABTEST:
-		return flow.GetNode(res.NextNodeName, res.NextNodeType)
+		nextNode, gotoNext = flow.GetNode(res.NextNodeName, res.NextNodeType)
+		return
 	default: //start
-		return flow.GetNode(curNode.NextNodeName, curNode.NextNodeKind)
+		nextNode, gotoNext = flow.GetNode(curNode.NextNodeName, curNode.NextNodeKind)
+		return
 	}
-	//return nextNode, false
+	return
 }
 
 type FlowNode struct {
