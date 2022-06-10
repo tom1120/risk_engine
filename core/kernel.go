@@ -41,11 +41,15 @@ func (kernel *Kernel) LoadDsl(method, path string) {
 			continue
 		}
 		flow, err := dsl.ConvertToDecisionFlow()
+		key := kernel.getMapKey(dsl.Key, dsl.Version)
 		if err != nil {
-			log.Printf("dsl (%s) convert to flow error: %s\n", kernel.getMapKey(dsl.Key, dsl.Version), err)
+			log.Printf("dsl (%s) convert to flow error: %s\n", key, err)
 			continue
 		}
-		kernel.DecisionFlowMap[kernel.getMapKey(dsl.Key, dsl.Version)] = flow //重复后一个覆盖前一个
+		if _, ok := kernel.DecisionFlowMap[key]; ok {
+			log.Printf("dsl load repeat %s \n", key)
+		}
+		kernel.DecisionFlowMap[key] = flow //重复后一个覆盖前一个
 	}
 }
 
@@ -53,8 +57,12 @@ func (kernel *Kernel) LoadFromFile(path string) (yamls map[string][]byte, err er
 	yamls = make(map[string][]byte)
 	//path get file list
 	files := []string{"/home/rong/go/src/github.com/skyhackvip/risk_engine/demo/flow_abtest.yaml",
-		"/home/rong/go/src/github.com/skyhackvip/risk_engine/demo/flow_simple.yaml"}
+		"../../demo/flow_simple.yaml",
+		"../../demo/flow_long.yaml",
+		"../../demo/flow_test.yaml",
+	}
 	for _, file := range files {
+		log.Println(file)
 		yaml, err := ioutil.ReadFile(file)
 		if err != nil {
 			log.Printf("load file (%s) error: %s\n", file, err)
