@@ -56,10 +56,8 @@ func (kernel *Kernel) LoadDsl(method, path string) {
 func (kernel *Kernel) LoadFromFile(path string) (yamls map[string][]byte, err error) {
 	yamls = make(map[string][]byte)
 	//path get file list
-	files := []string{"/home/rong/go/src/github.com/skyhackvip/risk_engine/demo/flow_abtest.yaml",
-		"../../demo/flow_simple.yaml",
-		"../../demo/flow_long.yaml",
-		"../../demo/flow_test.yaml",
+	files := []string{"demo/flow_abtest.yaml",
+		"demo/flow_simple.yaml",
 	}
 	for _, file := range files {
 		log.Println(file)
