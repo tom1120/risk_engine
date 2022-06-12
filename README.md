@@ -173,20 +173,20 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 
 ### 代码结构
 ```
-├── api   接口逻辑
+├── api  http接口逻辑
 ├── configs  配置文件
 ├── docs 文档
 ├── core 决策引擎解析核心目录
 ├── service 执行逻辑
 ├── cmd 启动文件
-├── global 全局上下文
+├── global 全局配置
+├── demo 测试yaml文件
 ├── internal
 │  ├── dto 数据传输对象
 │  ├── errcode 错误异常定义
 │  ├── feature 特征
 │  └── operator 操作算子
 ├── test 测试用例
-│  └── yaml 测试yaml文件
 ```
 
 ### DSL 语法结构
