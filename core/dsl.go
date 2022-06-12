@@ -30,6 +30,9 @@ func (dsl *Dsl) CheckValid() bool {
 //dsl to decisionflow
 func (dsl *Dsl) ConvertToDecisionFlow() (*DecisionFlow, error) {
 	flow := NewDecisionFlow()
+	flow.Key = dsl.Key
+	flow.Version = dsl.Version
+	flow.Metadata = dsl.Metadata
 
 	//map
 	rulesetMap := make(map[string]INode)

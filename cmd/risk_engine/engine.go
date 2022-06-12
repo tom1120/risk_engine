@@ -1,7 +1,11 @@
 package main
 
 import (
+	"context"
+	"flag"
 	"github.com/skyhackvip/risk_engine/api"
+	"github.com/skyhackvip/risk_engine/configs"
+	"github.com/skyhackvip/risk_engine/global"
 	"log"
 	"os"
 	"os/signal"
@@ -10,21 +14,31 @@ import (
 )
 
 func main() {
-	api.Init()
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT)
-	for {
-		s := <-c
-		log.Println("get a signal %s", s.String())
-		switch s {
-		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
-			//cancel()
-			time.Sleep(time.Second)
-			log.Println("risk_engine quit!")
-			return
-		case syscall.SIGHUP:
-		default:
-			return
-		}
+	c := flag.String("c", "", "config file path")
+	flag.Parse()
+	conf, err := configs.LoadConfig(*c)
+	if err != nil {
+		panic(err)
 	}
+	global.ServerConf = &conf.Server
+	global.AppConf = &conf.App
+
+	api.Init()
+
+	//graceful restart
+	quit := make(chan os.Signal)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGQUIT)
+	<-quit
+	log.Println("shutdown risk engine...")
+	//cancel
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	/*if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("server shutdown error:", err)
+	}*/
+	select {
+	case <-ctx.Done():
+		log.Println("timeout of 5 seconds")
+	}
+	log.Println("server exiting")
 }

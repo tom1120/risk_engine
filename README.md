@@ -18,10 +18,43 @@
 git clone https://github.com/skyhackvip/risk_engine
 cd risk_engine/cmd/risk_engine
 go build
-./risk_engine
+./risk_engine -c config.yaml
 ```
 
+### 获取支持的所有决策流
 - 请求接口：
+```shell
+curl http://localhost:8889/engine/list -XPOST
+
+```
+- 接口返回：
+```json
+{
+	"code": 200,
+	"error": "",
+	"result": [{
+		"key": "flow_long",
+		"version": "1.0",
+		"md5": "387a3719ab82b4a1b014a6d912a5ebb5"
+	}, {
+		"key": "flow_simple",
+		"version": "1.0",
+		"md5": "4b73cb9dfbe3d55e2b80c144fc04f643"
+	}, {
+		"key": "flow_test",
+		"version": "1.0",
+		"md5": "69296c88f96bb15d44ba565ed8364d86"
+	}, {
+		"key": "flow_abtest",
+		"version": "1.0",
+		"md5": "004a951c5d3b2678ec4c28e21bf0eaaf"
+	}]
+}
+```
+
+### 执行决策流
+- 请求接口：
+
 ```shell
 curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "req_id":"123456", "uid":1,"features":{"feature_1":5,"feature_2":3,"feature_3":55,"feature_4":32,"feature_5":33,"feature_6":231,"feature_7":2,"feature_8":4}}'
 ```

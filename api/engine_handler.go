@@ -2,12 +2,21 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/skyhackvip/risk_engine/core"
 	"github.com/skyhackvip/risk_engine/internal/dto"
 	"github.com/skyhackvip/risk_engine/service"
 	"net/http"
 )
 
-func EngineHandler(c *gin.Context) {
+type EngineHandler struct {
+	kernel *core.Kernel
+}
+
+func NewEngineHandler(kernel *core.Kernel) *EngineHandler {
+	return &EngineHandler{kernel: kernel}
+}
+
+func (handler *EngineHandler) Run(c *gin.Context) {
 	code := 200
 	errs := ""
 	var request dto.EngineRunRequest
@@ -20,7 +29,7 @@ func EngineHandler(c *gin.Context) {
 		})
 		return
 	}
-	svr := service.NewEngineService(kernel)
+	svr := service.NewEngineService(handler.kernel)
 	result, err := svr.Run(c, &request)
 	if err != nil {
 		code = 501
@@ -30,5 +39,18 @@ func EngineHandler(c *gin.Context) {
 		"code":   code,
 		"result": result,
 		"error":  errs,
+	})
+}
+
+func (handler *EngineHandler) List(c *gin.Context) {
+	data := make([]*dto.Dsl, 0)
+	for _, flow := range handler.kernel.GetAllDecisionFlow() {
+		dsl := &dto.Dsl{Key: flow.Key, Version: flow.Version, Md5: flow.Md5}
+		data = append(data, dsl)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code":   200,
+		"result": data,
+		"error":  "",
 	})
 }

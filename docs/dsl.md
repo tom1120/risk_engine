@@ -88,6 +88,8 @@ type Rule struct {
           feat1: aa
           feat2: bb
 ```
+规则名称全局唯一
+todo: 增加规则优先级
 
 ## Condition
 

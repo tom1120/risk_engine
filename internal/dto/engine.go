@@ -25,3 +25,16 @@ type EngineRunResponse struct {
 	EndTime     string                   `json:"end_time"`
 	RunTime     int64                    `json:"run_time"`
 }
+
+type DslListResponse struct {
+	Code int    `json:"code"`
+	Err  string `json:"err"`
+	Data []*Dsl `json:"data"`
+}
+
+type Dsl struct {
+	Key     string `json:"key"`
+	Version string `json:"version"`
+	//Metadata string `json:"metadata"`
+	Md5 string `json:"md5"`
+}

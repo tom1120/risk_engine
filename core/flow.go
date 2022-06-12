@@ -7,6 +7,10 @@ import (
 )
 
 type DecisionFlow struct {
+	Key       string
+	Version   string
+	Metadata  map[string]interface{}
+	Md5       string //yaml文件的md5值
 	flowMap   map[string]*FlowNode
 	startNode *FlowNode
 }

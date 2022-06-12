@@ -1,12 +1,15 @@
 package core
 
 import (
+	"crypto/md5"
 	"errors"
 	"fmt"
 	"github.com/skyhackvip/risk_engine/internal/errcode"
 	yaml "gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 )
 
 type Kernel struct {
@@ -49,30 +52,32 @@ func (kernel *Kernel) LoadDsl(method, path string) {
 		if _, ok := kernel.DecisionFlowMap[key]; ok {
 			log.Printf("dsl load repeat %s \n", key)
 		}
+		flow.Md5 = fmt.Sprintf("%x", md5.Sum(v))
 		kernel.DecisionFlowMap[key] = flow //重复后一个覆盖前一个
 	}
 }
 
 func (kernel *Kernel) LoadFromFile(path string) (yamls map[string][]byte, err error) {
+	//get file list
+	files := make([]string, 0)
+	err = filepath.Walk(path, func(fp string, info os.FileInfo, err error) error {
+		if filepath.Ext(fp) == ".yaml" {
+			files = append(files, fp)
+		}
+		return err
+	})
+
+	//read file
 	yamls = make(map[string][]byte)
-	//path get file list
-	files := []string{"/home/rong/go/src/github.com/skyhackvip/risk_engine/demo/flow_abtest.yaml",
-		"../../demo/flow_simple.yaml",
-		"../../demo/flow_long.yaml",
-		"../../demo/flow_test.yaml",
-	}
 	for _, file := range files {
-		log.Println(file)
-		yaml, err := ioutil.ReadFile(file)
+		yamlFile, err := ioutil.ReadFile(file)
 		if err != nil {
 			log.Printf("load file (%s) error: %s\n", file, err)
 			continue
 		}
-		yamls[file] = yaml
+		yamls[file] = yamlFile
 	}
-	go func() {
-		//ticker check file change
-	}()
+
 	if len(yamls) == 0 {
 		err = errors.New("no valid dsl") //errcode
 		return
