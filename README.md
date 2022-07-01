@@ -16,9 +16,9 @@
 - 编译执行
 ```shell
 git clone https://github.com/skyhackvip/risk_engine
-cd risk_engine/cmd/risk_engine
-go build
-./risk_engine -c config.yaml
+cd risk_engine
+make build
+make run
 ```
 
 ### 获取支持的所有决策流
