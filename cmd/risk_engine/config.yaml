@@ -6,4 +6,4 @@ Server:
 App:
   LogPath: log/app.log
   DslLoadMethod: file
-  DslLoadPath: dist/demo/  #注意实际放置目录
+  DslLoadPath: demo/  #注意实际放置目录
