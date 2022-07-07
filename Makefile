@@ -13,7 +13,7 @@ clean:
 	rm -rf dist/
 
 run:
-	nohup dist/bin/risk_engine -c dist/conf/config.yaml >dist/nohup.out 2>dist/nohup.out &
+	cd dist/; nohup bin/risk_engine -c conf/config.yaml >nohup.out 2>nohup.out &
 
 stop:
-	pkill -f dist/bin/risk_engine
+	pkill -f bin/risk_engine

@@ -12,13 +12,36 @@
 ### 开源声明
 本项目用于学习和参考，不能直接用于生产环境，转载使用请说明出处。代码不定期迭代更新，可加关注查看。如有交流欢迎加微信号 ***hepenggj*** 
 
-### 服务测试
-- 编译执行
+### 编译运行
+
+- Make 编译执行（推荐）
 ```shell
+#下载
 git clone https://github.com/skyhackvip/risk_engine
-cd risk_engine
+cd risk_engine/
+
+#编译
 make build
+
+#执行
 make run
+```
+
+- Go 编译执行
+```shell
+#下载
+git clone https://github.com/skyhackvip/risk_engine
+
+#编译
+cd risk_engine/
+mkdir -p dist/conf dist/bin
+cp cmd/risk_engine/config.yaml dist/conf
+cp demo dist/demo -r
+GO111MODULE=on CGO_ENABLED=0 go -o dist/bin/risk_engine cmd/risk_engine/engine.go
+
+#执行
+cd dist/
+nohup bin/risk_engine -c conf/config.yaml >nohup.out 2>nohup.out &
 ```
 
 ### 获取支持的所有决策流
@@ -155,7 +178,6 @@ key: 决策流标识，目前支持的决策流以文件形式存在于demo/中�
 
 ### 决策引擎架构图
 ![决策引擎架构图](https://i.loli.net/2021/01/21/bOR1tyVPnCZNGoi.png)
-tips：本代码为决策引擎系统代码，不包括可视化管理后台部分。完整风控架构可能由更多系统组成，可参考系列文章实现。
 
 ### 代码解读
 [智能风控决策引擎系统架构设计总纲](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484064&idx=1&sn=fecd2c7379208e84e7e3cd4eb1abfb6c&chksm=e8215db0df56d4a623bd6be2a706c0220952f0e045b0d6d9646616ee3aae742c574335fa228a&token=221471496&lang=zh_CN#rd)
