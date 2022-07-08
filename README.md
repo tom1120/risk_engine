@@ -24,6 +24,8 @@
 
 
 ## 编译运行
+- 环境准备
+go version go1.13 +
 
 - Make 编译执行（推荐）
 ```shell
@@ -34,26 +36,55 @@ cd risk_engine/
 #编译
 make build
 
-#执行
+#启动
 make run
+
+#停止
+make stop
+
 ```
 
 - Go 编译执行
 ```shell
 #下载
 git clone https://github.com/skyhackvip/risk_engine
+cd risk_engine/
 
 #编译
-cd risk_engine/
 mkdir -p dist/conf dist/bin
 cp cmd/risk_engine/config.yaml dist/conf
 cp demo dist/demo -r
 GO111MODULE=on CGO_ENABLED=0 go build -o dist/bin/risk_engine cmd/risk_engine/engine.go
 
-#执行
+#启动
 cd dist/
 nohup bin/risk_engine -c conf/config.yaml >nohup.out 2>nohup.out &
+
+#停止
+pkill -f bin/risk_engine
+
 ```
+
+- Docker 容器编译执行
+```shell
+#下载
+git clone https://github.com/skyhackvip/risk_engine
+cd risk_engine/
+
+#制作镜像
+docker build -t risk_engine:v1 .
+
+#启动镜像
+docker run -itd --name risk_engine -p 8889:8889 risk_engine:v1
+
+#进入容器
+docker exec -it risk_engine /bin/sh
+
+#停止容器
+docker stop risk_engine
+
+```
+
 
 ## 支持接口 API
 
