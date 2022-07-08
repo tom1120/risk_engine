@@ -1,6 +1,5 @@
 # 决策引擎系统
-[![License](https://img.shields.io/:license-apache%202-blue.svg)](https://opensource.org/licenses/Apache-2.0)  
-[![GoDoc](https://godoc.org/github.com/skyhackvip/risk_engine?status.png)](https://godoc.org/github.com/skyhackvip/risk_engine)
+[![License](https://img.shields.io/:license-apache%202-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![GoDoc](https://godoc.org/github.com/skyhackvip/risk_engine?status.png)](https://godoc.org/github.com/skyhackvip/risk_engine)
 [![Go Report Card](https://goreportcard.com/badge/github.com/skyhackvip/risk_engine)](https://goreportcard.com/report/github.com/skyhackvip/risk_engine)
 
 ## 开源声明
