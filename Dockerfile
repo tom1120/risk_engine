@@ -10,6 +10,7 @@ RUN make build
 FROM alpine:3.9.5
 COPY --from=build /app/building/dist/bin/risk_engine /app/bin/
 COPY --from=build /app/building/dist/conf/config.yaml /app/conf/
+COPY --from=build /app/building/dist/demo /app/demo
 EXPOSE 8889
 WORKDIR /app/
 CMD bin/risk_engine -c conf/config.yaml
