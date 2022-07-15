@@ -75,7 +75,7 @@ cd risk_engine/
 docker build -t risk_engine:v1 .
 
 #启动镜像
-docker run -itd --name risk_engine -p 8889:8889 risk_engine:v1
+docker run -d --name risk_engine -p 8889:8889 risk_engine:v1
 
 #进入容器
 docker exec -it risk_engine /bin/sh
