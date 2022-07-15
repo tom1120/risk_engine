@@ -123,7 +123,7 @@ curl http://localhost:8889/engine/list -XPOST
 - 请求接口：
 
 ```shell
-curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "req_id":"123456", "uid":1,"features":{"feature_1":5,"feature_2":3,"feature_3":55,"feature_4":32,"feature_5":33,"feature_6":231,"feature_7":2,"feature_8":4}}'
+curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version":"1.0", "req_id":"123456", "uid":1,"features":{"feature_1":5,"feature_2":3,"feature_3":55,"feature_4":32,"feature_5":33,"feature_6":231,"feature_7":2,"feature_8":4}}'
 ```
 key: 决策流标识，目前支持的决策流以文件形式存在于demo/中，对应的文件名即为key
 
