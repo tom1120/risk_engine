@@ -1,0 +1,9 @@
+Server:
+  Env: dev
+  Port: 8889
+  ReadTimeout: 10
+  WriteTimeout: 10
+App:
+  LogPath: log/app.log
+  DslLoadMethod: file
+  DslLoadPath: demo/  #注意实际放置目录

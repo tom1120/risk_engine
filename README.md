@@ -1,25 +1,92 @@
-# 风控决策引擎系统
-[![License](https://img.shields.io/:license-apache%202-blue.svg)](https://opensource.org/licenses/Apache-2.0)  
+# 决策引擎系统
+[![License](https://img.shields.io/:license-apache%202-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![GoDoc](https://godoc.org/github.com/skyhackvip/risk_engine?status.png)](https://godoc.org/github.com/skyhackvip/risk_engine)
+[![Go Report Card](https://goreportcard.com/badge/github.com/skyhackvip/risk_engine)](https://goreportcard.com/report/github.com/skyhackvip/risk_engine)
 
-### 决策引擎系统介绍
+## 开源声明
+本项目用于学习和参考，采用 Apache License, Version 2.0 开源，转载使用请说明出处。代码不定期迭代更新，欢迎 Star & Watch，如需交流请添加公众号“技术岁月”。
 
-风控决策引擎系统是在大数据支撑下，根据行业专家经验制定规则策略、以及机器学习/深度学习/AI领域建立的模型运算，对当前的业务风险进行全面的评估，并给出决策结果的一套系统。
+## 决策引擎系统介绍
+决策引擎系统，是构建于规则引擎和流程引擎基础上，满足复杂业务决策的一套系统，可用于反欺诈、信用评估、风险决策、推荐系统、精准营销、内容审核等领域。
 
-决策引擎，常用于金融反欺诈、金融信审等互金领域，由于黑产、羊毛党行业的盛行，风控决策引擎在电商、支付、游戏、社交等领域也有了长足的发展，刷单、套现、作弊，凡是和钱相关的业务都离不开风控决策引擎系统的支持保障。决策引擎和规则引擎比较接近（严格说决策引擎包含规则引擎，之前也有叫专家系统，推理引擎），它实现了业务决策与程序代码的分离。
+风控是决策引擎的一个重要应用场景，由于黑产、羊毛党行业的盛行，风控决策引擎在电商、支付、游戏、社交等领域也有了长足的发展，刷单、套现、作弊，凡是和钱相关的业务都离不开风控决策引擎系统的支持保障。目前流行的“智能风控”，即是以决策引擎为核心驱动，以机器学习/AI为大脑，在大数据基础上构建的通用风控能力。
 
-关于如何实现决策引擎的文章市面极少见，实践生产落地的经验分享也基本没有。我会结合工作实践及个人思考，从业务抽象建模，产品逻辑规划以及最终技术架构和代码实现等方面给出全方位的解决方案。
+我结合工作实践及个人思考，从业务抽象建模，产品逻辑规划以及最终技术架构和代码实现等方面给出全方位的解决方案。
 
-### 开源声明
-本项目用于学习和参考，不能直接用于生产环境，转载使用请说明出处。代码不定期迭代更新，可加关注查看。如有交流欢迎加微信号 ***hepenggj*** 
+### 功能列表
+- 规则
+- 规则集
+- 决策树
+- 决策表
+- 决策矩阵
+- 评分卡
+- 决策流
+- 冠军挑战者 
 
-### 服务测试
-- 编译执行
+
+## 编译运行
+- 环境准备
+go version go1.13 +
+
+- Make 编译执行（推荐）
 ```shell
+#下载
 git clone https://github.com/skyhackvip/risk_engine
-cd risk_engine/cmd/risk_engine
-go build
-./risk_engine -c config.yaml
+cd risk_engine/
+
+#编译
+make build
+
+#启动
+make run
+
+#停止
+make stop
+
 ```
+
+- Go 编译执行
+```shell
+#下载
+git clone https://github.com/skyhackvip/risk_engine
+cd risk_engine/
+
+#编译
+mkdir -p dist/conf dist/bin
+cp cmd/risk_engine/config.yaml dist/conf
+cp demo dist/demo -r
+GO111MODULE=on CGO_ENABLED=0 go build -o dist/bin/risk_engine cmd/risk_engine/engine.go
+
+#启动
+cd dist/
+nohup bin/risk_engine -c conf/config.yaml >nohup.out 2>nohup.out &
+
+#停止
+pkill -f bin/risk_engine
+
+```
+
+- Docker 容器编译执行
+```shell
+#下载
+git clone https://github.com/skyhackvip/risk_engine
+cd risk_engine/
+
+#制作镜像
+docker build -t risk_engine:v1 .
+
+#启动镜像
+docker run -d --name risk_engine -p 8889:8889 risk_engine:v1
+
+#进入容器
+docker exec -it risk_engine /bin/sh
+
+#停止容器
+docker stop risk_engine
+
+```
+
+
+## 支持接口 API
 
 ### 获取支持的所有决策流
 - 请求接口：
@@ -171,6 +238,7 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 - tracks 流执行轨迹 
 - node_results 各节点执行情况和产生值
 
+## 系统解读 
 ### 代码结构
 ```
 ├── api  http接口逻辑
@@ -195,9 +263,8 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 
 ### 决策引擎架构图
 ![决策引擎架构图](https://i.loli.net/2021/01/21/bOR1tyVPnCZNGoi.png)
-tips：本代码为决策引擎系统代码，不包括可视化管理后台部分。完整风控架构可能由更多系统组成，可参考系列文章实现。
 
-### 代码解读
+### 风控系列文章解读
 [智能风控决策引擎系统架构设计总纲](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484064&idx=1&sn=fecd2c7379208e84e7e3cd4eb1abfb6c&chksm=e8215db0df56d4a623bd6be2a706c0220952f0e045b0d6d9646616ee3aae742c574335fa228a&token=221471496&lang=zh_CN#rd)
 
 
