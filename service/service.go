@@ -32,30 +32,24 @@ func (service *EngineService) Run(c *gin.Context, req *dto.EngineRunRequest) (*d
 	if err != nil {
 		return (*dto.EngineRunResponse)(nil), err
 	}
+
 	ctx := core.NewPipelineContext()
-	features := make(map[string]*core.Feature)
-	for k, v := range req.Features {
-		feature := core.NewFeature(k, core.TypeInt, -9999) //todo
-		feature.SetValue(v)
-		features[k] = feature
+	//fill feature value from request features
+	features := make(map[string]core.IFeature)
+	for name, feature := range flow.FeatureMap {
+		if val, ok := req.Features[name]; ok {
+			features[name] = feature
+			features[name].SetValue(val)
+		}
 	}
-
-	/*
-		fMap := map[string]interface{}{"feature_1": 60, "feature_2": 5, "feature_3": 80, "feature_4": 1, "feature_5": 2, "feature_6": 8}
-		for k, v := range fMap {
-			feature := NewFeature(k, TypeInt, -9999)
-			feature.SetValue(v)
-			features[k] = feature
-		}*/
-
 	ctx.SetFeatures(features)
 	flow.Run(ctx)
 
-	result := ctx.GetDecisionResult() //将req放入
+	result := ctx.GetDecisionResult()
 	return service.dataAdapter(req, result), nil
 }
 
-//todo
+//adapte the result and output
 func (service *EngineService) dataAdapter(req *dto.EngineRunRequest, result *core.DecisionResult) *dto.EngineRunResponse {
 	resp := &dto.EngineRunResponse{
 		Key:       req.Key,

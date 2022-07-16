@@ -8,12 +8,13 @@ type Dsl struct {
 	Key          string                 `yaml:"key"`
 	Version      string                 `yaml:"version"`
 	Metadata     map[string]interface{} `yaml:"metadata"`
+	Features     []Feature              `yaml:"features,flow"`
 	DecisionFlow []FlowNode             `yaml:"decision_flow,flow"`
 	Rulesets     []RulesetNode          `yaml:"rulesets,flow"`
 	Abtests      []AbtestNode           `yaml:"abtests,flow"`
+	Matrixs      []MatrixNode           `yaml:"matrixs,flow"`
 	//	Conditionals    []Conditional    `yaml:"conditionals,flow"`
 	//	DecisionTrees   []DecisionTree   `yaml:"decisiontrees,flow"`
-	//	DecisionMatrixs []DecisionMatrix `yaml:"decisionmatrixs,flow"`
 	//	ScoreCards      []ScoreCard      `yaml:"scorecards,flow"`
 }
 
@@ -35,6 +36,11 @@ func (dsl *Dsl) ConvertToDecisionFlow() (*DecisionFlow, error) {
 	flow.Metadata = dsl.Metadata
 
 	//map
+	featureMap := make(map[string]IFeature)
+	for _, feature := range dsl.Features {
+		featureMap[feature.Name] = NewFeature(feature.Name, GetFeatureType(feature.Kind)) //IFeature
+	}
+	flow.FeatureMap = featureMap
 	rulesetMap := make(map[string]INode)
 	for _, ruleset := range dsl.Rulesets {
 		rulesetMap[ruleset.GetName()] = ruleset
@@ -42,6 +48,10 @@ func (dsl *Dsl) ConvertToDecisionFlow() (*DecisionFlow, error) {
 	abtestMap := make(map[string]INode)
 	for _, abtest := range dsl.Abtests {
 		abtestMap[abtest.GetName()] = abtest
+	}
+	matrixMap := make(map[string]INode)
+	for _, martix := range dsl.Matrixs {
+		matrixMap[martix.GetName()] = martix
 	}
 
 	//flow
@@ -60,6 +70,9 @@ func (dsl *Dsl) ConvertToDecisionFlow() (*DecisionFlow, error) {
 			flow.AddNode(&newNode)
 		case TypeEnd:
 			newNode.SetElem(NewEndNode(newNode.NodeName))
+			flow.AddNode(&newNode)
+		case TypeMatrix:
+			newNode.SetElem(matrixMap[newNode.NodeName])
 			flow.AddNode(&newNode)
 		default:
 			log.Printf("dsl (%s-%s) convert warning: unkown node type (%s)\n", dsl.Key, dsl.Version, newNode.NodeKind)

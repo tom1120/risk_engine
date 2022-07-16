@@ -6,15 +6,41 @@ var LogicMap = map[string]string{
 }
 
 var OperatorMap = map[string]string{
-	"GT":  ">",
-	"LT":  "<",
-	"GE":  ">=",
-	"LE":  "<=",
-	"EQ":  "==",
-	"NEQ": "!=",
+	"GT":      ">",
+	"LT":      "<",
+	"GE":      ">=",
+	"LE":      "<=",
+	"EQ":      "==",
+	"NEQ":     "!=",
+	"BETWEEN": "between",
+	"LIKE":    "like",
+	"IN":      "in",
+	"CONTAIN": "contain",
 	//todo add string like
 }
 
+var NumSupportOperator = map[string]struct{}{
+	"GT":      struct{}{},
+	"LT":      struct{}{},
+	"GE":      struct{}{},
+	"LE":      struct{}{},
+	"EQ":      struct{}{},
+	"NEQ":     struct{}{},
+	"BETWEEN": struct{}{},
+}
+var StringSupportOperator = map[string]struct{}{
+	"EQ":      struct{}{},
+	"NEQ":     struct{}{},
+	"LIKE":    struct{}{},
+	"IN":      struct{}{},
+	"CONTAIN": struct{}{},
+}
+var DefaultSupportOperator = map[string]struct{}{
+	"EQ":  struct{}{},
+	"NEQ": struct{}{},
+}
+
+//todo
 var DecisionMap = map[string]int{
 	"reject": 100, //first priority
 	"pass":   0,
@@ -48,4 +74,10 @@ const (
 	DECISIONTREE   = "decisiontree"
 	DECISIONMATRIX = "decisionmatrix"
 	SCORECARD      = "scorecard"
+)
+
+//matrix
+const (
+	MATRIXX = "matrixX"
+	MATRIXY = "matrixY"
 )

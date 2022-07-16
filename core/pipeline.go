@@ -19,7 +19,7 @@ type PipelineContext struct {
 	nodeResults map[string]*NodeResult
 
 	fMutex   sync.RWMutex
-	features map[string]*Feature
+	features map[string]IFeature //保存所有上下文中已赋值的特征
 }
 
 type Track struct {
@@ -31,7 +31,7 @@ type Track struct {
 }
 
 func NewPipelineContext() *PipelineContext {
-	return &PipelineContext{features: make(map[string]*Feature),
+	return &PipelineContext{features: make(map[string]IFeature),
 		hitRules:    make(map[string]*Rule),
 		nodeResults: make(map[string]*NodeResult),
 	}
@@ -54,7 +54,7 @@ func (ctx *PipelineContext) GetTracks() []*Track {
 	return ctx.tracks
 }
 
-func (ctx *PipelineContext) SetFeatures(features map[string]*Feature) {
+func (ctx *PipelineContext) SetFeatures(features map[string]IFeature) {
 	if len(features) == 0 {
 		return
 	}
@@ -65,13 +65,13 @@ func (ctx *PipelineContext) SetFeatures(features map[string]*Feature) {
 	}
 }
 
-func (ctx *PipelineContext) SetFeature(feature *Feature) {
+func (ctx *PipelineContext) SetFeature(feature IFeature) {
 	ctx.fMutex.Lock()
 	defer ctx.fMutex.Unlock()
 	ctx.features[feature.GetName()] = feature //override the same key feature
 }
 
-func (ctx *PipelineContext) GetFeature(name string) (result *Feature, ok bool) {
+func (ctx *PipelineContext) GetFeature(name string) (result IFeature, ok bool) {
 	//local
 	ctx.fMutex.RLock()
 	localFeatures := ctx.features
@@ -84,7 +84,7 @@ func (ctx *PipelineContext) GetFeature(name string) (result *Feature, ok bool) {
 	return
 }
 
-func (ctx *PipelineContext) GetFeatures(depends []string) (result map[string]*Feature) {
+func (ctx *PipelineContext) GetFeatures(depends []string) (result map[string]IFeature) {
 	if len(depends) == 0 {
 		return
 	}
@@ -94,6 +94,7 @@ func (ctx *PipelineContext) GetFeatures(depends []string) (result map[string]*Fe
 	localFeatures := ctx.features
 	ctx.fMutex.RUnlock()
 
+	result = make(map[string]IFeature)
 	remoteList := make([]string, 0)
 	for _, name := range depends {
 		if v, ok := localFeatures[name]; ok {
@@ -105,6 +106,7 @@ func (ctx *PipelineContext) GetFeatures(depends []string) (result map[string]*Fe
 
 	//from remote
 	if len(remoteList) == 0 {
+		//远程调用后new的时候要知道类型
 		return
 	}
 
@@ -112,7 +114,7 @@ func (ctx *PipelineContext) GetFeatures(depends []string) (result map[string]*Fe
 	return
 }
 
-func (ctx *PipelineContext) GetAllFeatures() map[string]*Feature {
+func (ctx *PipelineContext) GetAllFeatures() map[string]IFeature {
 	ctx.fMutex.RLock()
 	defer ctx.fMutex.RUnlock()
 	return ctx.features
@@ -145,7 +147,7 @@ func (ctx *PipelineContext) GetNodeResults() map[string]*NodeResult {
 type DecisionResult struct {
 	HitRules    map[string]*Rule
 	Tracks      []*Track
-	Features    map[string]*Feature
+	Features    map[string]IFeature
 	NodeResults map[string]*NodeResult
 }
 

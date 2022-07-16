@@ -31,6 +31,14 @@ func (node ConditionalNode) GetTag() string {
 	return node.Tag
 }
 
+func (node ConditionalNode) BeforeParse(ctx *PipelineContext) error {
+	return nil
+}
+
+func (node ConditionalNode) AfterParse(ctx *PipelineContext, result *NodeResult) error {
+	return nil
+}
+
 func (conditional ConditionalNode) Parse(ctx *PipelineContext) (interface{}, error) {
 	log.Println("====[trace]conditional start=====", conditional.Name)
 
