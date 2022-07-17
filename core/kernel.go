@@ -20,6 +20,7 @@ func NewKernel() *Kernel {
 	return &Kernel{DecisionFlowMap: make(map[string]*DecisionFlow)}
 }
 
+//load dsl from method, default from file path. convert into flow
 func (kernel *Kernel) LoadDsl(method, path string) {
 	var yamls map[string][]byte
 	var err error

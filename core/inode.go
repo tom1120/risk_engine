@@ -5,7 +5,9 @@ type INode interface {
 	GetName() string
 	GetType() NodeType
 	GetInfo() NodeInfo
+	BeforeParse(*PipelineContext) error
 	Parse(*PipelineContext) (*NodeResult, error)
+	AfterParse(*PipelineContext, *NodeResult) error
 }
 
 //节点返回内容 是否阻断 下一个节点信息(ab,条件节点）
@@ -31,20 +33,20 @@ const (
 	TypeRuleset
 	TypeAbtest
 	TypeConditional
-	TypeDecisiontree
-	TypeDecisionmartix
+	TypeTree
+	TypeMatrix
 	TypeScorecard
 )
 
 var nodeStrMap = map[NodeType]string{
-	TypeStart:          "start",
-	TypeEnd:            "end",
-	TypeRuleset:        "ruleset",
-	TypeAbtest:         "abtest",
-	TypeConditional:    "conditional",
-	TypeDecisiontree:   "decisiontree",
-	TypeDecisionmartix: "decisionmartix",
-	TypeScorecard:      "scorecard",
+	TypeStart:       "start",
+	TypeEnd:         "end",
+	TypeRuleset:     "ruleset",
+	TypeAbtest:      "abtest",
+	TypeConditional: "conditional",
+	TypeTree:        "tree",
+	TypeMatrix:      "matrix",
+	TypeScorecard:   "scorecard",
 }
 
 func (nodeType NodeType) String() string {
@@ -52,14 +54,14 @@ func (nodeType NodeType) String() string {
 }
 
 var nodeTypeMap map[string]NodeType = map[string]NodeType{
-	"start":          TypeStart,
-	"end":            TypeEnd,
-	"ruleset":        TypeRuleset,
-	"abtest":         TypeAbtest,
-	"conditional":    TypeConditional,
-	"decisiontree":   TypeDecisiontree,
-	"decisionmartix": TypeDecisionmartix,
-	"scorecard":      TypeScorecard,
+	"start":       TypeStart,
+	"end":         TypeEnd,
+	"ruleset":     TypeRuleset,
+	"abtest":      TypeAbtest,
+	"conditional": TypeConditional,
+	"tree":        TypeTree,
+	"matrix":      TypeMatrix,
+	"scorecard":   TypeScorecard,
 }
 
 func GetNodeType(name string) NodeType {

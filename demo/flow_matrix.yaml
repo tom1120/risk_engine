@@ -1,0 +1,141 @@
+key: flow_matrix
+version: 1.0
+label: 矩阵决策流
+metadata:
+  author: hepeng
+  group: github
+decision_flow:
+  - flow_node:
+    node_name: start_1
+    node_kind: start
+    next_node_name: matrix_1
+    next_node_kind: matrix
+  - flow_node:
+    node_name: matrix_1
+    node_kind: matrix
+    next_node_name: end_1 
+    next_node_kind: end
+  - flow_node:
+    node_name: end_1
+    node_kind: end
+    next_node_name: 
+    next_node_kind: 
+matrixs:
+  - matrix: 
+    info:
+      id: 1
+      name: matrix_1
+      tag: my_matrix
+      label: 测试决策矩阵
+      kind: matrix
+      depends: [feature_1,feature_2,feature_3]
+    exec_plan: parallel  #x,y并发执行
+    matrix_strategy:
+      output_name: my_matrix_1
+      output_kind: int
+      depend: [matrixX, matrixY]
+      cases:
+      - case: [rule_1, rule_3]
+        output: 1
+      - case: [rule_1, rule_4]
+        output: 2
+      - case: [rule_2, rule_3]
+        output: 3
+      - case: [rule_2, rule_4]
+        output: 4
+    rules: 
+    - rule:
+      id: 1
+      name: rule_1
+      tag: A
+      label: 横轴1
+      kind: matrixX
+      conditions:
+      - condition:
+        name: c1
+        feature: feature_1
+        operator: GT
+        value: 1
+      - condition:
+        name: c2
+        feature: feature_1
+        operator: LE
+        value: 10
+      decision: 
+        depends: [c1, c2]
+        logic: c1 && c2
+        output:
+          name:
+          value: D1
+          kind: string
+    - rule:
+      id: 2
+      name: rule_2
+      tag: B
+      label: 横轴2
+      kind: matrixX
+      conditions:
+      - condition:
+        name: c3
+        feature: feature_1
+        operator: GT
+        value: 10
+      decision: 
+        depends: [c3]
+        logic: c3
+        output:
+          name:
+          value: D2
+          kind: string
+    - rule:
+      id: 3
+      name: rule_3
+      tag: C
+      label: 纵轴3
+      kind: matrixY
+      conditions:
+      - condition:
+        name: c4
+        feature: feature_2
+        operator: LE
+        value: 5
+      decision: 
+        depends: [c4]
+        logic: c4
+        output:
+          name:
+          value: D3
+          kind: string
+    - rule:
+      id: 4
+      name: rule_4
+      tag: D
+      label: 纵轴4
+      kind: matrixY
+      conditions:
+      - condition:
+        name: c5
+        feature: feature_2
+        operator: GT
+        value: 5
+      decision: 
+        depends: [c5]
+        logic: c5
+        output:
+          name:
+          value: D4
+          kind: string
+features:
+  - feature:
+    id: 1    
+    name: feature_1
+    tag: aa
+    label: 特征1
+    kind: int 
+  - feature:
+    id: 22   
+    name: feature_2
+    tag: aa
+    label: 特征2
+    kind: int 
+

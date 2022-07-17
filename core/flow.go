@@ -7,12 +7,13 @@ import (
 )
 
 type DecisionFlow struct {
-	Key       string
-	Version   string
-	Metadata  map[string]interface{}
-	Md5       string //yaml文件的md5值
-	flowMap   map[string]*FlowNode
-	startNode *FlowNode
+	Key        string
+	Version    string
+	Metadata   map[string]interface{}
+	Md5        string //yaml文件的md5值
+	flowMap    map[string]*FlowNode
+	startNode  *FlowNode
+	FeatureMap map[string]IFeature
 }
 
 func NewDecisionFlow() *DecisionFlow {
@@ -102,7 +103,7 @@ func (flow *DecisionFlow) parseNode(curNode *FlowNode, ctx *PipelineContext) (ne
 	case TypeAbtest: //ABTEST:
 		nextNode, gotoNext = flow.GetNode(res.NextNodeName, res.NextNodeType)
 		return
-	default: //start
+	default:
 		nextNode, gotoNext = flow.GetNode(curNode.NextNodeName, curNode.NextNodeKind)
 		return
 	}
@@ -136,6 +137,20 @@ func (flowNode *FlowNode) GetElem() INode {
 }
 
 func (flowNode *FlowNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
-	//hook
-	return flowNode.elem.Parse(ctx)
+	//before hook
+	err := flowNode.elem.BeforeParse(ctx)
+	if err != nil {
+		return (*NodeResult)(nil), err
+	}
+	//parse
+	result, err := flowNode.elem.Parse(ctx)
+	if err != nil {
+		return (*NodeResult)(nil), err
+	}
+	//after hook
+	err = flowNode.elem.AfterParse(ctx, result)
+	if err != nil {
+		return (*NodeResult)(nil), err
+	}
+	return result, nil
 }

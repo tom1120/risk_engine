@@ -28,24 +28,29 @@ type Rule struct {
 	Name       string      `yaml:"name"`
 	Tag        string      `yaml:"tag"`
 	Label      string      `yaml:"label"`
+	Kind       string      `yaml:"kind"`
 	Conditions []Condition `yaml:"conditions,flow"`
 	Decision   Decision    `yaml:"decision"`
 }
 
 //parse rule
-func (rule *Rule) Parse(ctx *PipelineContext) (output *Output, err error) {
+func (rule *Rule) Parse(ctx *PipelineContext, depends map[string]IFeature) (output *Output, err error) {
 	output = &rule.Decision.Output
 
 	//rule.Conditions
 	if len(rule.Conditions) == 0 {
 		err = errors.New(fmt.Sprintf("rule (%s) condition is empty", rule.Name))
+		log.Println(err)
 		return
 	}
+
 	var conditionRet = make(map[string]interface{}, 0)
 	for _, condition := range rule.Conditions {
-		if feature, ok := ctx.GetFeature(condition.Feature); ok {
-			value, _ := feature.GetValue() //是否使用default
-			rs, err := operator.Compare(condition.Operator, value, condition.Value)
+		if feature, ok := depends[condition.Feature]; ok {
+			//value, _ := feature.GetValue() //是否使用default
+			rs, err := feature.Compare(condition.Operator, condition.Value)
+
+			//rs, err := operator.Compare(condition.Operator, value, condition.Value)
 			if err != nil {
 				return output, nil //value deafult
 			}
@@ -72,9 +77,9 @@ func (rule *Rule) Parse(ctx *PipelineContext) (output *Output, err error) {
 
 	//assign
 	if len(rule.Decision.Assign) > 0 {
-		features := make(map[string]*Feature)
+		features := make(map[string]IFeature)
 		for name, value := range rule.Decision.Assign {
-			feature := NewFeature(name, TypeString, "") //string
+			feature := NewFeature(name, TypeDefault) //string
 			feature.SetValue(value)
 			features[name] = feature
 		}

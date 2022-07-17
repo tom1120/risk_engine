@@ -121,6 +121,7 @@ curl http://localhost:8889/engine/list -XPOST
 	}]
 }
 ```
+目前支持的决策流以文件形式存在于demo/中，启动时加载到内存中
 
 ### 执行决策流
 - 请求接口：
@@ -145,12 +146,24 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 		"uid": 1,
 		"features": [{
 			"isDefault": false,
+			"name": "feature_8",
+			"value": 4
+		}, {
+			"isDefault": false,
 			"name": "feature_1",
 			"value": 5
 		}, {
 			"isDefault": false,
 			"name": "feature_2",
 			"value": 3
+		}, {
+			"isDefault": false,
+			"name": "feature_4",
+			"value": 32
+		}, {
+			"isDefault": false,
+			"name": "feat1",
+			"value": "aa"
 		}, {
 			"isDefault": false,
 			"name": "feature_5",
@@ -169,16 +182,8 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 			"value": 55
 		}, {
 			"isDefault": false,
-			"name": "feature_4",
-			"value": 32
-		}, {
-			"isDefault": false,
-			"name": "feature_8",
-			"value": 4
-		}, {
-			"isDefault": false,
-			"name": "feature_x",
-			"value": 111
+			"name": "feat2",
+			"value": "bb"
 		}],
 		"tracks": [{
 			"index": 1,
@@ -190,38 +195,70 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 			"name": "abtest_1"
 		}, {
 			"index": 3,
-			"label": "内部规则集1",
-			"name": "ruleset_1"
-		}, {
-			"index": 4,
-			"label": "",
-			"name": "end_1"
+			"label": "内部规则集2",
+			"name": "ruleset_2"
 		}],
-		"rules": [],
-		"start_time": "2022-06-09 21:11:11",
-		"end_time": "2022-06-09 21:11:11",
-		"run_time": 0
+		"hit_rules": [{
+			"id": "55",
+			"label": "规则4",
+			"name": "rule_4"
+		}],
+		"node_results": [{
+			"IsBlock": false,
+			"Kind": "start",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "start_1",
+			"tag": ""
+		}, {
+			"IsBlock": false,
+			"Kind": "abtest",
+			"Score": 0,
+			"Value": 34.20045077555402,
+			"id": 11,
+			"label": "分流实验",
+			"name": "abtest_1",
+			"tag": "tag_ab"
+		}, {
+			"IsBlock": true,
+			"Kind": "ruleset",
+			"Score": 100,
+			"Value": "reject",
+			"id": 333,
+			"label": "内部规则集2",
+			"name": "ruleset_2",
+			"tag": "internal"
+		}],
+		"start_time": "2022-06-12 11:48:59",
+		"end_time": "2022-06-12 11:48:59",
+		"run_time": 1
 	}
 }
 ```
+- features 所有特征值，包括执行过程中产生的衍生特征和赋值特征
+- hit_rules 命中的规则列表
+- tracks 流执行轨迹 
+- node_results 各节点执行情况和产生值
 
 ## 系统解读 
 ### 代码结构
 ```
-├── api   接口逻辑
+├── api  http接口逻辑
 ├── configs  配置文件
 ├── docs 文档
 ├── core 决策引擎解析核心目录
 ├── service 执行逻辑
 ├── cmd 启动文件
-├── global 全局上下文
+├── global 全局配置
+├── demo 测试yaml文件
 ├── internal
 │  ├── dto 数据传输对象
 │  ├── errcode 错误异常定义
 │  ├── feature 特征
 │  └── operator 操作算子
 ├── test 测试用例
-│  └── yaml 测试yaml文件
 ```
 
 ### DSL 语法结构

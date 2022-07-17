@@ -21,3 +21,15 @@ func Evaluate(exprStr string, params map[string]interface{}) (bool, error) {
 	}
 	return false, errors.New("convert error")
 }
+
+func InArray(arr []interface{}, val interface{}) bool {
+	if len(arr) == 0 {
+		return false
+	}
+	for _, v := range arr {
+		if v == val {
+			return true
+		}
+	}
+	return false
+}
