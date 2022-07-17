@@ -25,6 +25,14 @@ func (abtest AbtestNode) GetInfo() NodeInfo {
 	return abtest.Info
 }
 
+func (node AbtestNode) BeforeParse(ctx *PipelineContext) error {
+	return nil
+}
+
+func (node AbtestNode) AfterParse(ctx *PipelineContext, result *NodeResult) error {
+	return nil
+}
+
 func (abtest AbtestNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	info := abtest.GetInfo()
 	log.Printf("======[trace]abtest(%s, %s) start======\n", info.Label, abtest.GetName())

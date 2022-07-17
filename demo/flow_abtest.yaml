@@ -36,7 +36,7 @@ rulesets:
       tag: internal
       label: 内部规则集1
       kind: ruleset
-      depends: [feature_1,feature_2,feature_e]
+      depends: [feature_1,feature_2,feature_3]
     exec_plan: parallel
     block_strategy:
       is_block: true
@@ -179,3 +179,13 @@ abtests:
           name:
           value: ruleset_2
           kind: ruleset
+features:
+  - feature:
+    name: feature_1
+    kind: int
+  - feature:
+    name: feature_2
+    kind: int
+  - feature:
+    name: feature_3
+    kind: int
