@@ -262,7 +262,7 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 ```
 
 ### DSL 语法结构
-[dsl详解](https://github.com/skyhackvip/risk_engine/tree/master/docs/dsl.md)
+[Dsl 语法详解](https://github.com/skyhackvip/risk_engine/tree/master/docs/dsl.md)
 
 
 ### 决策引擎架构图
