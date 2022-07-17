@@ -5,6 +5,9 @@
 ## 开源声明
 本项目用于学习和参考，采用 Apache License, Version 2.0 开源，转载使用请说明出处。代码不定期迭代更新，欢迎 Star & Watch，如需交流请添加公众号“技术岁月”。
 
+## 关于版本
+公众号讲解版本为 tag v1，由于早期代码规划不合理，已做重构，最新更新稳定版本为 master 分支。
+
 ## 决策引擎系统介绍
 决策引擎系统，是构建于规则引擎和流程引擎基础上，满足复杂业务决策的一套系统，可用于反欺诈、信用评估、风险决策、推荐系统、精准营销、内容审核等领域。
 
@@ -21,9 +24,9 @@
 - 评分卡
 - 决策流
 - 冠军挑战者 
+- 支持特征类型：int、string、bool
 
-
-## 编译运行
+## 快速开始
 - 环境准备
 go version go1.13 +
 
@@ -86,7 +89,7 @@ docker stop risk_engine
 ```
 
 
-## 支持接口 API
+## 支持接口 HTTP API
 
 ### 获取支持的所有决策流
 - 请求接口：
@@ -125,7 +128,11 @@ curl http://localhost:8889/engine/list -XPOST
 ```shell
 curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version":"1.0", "req_id":"123456", "uid":1,"features":{"feature_1":5,"feature_2":3,"feature_3":55,"feature_4":32,"feature_5":33,"feature_6":231,"feature_7":2,"feature_8":4}}'
 ```
-key: 决策流标识，目前支持的决策流以文件形式存在于demo/中，对应的文件名即为key
+- key: 决策流标识，目前支持的决策流以文件形式存在于目录 demo/ 中
+- version：决策流版本标识
+- req_id：请求ID
+- uid： 用户ID
+- features：入参传入的特征值
 
 - 接口返回：
 ```json
