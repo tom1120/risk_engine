@@ -96,14 +96,16 @@ func (flow *DecisionFlow) parseNode(curNode *FlowNode, ctx *PipelineContext) (ne
 		return
 	}
 
-	switch curNode.GetNodeType() { //int
+	switch curNode.GetNodeType() {
 	case TypeEnd: //END:
 		gotoNext = false
 		return
-	case TypeAbtest: //ABTEST:
+	case TypeConditional:
+		fallthrough
+	case TypeAbtest: //ABTEST
 		nextNode, gotoNext = flow.GetNode(res.NextNodeName, res.NextNodeType)
 		return
-	default:
+	default: //start,matrix,ruleset,tree,scorecard
 		nextNode, gotoNext = flow.GetNode(curNode.NextNodeName, curNode.NextNodeKind)
 		return
 	}

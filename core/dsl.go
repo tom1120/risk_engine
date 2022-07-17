@@ -13,7 +13,7 @@ type Dsl struct {
 	Rulesets     []RulesetNode          `yaml:"rulesets,flow"`
 	Abtests      []AbtestNode           `yaml:"abtests,flow"`
 	Matrixs      []MatrixNode           `yaml:"matrixs,flow"`
-	//	Conditionals    []Conditional    `yaml:"conditionals,flow"`
+	Conditionals []ConditionalNode      `yaml:"conditionals,flow"`
 	//	DecisionTrees   []DecisionTree   `yaml:"decisiontrees,flow"`
 	//	ScoreCards      []ScoreCard      `yaml:"scorecards,flow"`
 }
@@ -49,6 +49,10 @@ func (dsl *Dsl) ConvertToDecisionFlow() (*DecisionFlow, error) {
 	for _, abtest := range dsl.Abtests {
 		abtestMap[abtest.GetName()] = abtest
 	}
+	conditionalMap := make(map[string]INode)
+	for _, conditional := range dsl.Conditionals {
+		conditionalMap[conditional.GetName()] = conditional
+	}
 	matrixMap := make(map[string]INode)
 	for _, martix := range dsl.Matrixs {
 		matrixMap[martix.GetName()] = martix
@@ -63,6 +67,9 @@ func (dsl *Dsl) ConvertToDecisionFlow() (*DecisionFlow, error) {
 			flow.AddNode(&newNode)
 		case TypeAbtest:
 			newNode.SetElem(abtestMap[newNode.NodeName])
+			flow.AddNode(&newNode)
+		case TypeConditional:
+			newNode.SetElem(conditionalMap[newNode.NodeName])
 			flow.AddNode(&newNode)
 		case TypeStart:
 			newNode.SetElem(NewStartNode(newNode.NodeName))

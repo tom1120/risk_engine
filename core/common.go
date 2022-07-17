@@ -47,10 +47,7 @@ func (rule *Rule) Parse(ctx *PipelineContext, depends map[string]IFeature) (outp
 	var conditionRet = make(map[string]interface{}, 0)
 	for _, condition := range rule.Conditions {
 		if feature, ok := depends[condition.Feature]; ok {
-			//value, _ := feature.GetValue() //是否使用default
 			rs, err := feature.Compare(condition.Operator, condition.Value)
-
-			//rs, err := operator.Compare(condition.Operator, value, condition.Value)
 			if err != nil {
 				return output, nil //value deafult
 			}
@@ -121,7 +118,6 @@ func (output *Output) GetHit() bool {
 type Branch struct {
 	Name       string      `yaml:"name"`
 	Conditions []Condition `yaml:"conditions"` //used by conditional
-	Logic      string      `yaml:"logic"`      //used by conditional
 	Percent    float64     `yaml:"percent"`    //used by abtest
 	Decision   Decision    `yaml:"decision"`
 }
