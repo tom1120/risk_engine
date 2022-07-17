@@ -269,27 +269,27 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 ![决策引擎架构图](https://i.loli.net/2021/01/21/bOR1tyVPnCZNGoi.png)
 
 ### 风控系列文章解读
-[智能风控决策引擎系统架构设计总纲](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484064&idx=1&sn=fecd2c7379208e84e7e3cd4eb1abfb6c&chksm=e8215db0df56d4a623bd6be2a706c0220952f0e045b0d6d9646616ee3aae742c574335fa228a&token=221471496&lang=zh_CN#rd)
+- [智能风控决策引擎系统架构设计总纲](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484064&idx=1&sn=fecd2c7379208e84e7e3cd4eb1abfb6c&chksm=e8215db0df56d4a623bd6be2a706c0220952f0e045b0d6d9646616ee3aae742c574335fa228a&token=221471496&lang=zh_CN#rd)
 
 
-[智能风控决策引擎系统可落地实现方案（一）规则引擎实现](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247483738&idx=1&sn=111609f176f11de8357c51a820b089b5&chksm=e8215e4adf56d75c2e6e8b81b89c1faabab667f493ce809cb749994cc9cd776342fd17d4172e&token=227666410&lang=zh_CN#rd)
+- [智能风控决策引擎系统可落地实现方案（一）规则引擎实现](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247483738&idx=1&sn=111609f176f11de8357c51a820b089b5&chksm=e8215e4adf56d75c2e6e8b81b89c1faabab667f493ce809cb749994cc9cd776342fd17d4172e&token=227666410&lang=zh_CN#rd)
 
-[智能风控决策引擎系统可落地实现方案（二）决策流实现](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247483770&idx=1&sn=3166a6617ddb6b628261b8b7ff84cfac&chksm=e8215e6adf56d77cb76de41b63e63759221932f030e315acebbc4025939b2e02b354a9072ecc&scene=178#rd)
+- [智能风控决策引擎系统可落地实现方案（二）决策流实现](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247483770&idx=1&sn=3166a6617ddb6b628261b8b7ff84cfac&chksm=e8215e6adf56d77cb76de41b63e63759221932f030e315acebbc4025939b2e02b354a9072ecc&scene=178#rd)
 
-[智能风控决策引擎系统可落地实现方案（三）模型引擎实现](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247483789&idx=1&sn=ddb5f31edfd3174d4551fecc3f120f42&chksm=e8215e9ddf56d78b520f7ab5c8db7e978b3078a1e2511d424ff272ac6c509fd4c13d893dfc09&token=1795265687&lang=zh_CN#rd)
+- [智能风控决策引擎系统可落地实现方案（三）模型引擎实现](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247483789&idx=1&sn=ddb5f31edfd3174d4551fecc3f120f42&chksm=e8215e9ddf56d78b520f7ab5c8db7e978b3078a1e2511d424ff272ac6c509fd4c13d893dfc09&token=1795265687&lang=zh_CN#rd)
 
-[智能风控决策引擎系统可落地实现方案（四）风控决策实现](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247483825&idx=1&sn=3ebf7c8ad42f870e48db56ca6bb99ade&chksm=e8215ea1df56d7b7d9b1c653c61ef011d72d46d090845d91deba39f635d03ce1282eaa433485&token=1795265687&lang=zh_CN#rd)
+- [智能风控决策引擎系统可落地实现方案（四）风控决策实现](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247483825&idx=1&sn=3ebf7c8ad42f870e48db56ca6bb99ade&chksm=e8215ea1df56d7b7d9b1c653c61ef011d72d46d090845d91deba39f635d03ce1282eaa433485&token=1795265687&lang=zh_CN#rd)
 
-[智能风控决策引擎系统可落地实现方案（五）评分卡实现](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247483860&idx=1&sn=45bfbf4e436001dc060d5d4718688e9b&chksm=e8215ec4df56d7d2396c6024b49fc67eb25ee5754da9ddd40365f72abd5c1535a45218ea79b1&token=1239858205&lang=zh_CN#rd)
+- [智能风控决策引擎系统可落地实现方案（五）评分卡实现](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247483860&idx=1&sn=45bfbf4e436001dc060d5d4718688e9b&chksm=e8215ec4df56d7d2396c6024b49fc67eb25ee5754da9ddd40365f72abd5c1535a45218ea79b1&token=1239858205&lang=zh_CN#rd)
 
-[智能风控决策引擎系统可落地实现方案（六）风控监控大盘实现](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247483882&idx=1&sn=cb1142ea342b03f2f4ada44383e4bcbe&chksm=e8215efadf56d7ecae2159b7f742678d6036e6df046513ccce0efb052029d13b4c7b67ae1bc6&token=290046129&lang=zh_CN#rd)
+- [智能风控决策引擎系统可落地实现方案（六）风控监控大盘实现](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247483882&idx=1&sn=cb1142ea342b03f2f4ada44383e4bcbe&chksm=e8215efadf56d7ecae2159b7f742678d6036e6df046513ccce0efb052029d13b4c7b67ae1bc6&token=290046129&lang=zh_CN#rd)
 
 
-[金融智能风控系统演进开发实践](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484207&idx=1&sn=9ef3c9a1b9f6ca0ad6fca1072925b15d&chksm=e8215c3fdf56d529b23975054a36b3186303400fedd90daa2298dd23c09779895204bc58655d&token=2012091003&lang=zh_CN#rd)
+- [金融智能风控系统演进开发实践](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484207&idx=1&sn=9ef3c9a1b9f6ca0ad6fca1072925b15d&chksm=e8215c3fdf56d529b23975054a36b3186303400fedd90daa2298dd23c09779895204bc58655d&token=2012091003&lang=zh_CN#rd)
 
-[金融风控领域的 DDD 与中台思考](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484233&idx=1&sn=59f68324e1b35c3ea2bc642edc21b004&chksm=e8215c59df56d54f9846cb218069451dc247dab2b815a0cdcc044886cb738e1372e2d25ba864&scene=178&cur_album_id=1519884739007053825#rd)
+- [金融风控领域的 DDD 与中台思考](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484233&idx=1&sn=59f68324e1b35c3ea2bc642edc21b004&chksm=e8215c59df56d54f9846cb218069451dc247dab2b815a0cdcc044886cb738e1372e2d25ba864&scene=178&cur_album_id=1519884739007053825#rd)
 
-[金融风控系统的演进与升级:从第一代到第四代](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484409&idx=1&sn=5b646fc06bdf7256f4ff341610878bbd&chksm=e8215ce9df56d5ff9e45b00ca2cbbe8bdc7cc46e3e0c759f5de44118312301677dac7f4807ea&token=2012091003&lang=zh_CN#rd)
+- [金融风控系统的演进与升级:从第一代到第四代](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484409&idx=1&sn=5b646fc06bdf7256f4ff341610878bbd&chksm=e8215ce9df56d5ff9e45b00ca2cbbe8bdc7cc46e3e0c759f5de44118312301677dac7f4807ea&token=2012091003&lang=zh_CN#rd)
 
 
 扫码关注微信公众号 ***技术岁月*** 支持：
