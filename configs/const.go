@@ -16,7 +16,6 @@ var OperatorMap = map[string]string{
 	"LIKE":    "like",
 	"IN":      "in",
 	"CONTAIN": "contain",
-	//todo add string like
 }
 
 var NumSupportOperator = map[string]struct{}{
@@ -27,20 +26,28 @@ var NumSupportOperator = map[string]struct{}{
 	"EQ":      struct{}{},
 	"NEQ":     struct{}{},
 	"BETWEEN": struct{}{},
+	"IN":      struct{}{},
 }
 var StringSupportOperator = map[string]struct{}{
-	"EQ":      struct{}{},
-	"NEQ":     struct{}{},
-	"LIKE":    struct{}{},
-	"IN":      struct{}{},
-	"CONTAIN": struct{}{},
+	"EQ":   struct{}{},
+	"NEQ":  struct{}{},
+	"LIKE": struct{}{},
+	"IN":   struct{}{},
+}
+var EnumSupportOperator = map[string]struct{}{
+	"EQ":  struct{}{},
+	"NEQ": struct{}{},
+}
+var BoolSupportOperator = map[string]struct{}{
+	"EQ":  struct{}{},
+	"NEQ": struct{}{},
 }
 var DefaultSupportOperator = map[string]struct{}{
 	"EQ":  struct{}{},
 	"NEQ": struct{}{},
 }
 
-//todo
+//ruleset decision
 var DecisionMap = map[string]int{
 	"reject": 100, //first priority
 	"pass":   0,

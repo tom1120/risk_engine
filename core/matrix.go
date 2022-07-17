@@ -151,9 +151,6 @@ func (matrixNode MatrixNode) matchResult(xResult, yResult string) (interface{}, 
 		key := c.Case[0] + c.Case[1]
 		caseMap[key] = c.Output
 	}
-	log.Println(caseMap)
-	log.Println(xResult + yResult)
-	log.Println(caseMap[xResult+yResult])
 	if val, ok := caseMap[xResult+yResult]; ok {
 		return val, matrixNode.MatrixStrategy.OutputKind, true
 	}

@@ -33,7 +33,7 @@ rulesets:
       tag: internal
       label: 内部规则集1
       kind: ruleset
-      depends: [feature_1,feature_2,feature_3]
+      depends: [feature_1,feature_2,feature_3,feature_4]
     exec_plan: parallel
     block_strategy:
       is_block: true
@@ -55,13 +55,13 @@ rulesets:
       - condition:
         name: c2
         feature: feature_2
-        operator: LE
-        value: 5
+        operator: LIKE
+        value: apple
       - condition:
         name: c3
         feature: feature_3
-        operator: EQ
-        value: 2
+        operator: IN
+        value: [1,2,3,4,5]
       decision: 
         depends: [c1, c2, c3]
         logic: (c1 || c2) && c3
@@ -80,9 +80,9 @@ rulesets:
       conditions:
       - condition:
         name: c1
-        feature: feature_2
-        operator: LT
-        value: 18
+        feature: feature_4
+        operator: EQ
+        value: true
       decision: 
         depends: [c1]
         logic: c1
@@ -98,11 +98,11 @@ rulesets:
       tag: model
       label: 规则集2
       kind: ruleset
-      depends: [test_in]
+      depends: [feature_5]
     exec_plan: serial
     block_strategy:
       is_block: true
-      hit_rule: [rule_1] #命中该规则就中断
+      hit_rule: [rule_3] #命中该规则就中断
       operator: EQ
       value: reject  #=reject中断
     rules: 
@@ -110,13 +110,13 @@ rulesets:
       id: 44
       name: rule_3
       tag: 10003
-      label: 简单规则3
+      label: 字符串规则
       conditions:
       - condition:
         name: c1
-        feature: test_in 
-        operator: GT
-        value: 5
+        feature: feature_5 
+        operator: EQ
+        value: test
       decision: 
         depends: [c1]
         logic: c1
@@ -125,3 +125,34 @@ rulesets:
           value: record
           kind: TypeStrategy
         assign:
+features:
+  - feature:
+    id: 1    
+    name: feature_1
+    tag: num
+    label: 特征1 
+    kind: int 
+  - feature:
+    id: 2 
+    name: feature_2
+    tag: str
+    label: 特征2 
+    kind: string
+  - feature:
+    id: 3    
+    name: feature_3
+    tag: num
+    label: 特征3 
+    kind: int 
+  - feature:
+    id: 4   
+    name: feature_4
+    tag: bool
+    label: 特征4
+    kind: bool
+  - feature:
+    id: 5
+    name: feature_5
+    tag: str
+    label: 特征5
+    kind: string

@@ -1,9 +1,10 @@
 package core
 
 import (
-	"errors"
 	"github.com/skyhackvip/risk_engine/configs"
+	"github.com/skyhackvip/risk_engine/internal/errcode"
 	"github.com/skyhackvip/risk_engine/internal/operator"
+	"strings"
 )
 
 type FeatureType int
@@ -13,29 +14,26 @@ const (
 	TypeFloat
 	TypeString
 	TypeBool
-	TypeEnum
-	TypeStrategy //策略结构体
+	//	TypeStrategy //策略结构体
 	TypeDefault
 )
 
 var FeatureTypeMap = map[string]FeatureType{
-	"int":      TypeInt,
-	"float":    TypeFloat,
-	"string":   TypeString,
-	"bool":     TypeBool,
-	"enum":     TypeEnum,
-	"default":  TypeDefault,
-	"strategy": TypeStrategy,
+	"int":     TypeInt,
+	"float":   TypeFloat,
+	"string":  TypeString,
+	"bool":    TypeBool,
+	"default": TypeDefault,
+	//	"strategy": TypeStrategy,
 }
 
 var FeatureStrMap = map[FeatureType]string{
-	TypeInt:      "int",
-	TypeFloat:    "float",
-	TypeString:   "string",
-	TypeBool:     "bool",
-	TypeEnum:     "enum",
-	TypeDefault:  "default",
-	TypeStrategy: "strategy",
+	TypeInt:     "int",
+	TypeFloat:   "float",
+	TypeString:  "string",
+	TypeBool:    "bool",
+	TypeDefault: "default",
+	//	TypeStrategy: "strategy",
 }
 
 func GetFeatureType(name string) FeatureType {
@@ -60,11 +58,8 @@ type IFeature interface {
 	GetValue() (interface{}, bool)
 	SupportOperators() map[string]struct{}
 	Compare(op string, value interface{}) (bool, error)
-
-	//in, like
 }
 
-//default
 func NewFeature(name string, kind FeatureType) (feature IFeature) {
 	switch kind {
 	case TypeInt:
@@ -76,6 +71,11 @@ func NewFeature(name string, kind FeatureType) (feature IFeature) {
 		}
 	case TypeString:
 		feature = &TypeStringFeature{
+			Name: name,
+			Kind: kind,
+		}
+	case TypeBool:
+		feature = &TypeBoolFeature{
 			Name: name,
 			Kind: kind,
 		}
@@ -117,7 +117,7 @@ func (feature *TypeNumFeature) GetName() string {
 
 func (feature *TypeNumFeature) Compare(op string, target interface{}) (bool, error) {
 	if _, ok := feature.SupportOperators()[op]; !ok {
-		return false, errors.New("not support operator")
+		return false, errcode.ParseErrorNotSupportOperator
 	}
 	value, _ := feature.GetValue() //默认值处理
 
@@ -135,10 +135,37 @@ func (feature *TypeNumFeature) Compare(op string, target interface{}) (bool, err
 	case "NEQ":
 		rs, err := operator.Compare(op, value, target)
 		return rs, err
+	case "BETWEEN":
+		if t, ok := target.([]int); !ok {
+			return false, errcode.ParseErrorTargetMustBeArray
+		} else {
+			if len(t) != 2 {
+				return false, errcode.ParseErrorTargetMustBeArray
+			}
+			if t[0] > t[1] {
+				t[0], t[1] = t[1], t[0]
+			}
+			rs1, err := operator.Compare("GT", value, t[0])
+			if err != nil {
+				return false, err
+			}
+			rs2, err := operator.Compare("LT", value, t[1])
+			if err != nil {
+				return false, err
+			}
+			return rs1 && rs2, nil
+
+		}
+	case "IN":
+		if t, ok := target.([]interface{}); !ok {
+			return false, errcode.ParseErrorTargetMustBeArray
+		} else {
+			return operator.InArray(t, value), nil
+		}
 	default:
-		return false, errors.New("not support operator1")
+		return false, errcode.ParseErrorNotSupportOperator
 	}
-	return false, errors.New("not support operator2")
+	return false, errcode.ParseErrorNotSupportOperator
 }
 
 //字符串类型
@@ -169,11 +196,64 @@ func (feature *TypeStringFeature) GetName() string {
 }
 
 func (feature *TypeStringFeature) Compare(op string, target interface{}) (bool, error) {
-	//todo
 	if _, ok := feature.SupportOperators()[op]; !ok {
-		return false, errors.New("not support operator")
+		return false, errcode.ParseErrorNotSupportOperator
 	}
 	value, _ := feature.GetValue() //默认值处理
+
+	switch op {
+	case "EQ":
+		fallthrough
+	case "NEQ":
+		rs, err := operator.Compare(op, value, target)
+		return rs, err
+	case "LIKE":
+		if ok := strings.Contains(value.(string), target.(string)); ok {
+			return true, nil
+		} else {
+			return false, nil
+		}
+	case "IN":
+		if t, ok := target.([]interface{}); !ok {
+			return false, errcode.ParseErrorTargetMustBeArray
+		} else {
+			return operator.InArray(t, value), nil
+		}
+	default:
+		return false, errcode.ParseErrorNotSupportOperator
+	}
+	return false, errcode.ParseErrorNotSupportOperator
+}
+
+//bool类型
+type TypeBoolFeature struct {
+	Name         string
+	Kind         FeatureType
+	Value        interface{}
+	DefaultValue interface{}
+}
+
+func (feature *TypeBoolFeature) SupportOperators() map[string]struct{} {
+	return configs.BoolSupportOperator
+}
+
+func (feature *TypeBoolFeature) SetValue(value interface{}) {
+	feature.Value = value
+}
+
+func (feature *TypeBoolFeature) GetValue() (interface{}, bool) {
+	return feature.Value, true
+}
+
+func (feature *TypeBoolFeature) GetName() string {
+	return feature.Name
+}
+
+func (feature *TypeBoolFeature) Compare(op string, target interface{}) (bool, error) {
+	if _, ok := feature.SupportOperators()[op]; !ok {
+		return false, errcode.ParseErrorNotSupportOperator
+	}
+	value, _ := feature.GetValue()
 	return operator.Compare(op, value, target)
 }
 
@@ -206,7 +286,7 @@ func (feature *TypeDefaultFeature) GetName() string {
 
 func (feature *TypeDefaultFeature) Compare(op string, target interface{}) (bool, error) {
 	if _, ok := feature.SupportOperators()[op]; !ok {
-		return false, errors.New("not support operator")
+		return false, errcode.ParseErrorNotSupportOperator
 	}
 	value, _ := feature.GetValue() //默认值处理
 	return operator.Compare(op, value, target)
