@@ -66,6 +66,7 @@ func (rule *Rule) Parse(ctx *PipelineContext, depends map[string]IFeature) (outp
 	//rule.Decision
 	expr := rule.Decision.Logic
 	logicRet, err := operator.Evaluate(expr, conditionRet)
+	//某个表达式执行失败会导致最终逻辑执行失败
 	if err != nil {
 		return
 	}
@@ -73,7 +74,7 @@ func (rule *Rule) Parse(ctx *PipelineContext, depends map[string]IFeature) (outp
 	output.SetHit(logicRet)
 
 	//assign
-	if len(rule.Decision.Assign) > 0 {
+	if len(rule.Decision.Assign) > 0 && logicRet {
 		features := make(map[string]IFeature)
 		for name, value := range rule.Decision.Assign {
 			feature := NewFeature(name, TypeDefault) //string

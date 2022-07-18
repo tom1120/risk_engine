@@ -1,0 +1,91 @@
+key: flow_ruleset
+version: 1.0
+label: ruleset决策流
+metadata:
+decision_flow:
+  - flow_node:
+    node_name: start_1
+    node_kind: start
+    next_node_name: ruleset_1
+    next_node_kind: ruleset
+  - flow_node:
+    node_name: ruleset_1
+    node_kind: ruleset
+    next_node_name: end_1
+    next_node_kind: end
+  - flow_node:
+    node_name: end_1
+    node_kind: end
+    next_node_name:
+    next_node_kind:
+rulesets:
+  - ruleset:
+    info:
+      id: 1
+      name: ruleset_1
+      tag: internal
+      label: 规则集1
+      kind: ruleset
+      depends: [feature_1,feature_2,feature_3]
+    exec_plan: parallel
+    block_strategy:
+      is_block: true
+      hit_rule: [rule_1] #命中该规则就中断
+      operator: EQ
+      value: reject  #=reject中断
+    rules: 
+    - rule: 
+      id: 1
+      name: rule_1
+      tag: tag1
+      label: 规则1
+      conditions:
+      - condition:
+        name: c1
+        feature: feature_1
+        operator: GT
+        value: 50
+      decision:
+        depends: [c1]
+        logic: c1
+        output:
+          name: #rename 如果为空，则给rule.name赋值
+          value: reject
+          kind: string
+        assign:
+          feature_x: xxx
+    - rule: 
+      id: 2
+      name: rule_2
+      tag: tag2
+      label: 规则2
+      conditions:
+      - condition:
+        name: c2
+        feature: feature_2
+        operator: NEQ
+        value: true
+      - condition:
+        name: c3
+        feature: feature_3
+        operator: IN
+        value: [a, b, c, d, e, f]
+      decision: 
+        depends: [c2, c3]
+        logic: c2 || c3
+        output:
+          name: 
+          value: record
+          kind: string
+        assign:
+          feature_y: yyy
+features:
+  - feature:
+    name: feature_1
+    kind: int
+  - feature:
+    name: feature_2
+    kind: bool
+  - feature:
+    name: feature_3
+    kind: string

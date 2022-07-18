@@ -94,7 +94,7 @@ docker stop risk_engine
 ### 获取支持的所有决策流
 - 请求接口：
 ```shell
-curl http://localhost:8889/engine/list -XPOST
+curl http://localhost:8889/engine/list
 
 ```
 - 接口返回：

@@ -16,7 +16,7 @@ func Init() { //conf
 
 	router := gin.Default()
 	router.POST("/engine/run", engineHandler.Run)
-	router.POST("/engine/list", engineHandler.List)
+	router.GET("/engine/list", engineHandler.List)
 
 	router.Run(fmt.Sprintf(":%d", global.ServerConf.Port)) //conf
 
