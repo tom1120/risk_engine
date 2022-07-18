@@ -109,11 +109,11 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 ### demo/ruleset
 * 规则集决策流案例 *
 
-![规则集决策流图](ruleset1.png)
-
 - key: flow_ruleset
 - version: 1.0
-- rules:
+
+![规则集决策流图](ruleset1.png)
+![规则集](ruleset2.jpg)
 
 
 *CURL*
