@@ -105,9 +105,15 @@ POST http://HOST/engine/run
 curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version":"1.0", "req_id":"123456", "uid":1,"features":{"feature_1":5,"feature_2":3,"feature_3":55,"feature_4":32,"feature_5":33,"feature_6":231,"feature_7":2,"feature_8":4}}'
 ```
 
-## demo 下的几个决策流案例
+# 决策流案例
+demo/ 下为所有可执行决策流案例
+- [规则集案例](#demo/ruleset)
+- [冠军挑战者案例](#demo/abtest)
+- [条件节点案例](#demo/conditional)
+- [决策矩阵案例](#demo/matrix)
+
 ### demo/ruleset
-* 规则集决策流案例 *
+*规则集决策流案例*
 
 - key: flow_ruleset
 - version: 1.0
@@ -118,17 +124,84 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 
 *CURL*
 ```shell
-curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version":"1.0", "req_id":"123456", "uid":1,"features":{"feature_1":5,"feature_2":3,"feature_3":55,"feature_4":32,"feature_5":33,"feature_6":231,"feature_7":2,"feature_8":4}}'
+curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_ruleset", "version":"1.0", "req_id":"123456789", "uid":1,"features":{"feature_1":55,"feature_2":true,"feature_3":"a"}}'
 ```
 
 *执行结果*
 ```json
-
+{
+	"code": 200,
+	"error": "",
+	"result": {
+		"key": "flow_ruleset",
+		"req_id": "123456789",
+		"uid": 1,
+		"features": [{
+			"isDefault": false,
+			"name": "feature_2",
+			"value": true
+		}, {
+			"isDefault": false,
+			"name": "feature_y",
+			"value": "yyy"
+		}, {
+			"isDefault": false,
+			"name": "feature_x",
+			"value": "xxx"
+		}, {
+			"isDefault": false,
+			"name": "feature_3",
+			"value": "a"
+		}, {
+			"isDefault": false,
+			"name": "feature_1",
+			"value": 55
+		}],
+		"tracks": [{
+			"index": 1,
+			"label": "",
+			"name": "start_1"
+		}, {
+			"index": 2,
+			"label": "规则集1",
+			"name": "ruleset_1"
+		}],
+		"hit_rules": [{
+			"id": "2",
+			"label": "规则2",
+			"name": "rule_2"
+		}, {
+			"id": "1",
+			"label": "规则1",
+			"name": "rule_1"
+		}],
+		"node_results": [{
+			"IsBlock": true,
+			"Kind": "ruleset",
+			"Score": 101,
+			"Value": "reject",
+			"id": 1,
+			"label": "规则集1",
+			"name": "ruleset_1",
+			"tag": "internal"
+		}, {
+			"IsBlock": false,
+			"Kind": "start",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "start_1",
+			"tag": ""
+		}],
+		"start_time": "2022-07-18 21:54:04",
+		"end_time": "2022-07-18 21:54:04",
+		"run_time": 0
+	}
+}
 ```
 
 ### demo/abtest
 ### demo/conditional
 ### demo/matrix
-### demo/tree
-### demo/scorecard
 
