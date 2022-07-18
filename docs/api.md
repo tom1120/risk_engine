@@ -18,9 +18,9 @@
 | 错误码 | 说明           |
 | ------ | -------------- |
 | 200    | 成功           |
-| -400   | 请求参数错误   |
-| -404   | 决策流不存在   |
-| -500   | 未知错误       |
+| 400   | 请求参数错误   |
+| 404   | 决策流不存在   |
+| 500   | 未知错误       |
 
 ### 决策流列表
 
@@ -83,13 +83,15 @@ POST http://HOST/engine/run
 ```json
 *****成功*****
 {
-    "code":0,
-    "message":""
+    "code":200,
+    "error":"",
+	"result":""
 }
 ****失败****
 {
-    "code":-400,
-    "message":"-400"
+    "code":400,
+    "error":"入参错误"
+	"result":""
 }
 ```
 
@@ -103,7 +105,27 @@ POST http://HOST/engine/run
 curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version":"1.0", "req_id":"123456", "uid":1,"features":{"feature_1":5,"feature_2":3,"feature_3":55,"feature_4":32,"feature_5":33,"feature_6":231,"feature_7":2,"feature_8":4}}'
 ```
 
+## demo 下的几个决策流案例
 ### demo/ruleset
+* 规则集决策流案例 *
+
+![规则集决策流图](ruleset1.png)
+
+- key: flow_ruleset
+- version: 1.0
+- rules:
+
+
+*CURL*
+```shell
+curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version":"1.0", "req_id":"123456", "uid":1,"features":{"feature_1":5,"feature_2":3,"feature_3":55,"feature_4":32,"feature_5":33,"feature_6":231,"feature_7":2,"feature_8":4}}'
+```
+
+*执行结果*
+```json
+
+```
+
 ### demo/abtest
 ### demo/conditional
 ### demo/matrix
