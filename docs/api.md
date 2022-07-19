@@ -303,6 +303,7 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_matrix", "version"
 - key: flow_abtest
 - version: 1.0
 
+![冠军挑战者决策流图](abtest1.png)
 
 *CURL*
 ```shell
@@ -398,6 +399,8 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 - yaml 源文件: [demo/flow_conditional](../demo/flow_conditional.yaml)
 - key: flow_conditional
 - version: 1.0
+
+![条件决策流图](conditional1.png)
 
 *CURL*
 ```shell
