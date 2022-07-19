@@ -298,4 +298,100 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_matrix", "version"
 }
 ```
 
+### 冠军挑战者决策流
+
+- yaml 源文件: [demo/flow_abtest](../demo/flow_abtest.yaml)
+- key: flow_abtest
+- version: 1.0
+
+
+*CURL*
+```shell
+curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version":"1.0", "req_id":"123456", "uid":3,"features":{"feature_1":20,"feature_3":"aaa","feature_4":4}}'
+```
+
+*执行结果*
+```json
+{
+	"code": 200,
+	"error": "",
+	"result": {
+		"key": "flow_abtest",
+		"req_id": "123456",
+		"uid": 3,
+		"features": [{
+			"isDefault": false,
+			"name": "feature_1",
+			"value": 20
+		}, {
+			"isDefault": false,
+			"name": "feature_3",
+			"value": "aaa"
+		}, {
+			"isDefault": false,
+			"name": "feature_4",
+			"value": 4
+		}],
+		"tracks": [{
+			"index": 1,
+			"label": "",
+			"name": "start_1"
+		}, {
+			"index": 2,
+			"label": "分流实验",
+			"name": "abtest_1"
+		}, {
+			"index": 3,
+			"label": "规则集1",
+			"name": "ruleset_1"
+		}, {
+			"index": 4,
+			"label": "",
+			"name": "end_1"
+		}],
+		"hit_rules": [],
+		"node_results": [{
+			"IsBlock": true,
+			"Kind": "end",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "end_1",
+			"tag": ""
+		}, {
+			"IsBlock": false,
+			"Kind": "start",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "start_1",
+			"tag": ""
+		}, {
+			"IsBlock": false,
+			"Kind": "abtest",
+			"Score": 0,
+			"Value": 30.010551178761848,
+			"id": 11,
+			"label": "分流实验",
+			"name": "abtest_1",
+			"tag": "tag_ab"
+		}, {
+			"IsBlock": false,
+			"Kind": "ruleset",
+			"Score": 0,
+			"Value": null,
+			"id": 1,
+			"label": "规则集1",
+			"name": "ruleset_1",
+			"tag": "internal"
+		}],
+		"start_time": "2022-07-18 22:24:33",
+		"end_time": "2022-07-18 22:24:33",
+		"run_time": 1
+	}
+}
+```
+
 
