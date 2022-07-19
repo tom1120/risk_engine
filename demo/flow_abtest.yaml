@@ -31,12 +31,12 @@ decision_flow:
 rulesets:
   - ruleset:
     info:
-      id: 111
+      id: 1
       name: ruleset_1
       tag: internal
-      label: 内部规则集1
+      label: 规则集1
       kind: ruleset
-      depends: [feature_1,feature_2,feature_3]
+      depends: [feature_1,feature_4]
     exec_plan: parallel
     block_strategy:
       is_block: true
@@ -45,7 +45,7 @@ rulesets:
       value: reject  #=reject中断
     rules: 
     - rule: 
-      id: 11
+      id: 1
       name: rule_1
       tag: tag1
       label: 规则1
@@ -61,23 +61,23 @@ rulesets:
         output:
           name: #rename 如果为空，则给rule.name赋值
           value: reject
-          kind: TypeStrategy
+          kind: string
         assign:
           feature_x: 111
     - rule: 
-      id: 23
+      id: 2
       name: rule_2
       tag: tag2
       label: 规则2
       conditions:
       - condition:
         name: c2
-        feature: feature_2
+        feature: feature_1
         operator: LT
         value: 18
       - condition:
         name: c3
-        feature: feature_3
+        feature: feature_4
         operator: GT
         value: 50
       decision: 
@@ -86,16 +86,16 @@ rulesets:
         output:
           name: 
           value: record
-          kind: TypeStrategy
+          kind: string
         assign:
   - ruleset:
     info:
-      id: 333
+      id: 2
       name: ruleset_2
       tag: internal
-      label: 内部规则集2
+      label: 规则集2
       kind: ruleset
-      depends: [feature_1,feature_2,feature_3]
+      depends: [feature_1,feature_3]
     exec_plan: parallel
     block_strategy:
       is_block: true
@@ -120,7 +120,7 @@ rulesets:
         output:
           name:
           value: record
-          kind: TypeStrategy
+          kind: string
         assign:
     - rule: 
       id: 55
@@ -130,21 +130,21 @@ rulesets:
       conditions:
       - condition:
         name: c4
-        feature: feature_2
-        operator: LT
-        value: 8
+        feature: feature_3
+        operator: EQ
+        value: aaa
       - condition:
         name: c5
         feature: feature_3
-        operator: GT
-        value: 9
+        operator: EQ
+        value: bbb
       decision: 
         depends: [c4, c5]
         logic: c4 || c5
         output:
           name:
           value: reject
-          kind: TypeStrategy
+          kind: string
         assign:
           feat1: aa
           feat2: bb
@@ -181,11 +181,20 @@ abtests:
           kind: ruleset
 features:
   - feature:
+    id: 1
     name: feature_1
+    tag: aa
+    label: 特征1
     kind: int
   - feature:
-    name: feature_2
-    kind: int
-  - feature:
+    id: 3
     name: feature_3
+    tag: aa
+    label: 特征3
+    kind: string
+  - feature:
+    id: 4
+    name: feature_4
+    tag: aa
+    label: 特征4
     kind: int

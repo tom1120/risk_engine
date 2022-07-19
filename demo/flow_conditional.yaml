@@ -1,0 +1,338 @@
+key: flow_conditional
+version: 1.0
+label: 条件决策流
+metadata:
+decision_flow:
+  - flow_node:
+    node_name: start_1
+    node_kind: start
+    next_node_name: conditional_1
+    next_node_kind: conditional
+  - flow_node:
+    node_name: conditional_1
+    node_kind: conditional
+    next_node_name:
+    next_node_kind:
+  - flow_node:
+    node_name: ruleset_1
+    node_kind: ruleset
+    next_node_name: end_1
+    next_node_kind: end
+  - flow_node:
+    node_name: ruleset_2
+    node_kind: ruleset
+    next_node_name: end_1
+    next_node_kind: end
+  - flow_node:
+    node_name: ruleset_3
+    node_kind: ruleset
+    next_node_name: end_1
+    next_node_kind: end
+  - flow_node:
+    node_name: ruleset_4
+    node_kind: ruleset
+    next_node_name: end_1
+    next_node_kind: end
+  - flow_node:
+    node_name: end_1
+    node_kind: end
+    next_node_name:
+    next_node_kind:
+rulesets:
+  - ruleset:
+    info:
+      id: 1
+      name: ruleset_1
+      tag: internal
+      label: 规则集1
+      kind: ruleset
+      depends: [feature_1]
+    exec_plan: parallel
+    block_strategy:
+      is_block: true
+      hit_rule: [rule_1] #命中该规则就中断
+      operator: EQ
+      value: reject  #=reject中断
+    rules: 
+    - rule: 
+      id: 1
+      name: rule_1
+      tag: tag1
+      label: 规则1
+      conditions:
+      - condition:
+        name: c1
+        feature: feature_1
+        operator: GT
+        value: 50
+      decision:
+        depends: [c1]
+        logic: c1
+        output:
+          name: #rename 如果为空，则给rule.name赋值
+          value: reject
+          kind: string
+        assign:
+          feature_x: 111
+  - ruleset:
+    info:
+      id: 2
+      name: ruleset_2
+      tag: internal
+      label: 规则集2
+      kind: ruleset
+      depends: [feature_1,feature_4,feature_5]
+    exec_plan: parallel
+    block_strategy:
+      is_block: true
+      hit_rule: [rule_3] #命中该规则就中断
+      operator: EQ
+      value: reject  #命中规则优先级最高结果=reject 中断
+    rules: 
+    - rule: 
+      id: 3
+      name: rule_3
+      tag: rule_3
+      label: 规则3
+      conditions:
+      - condition:
+        name: c3
+        feature: feature_1
+        operator: GT
+        value: 5
+      decision: 
+        depends: [c3]
+        logic: c3
+        output:
+          name:
+          value: record
+          kind: string
+        assign:
+    - rule: 
+      id: 4
+      name: rule_4
+      tag: rule_4
+      label: 规则4
+      conditions:
+      - condition:
+        name: c4
+        feature: feature_4
+        operator: LT
+        value: 8
+      - condition:
+        name: c5
+        feature: feature_5
+        operator: GT
+        value: 9
+      decision: 
+        depends: [c4, c5]
+        logic: c4 || c5
+        output:
+          name:
+          value: reject
+          kind: string
+        assign:
+          feat1: aa
+          feat2: bb
+  - ruleset:
+    info:
+      id: 3
+      name: ruleset_3
+      tag: internal
+      label: 规则集3
+      kind: ruleset
+      depends: [feature_3]
+    exec_plan: parallel
+    block_strategy:
+      is_block: false
+      hit_rule: [] 
+      operator:
+      value: 
+    rules: 
+    - rule: 
+      id: 5
+      name: rule_5
+      tag: rule_5
+      label: 规则5
+      conditions:
+      - condition:
+        name: c1
+        feature: feature_3
+        operator: LIKE
+        value: xyz
+      decision: 
+        depends: [c1]
+        logic: c1
+        output:
+          name:
+          value: record
+          kind: string
+  - ruleset:
+    info:
+      id: 4
+      name: ruleset_4
+      tag: internal
+      label: 规则集4
+      kind: ruleset
+      depends: [feature_6]
+    exec_plan: parallel
+    block_strategy:
+      is_block: false
+      hit_rule: [] 
+      operator:
+      value: 
+    rules: 
+    - rule: 
+      id: 6
+      name: rule_6
+      tag: rule_6
+      label: 规则6
+      conditions:
+      - condition:
+        name: c1
+        feature: feature_6
+        operator: IN
+        value: [a, b, c, d, e]
+      decision: 
+        depends: [c1]
+        logic: c1
+        output:
+          name:
+          value: record
+          kind: string
+
+conditionals:
+  - conditional:
+    info:
+      id: 1
+      name: conditional_1 
+      tag: ab
+      label: 分支节点
+      kind: conditional
+      depends: [feature_a, feature_b]
+    branchs:
+    - branch:
+      name: branch_1
+      conditions:
+        - condition:
+          name: b1
+          feature: feature_a
+          operator: EQ
+          value: true 
+        - condition:
+          name: b2
+          feature: feature_b
+          operator: LE
+          value: 100 
+      decision:
+        depends: [b1, b2]
+        logic: b1 && b2
+        output:
+          name: 
+          value: ruleset_1
+          kind: ruleset
+    - branch:
+      name: branch_2
+      conditions:
+        - condition:
+          name: b1
+          feature: feature_a
+          operator: EQ
+          value: true
+        - condition:
+          name: b2
+          feature: feature_b
+          operator: GT
+          value: 100 
+      decision:
+        depends: [b1, b2]
+        logic: b1 && b2
+        output:
+          name: 
+          value: ruleset_2
+          kind: ruleset
+    - branch:
+      name: branch_3
+      conditions:
+        - condition:
+          name: b1
+          feature: feature_a
+          operator: EQ
+          value: false
+        - condition:
+          name: b2
+          feature: feature_b
+          operator: LE
+          value: 100 
+      decision:
+        depends: [b1, b2]
+        logic: b1 && b2
+        output:
+          name: 
+          value: ruleset_3
+          kind: ruleset
+    - branch:
+      name: branch_4
+      conditions:
+        - condition:
+          name: b1
+          feature: feature_a
+          operator: EQ
+          value: false
+        - condition:
+          name: b2
+          feature: feature_b
+          operator: GT
+          value: 100 
+      decision:
+        depends: [b1, b2]
+        logic: b1 && b2
+        output:
+          name: 
+          value: ruleset_4
+          kind: ruleset
+
+features:
+  - feature:
+    id: 1
+    name: feature_1
+    tag: aa
+    label: 特征1
+    kind: int
+  - feature:
+    id: 3
+    name: feature_3
+    tag: aa
+    label: 特征3
+    kind: string
+  - feature:
+    id: 4
+    name: feature_4
+    tag: aa
+    label: 特征4
+    kind: int
+  - feature:
+    id: 5
+    name: feature_5
+    tag: aa
+    label: 特征5
+    kind: int
+  - feature:
+    id: 6
+    name: feature_6
+    tag: aa
+    label: 特征6
+    kind: string
+  - feature:
+    id: 110
+    name: feature_a
+    tag: bb
+    label: 特征a
+    kind: bool
+  - feature:
+    id: 111
+    name: feature_b
+    tag: bb
+    label: 特征b
+    kind: bool
+    kind: int

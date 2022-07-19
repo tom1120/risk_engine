@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/skyhackvip/risk_engine/core"
 	"github.com/skyhackvip/risk_engine/internal/dto"
+	"github.com/skyhackvip/risk_engine/internal/util"
 	"log"
 	"time"
 )
@@ -34,10 +35,19 @@ func (service *EngineService) Run(c *gin.Context, req *dto.EngineRunRequest) (*d
 	}
 
 	ctx := core.NewPipelineContext()
+
 	//fill feature value from request features
 	features := make(map[string]core.IFeature)
 	for name, feature := range flow.FeatureMap {
 		if val, ok := req.Features[name]; ok {
+			featureType, err := util.GetFeatureType(val)
+			if err != nil { //warning: unknow type
+				log.Println(err)
+			}
+			if core.GetFeatureType(featureType) != feature.GetType() {
+				log.Printf("request feature (%s:%s) type is not match, required %s\n", name, val, feature.GetType())
+				continue
+			}
 			features[name] = feature
 			features[name].SetValue(val)
 		}
