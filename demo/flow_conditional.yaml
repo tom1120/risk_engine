@@ -81,7 +81,7 @@ rulesets:
       tag: internal
       label: 规则集2
       kind: ruleset
-      depends: [feature_1,feature_2,feature_3]
+      depends: [feature_1,feature_4,feature_5]
     exec_plan: parallel
     block_strategy:
       is_block: true
@@ -116,12 +116,12 @@ rulesets:
       conditions:
       - condition:
         name: c4
-        feature: feature_2
+        feature: feature_4
         operator: LT
         value: 8
       - condition:
         name: c5
-        feature: feature_3
+        feature: feature_5
         operator: GT
         value: 9
       decision: 
@@ -141,7 +141,7 @@ rulesets:
       tag: internal
       label: 规则集3
       kind: ruleset
-      depends: [feature_4]
+      depends: [feature_3]
     exec_plan: parallel
     block_strategy:
       is_block: false
@@ -157,7 +157,7 @@ rulesets:
       conditions:
       - condition:
         name: c1
-        feature: feature_4
+        feature: feature_3
         operator: LIKE
         value: xyz
       decision: 
@@ -174,7 +174,7 @@ rulesets:
       tag: internal
       label: 规则集4
       kind: ruleset
-      depends: [feature_5]
+      depends: [feature_6]
     exec_plan: parallel
     block_strategy:
       is_block: false
@@ -190,7 +190,7 @@ rulesets:
       conditions:
       - condition:
         name: c1
-        feature: feature_4
+        feature: feature_6
         operator: IN
         value: [a, b, c, d, e]
       decision: 
@@ -294,23 +294,45 @@ conditionals:
 
 features:
   - feature:
+    id: 1
     name: feature_1
+    tag: aa
+    label: 特征1
     kind: int
   - feature:
-    name: feature_2
-    kind: int
-  - feature:
+    id: 3
     name: feature_3
+    tag: aa
+    label: 特征3
+    kind: string
+  - feature:
+    id: 4
+    name: feature_4
+    tag: aa
+    label: 特征4
     kind: int
   - feature:
-    name: feature_4
-    kind: string
-  - feature:
+    id: 5
     name: feature_5
+    tag: aa
+    label: 特征5
+    kind: int
+  - feature:
+    id: 6
+    name: feature_6
+    tag: aa
+    label: 特征6
     kind: string
   - feature:
+    id: 110
     name: feature_a
+    tag: bb
+    label: 特征a
     kind: bool
   - feature:
+    id: 111
     name: feature_b
+    tag: bb
+    label: 特征b
+    kind: bool
     kind: int

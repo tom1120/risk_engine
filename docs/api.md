@@ -121,7 +121,6 @@ demo/ 下为所有可执行决策流案例
 ![规则集决策流图](ruleset1.png)
 ![规则集](ruleset2.jpg)
 
-
 *CURL*
 ```shell
 curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_ruleset", "version":"1.0", "req_id":"123456789", "uid":1,"features":{"feature_1":55,"feature_2":true,"feature_3":"a"}}'
@@ -394,4 +393,117 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 }
 ```
 
+### 条件决策流
 
+- yaml 源文件: [demo/flow_conditional](../demo/flow_conditional.yaml)
+- key: flow_conditional
+- version: 1.0
+
+*CURL*
+```shell
+curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_conditional", "version":"1.0", "req_id":"123456789", "uid":1,"features":{"feature_1":20,"feature_3":"xyzab","feature_4":55,"feature_5":44,"feature_6":"a","feature_a":false,"feature_b":1}}'
+```
+
+*执行结果*
+```json
+{
+	"code": 200,
+	"error": "",
+	"result": {
+		"key": "flow_conditional",
+		"req_id": "123456789",
+		"uid": 1,
+		"features": [{
+			"isDefault": false,
+			"name": "feature_4",
+			"value": 55
+		}, {
+			"isDefault": false,
+			"name": "feature_5",
+			"value": 44
+		}, {
+			"isDefault": false,
+			"name": "feature_6",
+			"value": "a"
+		}, {
+			"isDefault": false,
+			"name": "feature_a",
+			"value": false
+		}, {
+			"isDefault": false,
+			"name": "feature_b",
+			"value": 1
+		}, {
+			"isDefault": false,
+			"name": "feature_1",
+			"value": 20
+		}, {
+			"isDefault": false,
+			"name": "feature_3",
+			"value": "xyzab"
+		}],
+		"tracks": [{
+			"index": 1,
+			"label": "",
+			"name": "start_1"
+		}, {
+			"index": 2,
+			"label": "分支节点",
+			"name": "conditional_1"
+		}, {
+			"index": 3,
+			"label": "规则集3",
+			"name": "ruleset_3"
+		}, {
+			"index": 4,
+			"label": "",
+			"name": "end_1"
+		}],
+		"hit_rules": [{
+			"id": "5",
+			"label": "规则5",
+			"name": "rule_5"
+		}],
+		"node_results": [{
+			"IsBlock": true,
+			"Kind": "end",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "end_1",
+			"tag": ""
+		}, {
+			"IsBlock": false,
+			"Kind": "start",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "start_1",
+			"tag": ""
+		}, {
+			"IsBlock": false,
+			"Kind": "conditional",
+			"Score": 0,
+			"Value": "branch_3",
+			"id": 1,
+			"label": "分支节点",
+			"name": "conditional_1",
+			"tag": "ab"
+		}, {
+			"IsBlock": false,
+			"Kind": "ruleset",
+			"Score": 1,
+			"Value": "record",
+			"id": 3,
+			"label": "规则集3",
+			"name": "ruleset_3",
+			"tag": "internal"
+		}],
+		"start_time": "2022-07-18 22:04:11",
+		"end_time": "2022-07-18 22:04:11",
+		"run_time": 1
+	}
+}
+```

@@ -81,16 +81,19 @@ rulesets:
           feature_y: yyy
 features:
   - feature:
+    id: 1
     name: feature_1
     tag: aa
     label: 特征1
     kind: int
   - feature:
+    id: 2
     name: feature_2
     tag: aa
     label: 特征2
     kind: bool
   - feature:
+    id: 3
     name: feature_3
     tag: aa
     label: 特征3
