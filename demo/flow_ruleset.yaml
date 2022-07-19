@@ -82,10 +82,16 @@ rulesets:
 features:
   - feature:
     name: feature_1
+    tag: aa
+    label: 特征1
     kind: int
   - feature:
     name: feature_2
+    tag: aa
+    label: 特征2
     kind: bool
   - feature:
     name: feature_3
+    tag: aa
+    label: 特征3
     kind: string

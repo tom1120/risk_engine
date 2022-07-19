@@ -28,7 +28,7 @@ matrixs:
       tag: my_matrix
       label: 测试决策矩阵
       kind: matrix
-      depends: [feature_1,feature_2,feature_3]
+      depends: [feature_1,feature_4]
     exec_plan: parallel  #x,y并发执行
     matrix_strategy:
       output_name: my_matrix_1
@@ -96,7 +96,7 @@ matrixs:
       conditions:
       - condition:
         name: c4
-        feature: feature_2
+        feature: feature_4
         operator: LE
         value: 5
       decision: 
@@ -115,7 +115,7 @@ matrixs:
       conditions:
       - condition:
         name: c5
-        feature: feature_2
+        feature: feature_4
         operator: GT
         value: 5
       decision: 
@@ -133,9 +133,8 @@ features:
     label: 特征1
     kind: int 
   - feature:
-    id: 22   
-    name: feature_2
+    id: 4
+    name: feature_4
     tag: aa
-    label: 特征2
+    label: 特征4
     kind: int 
-

@@ -108,13 +108,13 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 # 决策流案例
 demo/ 下为所有可执行决策流案例
 - [规则集决策流](#规则集决策流)
-- [决策矩阵案例](#demo/matrix)
-- [冠军挑战者案例](#demo/abtest)
-- [条件节点案例](#demo/conditional)
+- [矩阵决策流](#矩阵决策流)
+- [冠军挑战者决策流](#冠军挑战者决策流)
+- [条件决策流](#条件决策流)
 
 ### 规则集决策流
-[demo/ruleset](../demo/flow_ruleset.yaml)
 
+- yaml 源文件: [demo/flow_ruleset](../demo/flow_ruleset.yaml)
 - key: flow_ruleset
 - version: 1.0
 
@@ -201,7 +201,101 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_ruleset", "version
 }
 ```
 
-### demo/abtest
-### demo/conditional
-### demo/matrix
+### 规则集决策流
+
+- yaml 源文件: [demo/flow_matrix](../demo/flow_matrix.yaml)
+- key: flow_matrix
+- version: 1.0
+
+![矩阵决策流图](matrix1.png)
+![决策矩阵](matrix2.png)
+
+*CURL*
+```shell
+curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_ruleset", "version":"1.0", "req_id":"123456789", "uid":1,"features":{"feature_1":55,"feature_2":true,"feature_3":"a"}}'
+```
+
+*执行结果*
+```json
+{
+	"code": 200,
+	"error": "",
+	"result": {
+		"key": "flow_matrix",
+		"req_id": "123456789",
+		"uid": 1,
+		"features": [{
+			"isDefault": false,
+			"name": "feature_1",
+			"value": 20
+		}, {
+			"isDefault": false,
+			"name": "feature_4",
+			"value": 3
+		}, {
+			"isDefault": false,
+			"name": "matrix_1",
+			"value": "3"
+		}, {
+			"isDefault": false,
+			"name": "my_matrix_1",
+			"value": "3"
+		}],
+		"tracks": [{
+			"index": 1,
+			"label": "",
+			"name": "start_1"
+		}, {
+			"index": 2,
+			"label": "测试决策矩阵",
+			"name": "matrix_1"
+		}, {
+			"index": 3,
+			"label": "",
+			"name": "end_1"
+		}],
+		"hit_rules": [{
+			"id": "2",
+			"label": "横轴2",
+			"name": "rule_2"
+		}, {
+			"id": "3",
+			"label": "纵轴3",
+			"name": "rule_3"
+		}],
+		"node_results": [{
+			"IsBlock": false,
+			"Kind": "start",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "start_1",
+			"tag": ""
+		}, {
+			"IsBlock": false,
+			"Kind": "matrix",
+			"Score": 0,
+			"Value": "3",
+			"id": 1,
+			"label": "测试决策矩阵",
+			"name": "matrix_1",
+			"tag": "my_matrix"
+		}, {
+			"IsBlock": true,
+			"Kind": "end",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "end_1",
+			"tag": ""
+		}],
+		"start_time": "2022-07-18 22:28:20",
+		"end_time": "2022-07-18 22:28:20",
+		"run_time": 1
+	}
+}
+```
+
 
