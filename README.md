@@ -89,158 +89,13 @@ docker stop risk_engine
 ```
 
 
-## 支持接口 HTTP API
+## 支持 HTTP 接口执行
 
-### 获取支持的所有决策流
-- 请求接口：
-```shell
-curl http://localhost:8889/engine/list
-
-```
-- 接口返回：
-```json
-{
-	"code": 200,
-	"error": "",
-	"result": [{
-		"key": "flow_long",
-		"version": "1.0",
-		"md5": "387a3719ab82b4a1b014a6d912a5ebb5"
-	}, {
-		"key": "flow_simple",
-		"version": "1.0",
-		"md5": "4b73cb9dfbe3d55e2b80c144fc04f643"
-	}, {
-		"key": "flow_test",
-		"version": "1.0",
-		"md5": "69296c88f96bb15d44ba565ed8364d86"
-	}, {
-		"key": "flow_abtest",
-		"version": "1.0",
-		"md5": "004a951c5d3b2678ec4c28e21bf0eaaf"
-	}]
-}
-```
-目前支持的决策流以文件形式存在于demo/中，启动时加载到内存中
-
+### 获取决策流列表
 ### 执行决策流
-- 请求接口：
+### 决策流案例
 
-```shell
-curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version":"1.0", "req_id":"123456", "uid":1,"features":{"feature_1":5,"feature_2":3,"feature_3":55,"feature_4":32,"feature_5":33,"feature_6":231,"feature_7":2,"feature_8":4}}'
-```
-- key: 决策流标识，目前支持的决策流以文件形式存在于目录 demo/ 中
-- version：决策流版本标识
-- req_id：请求ID
-- uid： 用户ID
-- features：入参传入的特征值
-
-- 接口返回：
-```json
-{
-	"code": 200,
-	"error": "",
-	"result": {
-		"key": "flow_abtest",
-		"req_id": "123456",
-		"uid": 1,
-		"features": [{
-			"isDefault": false,
-			"name": "feature_8",
-			"value": 4
-		}, {
-			"isDefault": false,
-			"name": "feature_1",
-			"value": 5
-		}, {
-			"isDefault": false,
-			"name": "feature_2",
-			"value": 3
-		}, {
-			"isDefault": false,
-			"name": "feature_4",
-			"value": 32
-		}, {
-			"isDefault": false,
-			"name": "feat1",
-			"value": "aa"
-		}, {
-			"isDefault": false,
-			"name": "feature_5",
-			"value": 33
-		}, {
-			"isDefault": false,
-			"name": "feature_6",
-			"value": 231
-		}, {
-			"isDefault": false,
-			"name": "feature_7",
-			"value": 2
-		}, {
-			"isDefault": false,
-			"name": "feature_3",
-			"value": 55
-		}, {
-			"isDefault": false,
-			"name": "feat2",
-			"value": "bb"
-		}],
-		"tracks": [{
-			"index": 1,
-			"label": "",
-			"name": "start_1"
-		}, {
-			"index": 2,
-			"label": "分流实验",
-			"name": "abtest_1"
-		}, {
-			"index": 3,
-			"label": "内部规则集2",
-			"name": "ruleset_2"
-		}],
-		"hit_rules": [{
-			"id": "55",
-			"label": "规则4",
-			"name": "rule_4"
-		}],
-		"node_results": [{
-			"IsBlock": false,
-			"Kind": "start",
-			"Score": 0,
-			"Value": null,
-			"id": 0,
-			"label": "",
-			"name": "start_1",
-			"tag": ""
-		}, {
-			"IsBlock": false,
-			"Kind": "abtest",
-			"Score": 0,
-			"Value": 34.20045077555402,
-			"id": 11,
-			"label": "分流实验",
-			"name": "abtest_1",
-			"tag": "tag_ab"
-		}, {
-			"IsBlock": true,
-			"Kind": "ruleset",
-			"Score": 100,
-			"Value": "reject",
-			"id": 333,
-			"label": "内部规则集2",
-			"name": "ruleset_2",
-			"tag": "internal"
-		}],
-		"start_time": "2022-06-12 11:48:59",
-		"end_time": "2022-06-12 11:48:59",
-		"run_time": 1
-	}
-}
-```
-- features 所有特征值，包括执行过程中产生的衍生特征和赋值特征
-- hit_rules 命中的规则列表
-- tracks 流执行轨迹 
-- node_results 各节点执行情况和产生值
+[接口文档详情](docs/api.md)
 
 ## 系统解读 
 ### 代码结构
@@ -262,7 +117,7 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 ```
 
 ### DSL 语法结构
-[Dsl 语法详解](https://github.com/skyhackvip/risk_engine/tree/master/docs/dsl.md)
+[Dsl 语法详解](docs/dsl.md)
 
 
 ### 决策引擎架构图
