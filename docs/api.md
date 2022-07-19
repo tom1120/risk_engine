@@ -107,13 +107,13 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 
 # 决策流案例
 demo/ 下为所有可执行决策流案例
-- [规则集案例](#demo/ruleset)
+- [规则集决策流](#规则集决策流)
+- [决策矩阵案例](#demo/matrix)
 - [冠军挑战者案例](#demo/abtest)
 - [条件节点案例](#demo/conditional)
-- [决策矩阵案例](#demo/matrix)
 
-### demo/ruleset
-*规则集决策流案例*
+### 规则集决策流
+[demo/ruleset](../demo/flow_ruleset.yaml)
 
 - key: flow_ruleset
 - version: 1.0
