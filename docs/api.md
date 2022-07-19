@@ -201,7 +201,7 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_ruleset", "version
 }
 ```
 
-### 规则集决策流
+### 矩阵决策流
 
 - yaml 源文件: [demo/flow_matrix](../demo/flow_matrix.yaml)
 - key: flow_matrix
@@ -212,7 +212,7 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_ruleset", "version
 
 *CURL*
 ```shell
-curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_ruleset", "version":"1.0", "req_id":"123456789", "uid":1,"features":{"feature_1":55,"feature_2":true,"feature_3":"a"}}'
+curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_matrix", "version":"1.0", "req_id":"123456789", "uid":1,"features":{"feature_1":20,"feature_4":3}}'
 ```
 
 *执行结果*
