@@ -47,10 +47,7 @@ func (rule *Rule) Parse(ctx *PipelineContext, depends map[string]IFeature) (outp
 	var conditionRet = make(map[string]interface{}, 0)
 	for _, condition := range rule.Conditions {
 		if feature, ok := depends[condition.Feature]; ok {
-			//value, _ := feature.GetValue() //是否使用default
 			rs, err := feature.Compare(condition.Operator, condition.Value)
-
-			//rs, err := operator.Compare(condition.Operator, value, condition.Value)
 			if err != nil {
 				return output, nil //value deafult
 			}
@@ -69,6 +66,7 @@ func (rule *Rule) Parse(ctx *PipelineContext, depends map[string]IFeature) (outp
 	//rule.Decision
 	expr := rule.Decision.Logic
 	logicRet, err := operator.Evaluate(expr, conditionRet)
+	//某个表达式执行失败会导致最终逻辑执行失败
 	if err != nil {
 		return
 	}
@@ -76,7 +74,7 @@ func (rule *Rule) Parse(ctx *PipelineContext, depends map[string]IFeature) (outp
 	output.SetHit(logicRet)
 
 	//assign
-	if len(rule.Decision.Assign) > 0 {
+	if len(rule.Decision.Assign) > 0 && logicRet {
 		features := make(map[string]IFeature)
 		for name, value := range rule.Decision.Assign {
 			feature := NewFeature(name, TypeDefault) //string
@@ -121,7 +119,6 @@ func (output *Output) GetHit() bool {
 type Branch struct {
 	Name       string      `yaml:"name"`
 	Conditions []Condition `yaml:"conditions"` //used by conditional
-	Logic      string      `yaml:"logic"`      //used by conditional
 	Percent    float64     `yaml:"percent"`    //used by abtest
 	Decision   Decision    `yaml:"decision"`
 }

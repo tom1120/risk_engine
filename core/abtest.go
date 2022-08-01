@@ -1,8 +1,7 @@
 package core
 
 import (
-	//	"github.com/skyhackvip/risk_engine/configs"
-	//"github.com/skyhackvip/risk_engine/internal/errcode"
+	"github.com/skyhackvip/risk_engine/internal/errcode"
 	"log"
 	"math/rand"
 	"time"
@@ -37,27 +36,26 @@ func (abtest AbtestNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	info := abtest.GetInfo()
 	log.Printf("======[trace]abtest(%s, %s) start======\n", info.Label, abtest.GetName())
 	nodeResult := &NodeResult{Id: info.Id, Name: info.Name, Kind: abtest.GetType(), Tag: info.Tag, Label: info.Label, IsBlock: false}
+
 	rand.Seed(time.Now().UnixNano())
 	winNum := rand.Float64() * 100
 	var counter float64 = 0
+	var matchBranch bool
 	for _, branch := range abtest.Branchs {
 		counter += branch.Percent
 		if counter > winNum {
-			//feature global.Features.Set(dto.Feature{Name: abtest.Name, Value: branch.Name})
-			log.Printf("abtest %v : %v, %v, output:%v \n", abtest.GetName(), branch.Name, winNum, branch.Decision.Output)
-			nextNodeName := branch.Decision.Output.Value.(string)
-			nextNodeType := GetNodeType(branch.Decision.Output.Kind)
-			nodeResult.NextNodeName = nextNodeName
-			nodeResult.NextNodeType = nextNodeType
-			/*if res, ok := branch.Decision.Output.([]interface{}); ok {
-				if len(res) == 2 {
-					log.Println("abtest result", res)
-					return res, nil
-				}
-			}*/
+			log.Printf(" abtest %v : %v, %v, output:%v \n", abtest.GetName(), branch.Name, winNum, branch.Decision.Output)
+			nodeResult.NextNodeName = branch.Decision.Output.Value.(string)
+			nodeResult.NextNodeType = GetNodeType(branch.Decision.Output.Kind)
+			matchBranch = true
+			break //break loop
 		}
 	}
 	nodeResult.Value = winNum
+
 	log.Printf("======[trace]abtest(%s, %s) end======\n", info.Label, abtest.GetName())
-	return nodeResult, nil
+	if matchBranch {
+		return nodeResult, nil
+	}
+	return nodeResult, errcode.ParseErrorNoBranchMatch
 }

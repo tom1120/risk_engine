@@ -14,7 +14,6 @@ const (
 	TypeFloat
 	TypeString
 	TypeBool
-	//	TypeStrategy //策略结构体
 	TypeDefault
 )
 
@@ -24,7 +23,6 @@ var FeatureTypeMap = map[string]FeatureType{
 	"string":  TypeString,
 	"bool":    TypeBool,
 	"default": TypeDefault,
-	//	"strategy": TypeStrategy,
 }
 
 var FeatureStrMap = map[FeatureType]string{
@@ -33,7 +31,6 @@ var FeatureStrMap = map[FeatureType]string{
 	TypeString:  "string",
 	TypeBool:    "bool",
 	TypeDefault: "default",
-	//	TypeStrategy: "strategy",
 }
 
 func GetFeatureType(name string) FeatureType {
@@ -56,6 +53,7 @@ type IFeature interface {
 	GetName() string
 	SetValue(value interface{})
 	GetValue() (interface{}, bool)
+	GetType() FeatureType
 	SupportOperators() map[string]struct{}
 	Compare(op string, value interface{}) (bool, error)
 }
@@ -94,6 +92,10 @@ type TypeNumFeature struct {
 	Kind         FeatureType
 	Value        interface{}
 	DefaultValue interface{}
+}
+
+func (feature *TypeNumFeature) GetType() FeatureType {
+	return feature.Kind
 }
 
 func (feature *TypeNumFeature) SupportOperators() map[string]struct{} {
@@ -176,6 +178,10 @@ type TypeStringFeature struct {
 	DefaultValue interface{}
 }
 
+func (feature *TypeStringFeature) GetType() FeatureType {
+	return feature.Kind
+}
+
 func (feature *TypeStringFeature) SupportOperators() map[string]struct{} {
 	return configs.StringSupportOperator
 }
@@ -233,6 +239,10 @@ type TypeBoolFeature struct {
 	DefaultValue interface{}
 }
 
+func (feature *TypeBoolFeature) GetType() FeatureType {
+	return feature.Kind
+}
+
 func (feature *TypeBoolFeature) SupportOperators() map[string]struct{} {
 	return configs.BoolSupportOperator
 }
@@ -263,6 +273,10 @@ type TypeDefaultFeature struct {
 	Kind         FeatureType
 	Value        interface{}
 	DefaultValue interface{}
+}
+
+func (feature *TypeDefaultFeature) GetType() FeatureType {
+	return feature.Kind
 }
 
 func (feature *TypeDefaultFeature) SupportOperators() map[string]struct{} {
