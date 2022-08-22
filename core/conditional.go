@@ -33,7 +33,7 @@ func (node ConditionalNode) AfterParse(ctx *PipelineContext, result *NodeResult)
 
 func (conditional ConditionalNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	info := conditional.GetInfo()
-	log.Println("====[trace]conditional (%s, %s) start=====", info.Label, conditional.GetName())
+	log.Printf("====[trace]conditional (%s, %s) start=====\n", info.Label, conditional.GetName())
 	nodeResult := &NodeResult{Id: info.Id, Name: info.Name, Kind: conditional.GetType(), Tag: info.Tag, Label: info.Label, IsBlock: false}
 
 	depends := ctx.GetFeatures(info.Depends)
@@ -68,7 +68,7 @@ func (conditional ConditionalNode) Parse(ctx *PipelineContext) (*NodeResult, err
 			break
 		}
 	}
-	log.Println("====[trace]conditional (%s, %s) end=====", info.Label, conditional.GetName())
+	log.Printf("====[trace]conditional (%s, %s) end=====\n", info.Label, conditional.GetName())
 	if matchBranch {
 		return nodeResult, nil
 	}

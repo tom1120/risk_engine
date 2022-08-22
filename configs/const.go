@@ -16,6 +16,8 @@ var OperatorMap = map[string]string{
 	"LIKE":    "like",
 	"IN":      "in",
 	"CONTAIN": "contain",
+	"BEFORE":  "before",
+	"AFTER":   "after",
 }
 
 var NumSupportOperator = map[string]struct{}{
@@ -41,6 +43,19 @@ var EnumSupportOperator = map[string]struct{}{
 var BoolSupportOperator = map[string]struct{}{
 	"EQ":  struct{}{},
 	"NEQ": struct{}{},
+}
+var DateSupportOperator = map[string]struct{}{
+	"BEFORE":  struct{}{},
+	"AFTER":   struct{}{},
+	"EQ":      struct{}{},
+	"NEQ":     struct{}{},
+	"BETWEEN": struct{}{},
+}
+var ListSupportOperator = map[string]struct{}{
+	"EQ":      struct{}{},
+	"NEQ":     struct{}{},
+	"CONTAIN": struct{}{},
+	"IN":      struct{}{},
 }
 var DefaultSupportOperator = map[string]struct{}{
 	"EQ":  struct{}{},
@@ -87,4 +102,9 @@ const (
 const (
 	MATRIXX = "matrixX"
 	MATRIXY = "matrixY"
+)
+
+const (
+	DATE_FORMAT        = "2006-01-02"
+	DATE_FORMAT_DETAIL = "2006-01-02 15:04:05"
 )

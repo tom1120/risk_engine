@@ -9,4 +9,5 @@ var (
 	ParseErrorMatrixOutputEmpty  = NewError(1000032, "matrix output is empty")
 	ParseErrorNotSupportOperator = NewError(1000101, "not support operator")
 	ParseErrorTargetMustBeArray  = NewError(1000102, "target must be array, check yaml first")
+	ParseErrorTargetNotSupport   = NewError(1000103, "target not support error")
 )
