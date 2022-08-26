@@ -39,17 +39,24 @@ func (service *EngineService) Run(c *gin.Context, req *dto.EngineRunRequest) (*d
 	//fill feature value from request features
 	features := make(map[string]core.IFeature)
 	for name, feature := range flow.FeatureMap {
-		if val, ok := req.Features[name]; ok {
-			featureType, err := util.GetFeatureType(val)
-			if err != nil { //warning: unknow type
-				log.Println(err)
+		if val, ok := req.Features[name]; ok { //in request params
+			featureType, err := util.GetType(val) //check data
+			if err != nil {                       //warning: unknow type
+				log.Println("type check error: ", err)
 			}
 			if core.GetFeatureType(featureType) != feature.GetType() {
 				log.Printf("request feature (%s:%s) type is not match, required %s\n", name, val, feature.GetType())
 				continue
 			}
 			features[name] = feature
-			features[name].SetValue(val)
+			if feature.GetType() == core.TypeDate {
+				valDate, _ := util.StringToDate(val.(string))
+				features[name].SetValue(valDate)
+			} else {
+				features[name].SetValue(val)
+			}
+		} else {
+			log.Println("request lack feature: ", name)
 		}
 	}
 	ctx.SetFeatures(features)
@@ -96,6 +103,9 @@ func (service *EngineService) dataAdapter(req *dto.EngineRunRequest, result *cor
 	resp.HitRules = hitRules
 	nodeResults := make([]map[string]interface{}, 0)
 	for _, nodeResult := range result.NodeResults {
+		if nodeResult == nil {
+			continue
+		}
 		nodeResults = append(nodeResults, map[string]interface{}{
 			"name":    nodeResult.Name,
 			"id":      nodeResult.Id,

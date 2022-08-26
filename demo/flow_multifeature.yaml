@@ -1,0 +1,187 @@
+key: flow_multifeature
+version: 1.0
+label: 测试多种特征类型决策流
+metadata:
+decision_flow:
+  - flow_node:
+    node_name: start_1
+    node_kind: start
+    next_node_name: ruleset_1
+    next_node_kind: ruleset
+  - flow_node:
+    node_name: ruleset_1
+    node_kind: ruleset
+    next_node_name: end_1
+    next_node_kind: end
+  - flow_node:
+    node_name: end_1
+    node_kind: end
+    next_node_name:
+    next_node_kind:
+rulesets:
+  - ruleset:
+    info:
+      id: 1
+      name: ruleset_1
+      tag: internal
+      label: 规则集
+      kind: ruleset
+      depends: [num_feature,str_feature,bool_feature,date_feature,array_feature,map_feature]
+    exec_plan: serial
+    block_strategy:
+      is_block: true
+      hit_rule: []
+      operator: EQ
+      value: reject
+    rules: 
+    - rule: 
+      id: 1
+      name: num_rule
+      tag: tag1
+      label: 数值规则
+      conditions:
+      - condition:
+        name: c1
+        feature: num_feature
+        operator: GT
+        value: 50
+      decision:
+        depends: [c1]
+        logic: c1
+        output:
+          name:
+          value: record
+          kind: string
+        assign:
+    - rule: 
+      id: 2
+      name: str_rule
+      tag: tag1
+      label: 字符串规则
+      conditions:
+      - condition:
+        name: c1
+        feature: str_feature
+        operator: LIKE
+        value: test
+      decision:
+        depends: [c1]
+        logic: c1
+        output:
+          name:
+          value: record
+          kind: string
+        assign:
+    - rule: 
+      id: 3
+      name: bool_rule
+      tag: tag1
+      label: 布尔规则
+      conditions:
+      - condition:
+        name: c1
+        feature: bool_feature
+        operator: EQ
+        value: false
+      decision:
+        depends: [c1]
+        logic: c1
+        output:
+          name:
+          value: record
+          kind: string
+        assign:
+    - rule: 
+      id: 4
+      name: date_rule
+      tag: tag1
+      label: 日期规则
+      conditions:
+      - condition:
+        name: c1
+        feature: date_feature
+        operator: BEFORE
+        value: 2022-08-30
+      decision:
+        depends: [c1]
+        logic: c1
+        output:
+          name:
+          value: record
+          kind: string
+        assign:
+    - rule: 
+      id: 5
+      name: array_rule
+      tag: tag1
+      label: 数组规则
+      conditions:
+      - condition:
+        name: c1
+        feature: array_feature
+        operator: IN
+        value: [1, 3, 5, 7, 9]
+      decision:
+        depends: [c1]
+        logic: c1
+        output:
+          name:
+          value: record
+          kind: string
+        assign:
+    - rule: 
+      id: 6
+      name: map_rule
+      tag: tag1
+      label: 字典规则
+      conditions:
+      - condition:
+        name: c1
+        feature: map_feature
+        operator: VALUEEXIST
+        value: x
+      decision:
+        depends: [c1]
+        logic: c1
+        output:
+          name:
+          value: record
+          kind: string
+        assign:
+features:
+  - feature:
+    id: 1
+    name: num_feature
+    tag: aa
+    label: 数值特征
+    kind: int
+  - feature:
+    id: 2
+    name: str_feature
+    tag: aa
+    label: 字符串特征
+    kind: string
+  - feature:
+    id: 3
+    name: bool_feature
+    tag: aa
+    label: 布尔特征
+    kind: bool
+  - feature:
+    id: 4
+    name: date_feature
+    tag: aa
+    label: 日期特征
+    kind: date
+  - feature:
+    id: 5
+    name: array_feature
+    tag: aa
+    label: 数组特征
+    kind: array
+  - feature:
+    id: 6
+    name: map_feature
+    tag: aa
+    label: 字典特征
+    kind: map

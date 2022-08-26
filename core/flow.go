@@ -85,17 +85,21 @@ func (flow *DecisionFlow) parseNode(curNode *FlowNode, ctx *PipelineContext) (ne
 	//parse current node
 	ctx.AddTrack(curNode.GetElem())
 	res, err := curNode.Parse(ctx)
-	if err != nil {
-		log.Println(err)
-	}
 	ctx.AddNodeResult(curNode.NodeName, res)
 
-	//get next node
+	//error break
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	//node is block
 	if res.IsBlock {
 		gotoNext = !res.IsBlock
 		return
 	}
 
+	//goto next node
 	switch curNode.GetNodeType() {
 	case TypeEnd: //END:
 		gotoNext = false
@@ -109,7 +113,6 @@ func (flow *DecisionFlow) parseNode(curNode *FlowNode, ctx *PipelineContext) (ne
 		nextNode, gotoNext = flow.GetNode(curNode.NextNodeName, curNode.NextNodeKind)
 		return
 	}
-	return
 }
 
 type FlowNode struct {

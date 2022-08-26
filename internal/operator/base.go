@@ -33,3 +33,25 @@ func InArray(arr []interface{}, val interface{}) bool {
 	}
 	return false
 }
+
+func AInB(a []interface{}, b []interface{}) bool {
+	if len(b) == 0 {
+		return false
+	}
+	if len(a) == 0 {
+		return true
+	}
+	if len(a) > len(b) {
+		return false
+	}
+	tmp := make(map[interface{}]struct{}, len(b))
+	for _, v := range b {
+		tmp[v] = struct{}{}
+	}
+	for _, v := range a {
+		if _, ok := tmp[v]; !ok {
+			return false
+		}
+	}
+	return true
+}

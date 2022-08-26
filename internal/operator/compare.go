@@ -19,3 +19,23 @@ func Compare(operator string, left interface{}, right interface{}) (bool, error)
 
 	return Evaluate(expr, params)
 }
+
+func CompareArray(a, b []interface{}) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	if (a == nil) != (b == nil) {
+		return false
+	}
+	b = b[:len(a)]
+	tmp := make(map[interface{}]struct{}, len(b))
+	for _, v := range b {
+		tmp[v] = struct{}{}
+	}
+	for _, v := range a {
+		if _, ok := tmp[v]; !ok {
+			return false
+		}
+	}
+	return true
+}
