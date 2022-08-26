@@ -49,13 +49,14 @@ func (rule *Rule) Parse(ctx *PipelineContext, depends map[string]IFeature) (outp
 		if feature, ok := depends[condition.Feature]; ok {
 			rs, err := feature.Compare(condition.Operator, condition.Value)
 			if err != nil {
+				log.Println(err)
 				return output, nil //value deafult
 			}
 			conditionRet[condition.Name] = rs
 		} else {
 			//lack of feature  whether ignore
 			log.Printf("error lack of feature: %s\n", condition.Feature)
-			continue
+			//continue
 		}
 	}
 	if len(conditionRet) == 0 {

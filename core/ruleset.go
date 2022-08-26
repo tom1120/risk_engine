@@ -81,7 +81,8 @@ func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) 
 				continue
 			}
 			//命中规则有结果
-			ctx.AddHitRule(&rule)
+			hitRule := rule
+			ctx.AddHitRule(&hitRule)
 			ruleOutputs[rule.Name] = output
 		}
 	}
