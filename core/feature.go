@@ -4,6 +4,7 @@ import (
 	"github.com/skyhackvip/risk_engine/configs"
 	"github.com/skyhackvip/risk_engine/internal/errcode"
 	"github.com/skyhackvip/risk_engine/internal/operator"
+	"github.com/skyhackvip/risk_engine/internal/util"
 	"strings"
 	"time"
 )
@@ -15,9 +16,9 @@ const (
 	TypeFloat
 	TypeString
 	TypeBool
-	TypeList
-	TypeMap
 	TypeDate
+	TypeArray
+	TypeMap
 	TypeDefault
 )
 
@@ -26,9 +27,9 @@ var FeatureTypeMap = map[string]FeatureType{
 	"float":   TypeFloat,
 	"string":  TypeString,
 	"bool":    TypeBool,
-	"list":    TypeList,
-	"map":     TypeMap,
 	"date":    TypeDate,
+	"array":   TypeArray,
+	"map":     TypeMap,
 	"default": TypeDefault,
 }
 
@@ -37,9 +38,9 @@ var FeatureStrMap = map[FeatureType]string{
 	TypeFloat:   "float",
 	TypeString:  "string",
 	TypeBool:    "bool",
-	TypeList:    "list",
-	TypeMap:     "map",
 	TypeDate:    "date",
+	TypeArray:   "array",
+	TypeMap:     "map",
 	TypeDefault: "default",
 }
 
@@ -61,7 +62,7 @@ type Feature struct {
 
 type IFeature interface {
 	GetName() string
-	SetValue(value interface{})
+	SetValue(value interface{}) error
 	GetValue() (interface{}, bool)
 	GetType() FeatureType
 	SupportOperators() map[string]struct{}
@@ -92,6 +93,16 @@ func NewFeature(name string, kind FeatureType) (feature IFeature) {
 			Name: name,
 			Kind: kind,
 		}
+	case TypeArray:
+		feature = &TypeArrayFeature{
+			Name: name,
+			Kind: kind,
+		}
+	case TypeMap:
+		feature = &TypeMapFeature{
+			Name: name,
+			Kind: kind,
+		}
 	default:
 		feature = &TypeDefaultFeature{
 			Name: name,
@@ -117,8 +128,12 @@ func (feature *TypeNumFeature) SupportOperators() map[string]struct{} {
 	return configs.NumSupportOperator
 }
 
-func (feature *TypeNumFeature) SetValue(value interface{}) {
+func (feature *TypeNumFeature) SetValue(value interface{}) error {
+	if err := checkValue(value, feature.GetType()); err != nil {
+		return err
+	}
 	feature.Value = value
+	return nil
 }
 
 func (feature *TypeNumFeature) GetValue() (interface{}, bool) {
@@ -147,7 +162,7 @@ func (feature *TypeNumFeature) Compare(op string, target interface{}) (bool, err
 		fallthrough
 	case "LE":
 		fallthrough
-	case "EQ":
+	case configs.EQ:
 		fallthrough
 	case "NEQ":
 		rs, err := operator.Compare(op, value, target)
@@ -201,8 +216,12 @@ func (feature *TypeStringFeature) SupportOperators() map[string]struct{} {
 	return configs.StringSupportOperator
 }
 
-func (feature *TypeStringFeature) SetValue(value interface{}) {
+func (feature *TypeStringFeature) SetValue(value interface{}) error {
+	if err := checkValue(value, feature.GetType()); err != nil {
+		return err
+	}
 	feature.Value = value
+	return nil
 }
 
 func (feature *TypeStringFeature) GetValue() (interface{}, bool) {
@@ -223,7 +242,7 @@ func (feature *TypeStringFeature) Compare(op string, target interface{}) (bool, 
 	value, _ := feature.GetValue() //默认值处理
 
 	switch op {
-	case "EQ":
+	case configs.EQ:
 		fallthrough
 	case "NEQ":
 		rs, err := operator.Compare(op, value, target)
@@ -262,8 +281,12 @@ func (feature *TypeBoolFeature) SupportOperators() map[string]struct{} {
 	return configs.BoolSupportOperator
 }
 
-func (feature *TypeBoolFeature) SetValue(value interface{}) {
+func (feature *TypeBoolFeature) SetValue(value interface{}) error {
+	if err := checkValue(value, feature.GetType()); err != nil {
+		return err
+	}
 	feature.Value = value
+	return nil
 }
 
 func (feature *TypeBoolFeature) GetValue() (interface{}, bool) {
@@ -298,8 +321,12 @@ func (feature *TypeDateFeature) SupportOperators() map[string]struct{} {
 	return configs.DateSupportOperator
 }
 
-func (feature *TypeDateFeature) SetValue(value interface{}) { //format error
+func (feature *TypeDateFeature) SetValue(value interface{}) error {
+	if err := checkValue(value, feature.GetType()); err != nil {
+		return err
+	}
 	feature.Value = value
+	return nil
 }
 
 func (feature *TypeDateFeature) GetValue() (interface{}, bool) {
@@ -317,7 +344,7 @@ func (feature *TypeDateFeature) Compare(op string, target interface{}) (bool, er
 	value, _ := feature.GetValue()
 	valueTime, ok := value.(time.Time)
 	if !ok {
-		return false, errcode.ParseErrorTargetNotSupport
+		return false, errcode.ParseErrorFeatureTypeNotMatch
 	}
 	var (
 		targetTime      time.Time
@@ -328,7 +355,7 @@ func (feature *TypeDateFeature) Compare(op string, target interface{}) (bool, er
 	var err error
 	switch target.(type) {
 	case string:
-		targetTime, err = feature.strToTime(target.(string))
+		targetTime, err = util.StringToDate(target.(string))
 		if err != nil {
 			return false, err
 		}
@@ -338,11 +365,11 @@ func (feature *TypeDateFeature) Compare(op string, target interface{}) (bool, er
 		if targetArr := target.([]string); len(targetArr) != 2 {
 			return false, errcode.ParseErrorTargetNotSupport
 		} else {
-			targetTimeLeft, err = feature.strToTime(targetArr[0])
+			targetTimeLeft, err = util.StringToDate(targetArr[0])
 			if err != nil {
 				return false, err
 			}
-			targetTimeRight, err = feature.strToTime(targetArr[1])
+			targetTimeRight, err = util.StringToDate(targetArr[1])
 			if err != nil {
 				return false, err
 			}
@@ -367,7 +394,7 @@ func (feature *TypeDateFeature) Compare(op string, target interface{}) (bool, er
 		return valueTime.Before(targetTime), nil
 	case "AFTER":
 		return valueTime.After(targetTime), nil
-	case "EQ":
+	case configs.EQ:
 		return valueTime.Equal(targetTime), nil
 	case "NEQ":
 		return !valueTime.Equal(targetTime), nil
@@ -377,47 +404,142 @@ func (feature *TypeDateFeature) Compare(op string, target interface{}) (bool, er
 	return false, errcode.ParseErrorNotSupportOperator
 }
 
-func (feature TypeDateFeature) strToTime(str string) (time.Time, error) {
-	return time.Parse(configs.DATE_FORMAT_DETAIL, str)
-}
-
-//List类型
-type TypeListFeature struct {
+//Array类型
+type TypeArrayFeature struct {
 	Name         string
 	Kind         FeatureType
 	Value        interface{}
 	DefaultValue interface{}
 }
 
-func (feature *TypeListFeature) GetType() FeatureType {
+func (feature *TypeArrayFeature) GetType() FeatureType {
 	return feature.Kind
 }
 
-func (feature *TypeListFeature) SupportOperators() map[string]struct{} {
-	return configs.ListSupportOperator
+func (feature *TypeArrayFeature) SupportOperators() map[string]struct{} {
+	return configs.ArraySupportOperator
 }
 
-func (feature *TypeListFeature) SetValue(value interface{}) {
-	feature.Value = value
+func (feature *TypeArrayFeature) SetValue(value interface{}) error {
+	if err := checkValue(value, feature.GetType()); err != nil {
+		return err
+	}
+	valueArr, ok := value.([]interface{})
+	if !ok {
+		return errcode.ParseErrorFeatureSetValue
+	}
+	for k, v := range valueArr {
+		if util.IsInt(v) {
+			valueArr[k], _ = util.ToInt(v)
+		}
+	}
+	feature.Value = valueArr
+	return nil
 }
 
-func (feature *TypeListFeature) GetValue() (interface{}, bool) {
+func (feature *TypeArrayFeature) GetValue() (interface{}, bool) {
 	if feature.Value == nil { //取不到走默认值
 		return feature.DefaultValue, false
 	}
 	return feature.Value, true
 }
 
-func (feature *TypeListFeature) GetName() string {
+func (feature *TypeArrayFeature) GetName() string {
 	return feature.Name
 }
 
-func (feature *TypeListFeature) Compare(op string, target interface{}) (bool, error) {
+func (feature *TypeArrayFeature) Compare(op string, target interface{}) (bool, error) {
+	if _, ok := feature.SupportOperators()[op]; !ok {
+		return false, errcode.ParseErrorNotSupportOperator
+	}
+	value, _ := feature.GetValue()
+	valueArr, ok := value.([]interface{})
+	if !ok {
+		return false, errcode.ParseErrorFeatureTypeNotMatch
+	}
+	targetArr, isTargetArray := target.([]interface{})
+	if !isTargetArray && op != configs.CONTAIN { //contain target can be simple data
+		return false, errcode.ParseErrorTargetMustBeArray
+	}
+	switch op {
+	case configs.EQ:
+		return operator.CompareArray(valueArr, targetArr), nil
+	case configs.NEQ:
+		return !operator.CompareArray(valueArr, targetArr), nil
+	case configs.IN:
+		return operator.AInB(valueArr, targetArr), nil
+	case configs.CONTAIN:
+		if isTargetArray {
+			return operator.AInB(targetArr, valueArr), nil
+		}
+		return operator.InArray(valueArr, target), nil
+	}
+	return false, errcode.ParseErrorNotSupportOperator
+}
+
+//map类型
+type TypeMapFeature struct {
+	Name         string
+	Kind         FeatureType
+	Value        interface{}
+	DefaultValue interface{}
+}
+
+func (feature *TypeMapFeature) GetType() FeatureType {
+	return feature.Kind
+}
+
+func (feature *TypeMapFeature) SupportOperators() map[string]struct{} {
+	return configs.MapSupportOperator
+}
+
+func (feature *TypeMapFeature) SetValue(value interface{}) error {
+	if err := checkValue(value, feature.GetType()); err != nil {
+		return err
+	}
+	feature.Value = value
+	return nil
+}
+
+func (feature *TypeMapFeature) GetValue() (interface{}, bool) {
+	if feature.Value == nil { //取不到走默认值
+		return feature.DefaultValue, false
+	}
+	return feature.Value, true
+}
+
+func (feature *TypeMapFeature) GetName() string {
+	return feature.Name
+}
+
+func (feature *TypeMapFeature) Compare(op string, target interface{}) (bool, error) {
 	if _, ok := feature.SupportOperators()[op]; !ok {
 		return false, errcode.ParseErrorNotSupportOperator
 	}
 	value, _ := feature.GetValue() //默认值处理
-	return operator.Compare(op, value, target)
+	valueMap, ok := value.(map[string]interface{})
+	if !ok {
+		return false, errcode.ParseErrorFeatureTypeNotMatch
+	}
+	switch op {
+	case configs.KEYEXIST:
+		targetStr, err := util.ToString(target)
+		if err != nil {
+			return false, err
+		}
+		if _, ok := valueMap[targetStr]; ok {
+			return true, nil
+		}
+		return false, nil
+	case configs.VALUEEXIST:
+		for _, v := range valueMap {
+			if v == target {
+				return true, nil
+			}
+		}
+		return false, nil
+	}
+	return false, errcode.ParseErrorNotSupportOperator
 }
 
 //默认类型
@@ -436,8 +558,9 @@ func (feature *TypeDefaultFeature) SupportOperators() map[string]struct{} {
 	return configs.DefaultSupportOperator
 }
 
-func (feature *TypeDefaultFeature) SetValue(value interface{}) {
+func (feature *TypeDefaultFeature) SetValue(value interface{}) error {
 	feature.Value = value
+	return nil
 }
 
 func (feature *TypeDefaultFeature) GetValue() (interface{}, bool) {
@@ -457,4 +580,15 @@ func (feature *TypeDefaultFeature) Compare(op string, target interface{}) (bool,
 	}
 	value, _ := feature.GetValue() //默认值处理
 	return operator.Compare(op, value, target)
+}
+
+func checkValue(value interface{}, featureType FeatureType) error {
+	valueType, err := util.GetType(value)
+	if err != nil {
+		return errcode.ParseErrorFeatureSetValue
+	}
+	if GetFeatureType(valueType) != featureType {
+		return errcode.ParseErrorFeatureSetValue
+	}
+	return nil
 }
