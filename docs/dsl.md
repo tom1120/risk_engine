@@ -1,12 +1,11 @@
 # DSL语法详解
 完整案例参见 /demo 目录
 
-# common部分
-- Rule
-- Condition
-- Decision
-- Output
-- BlockStrategy
+# 规则基础部分
+- Rule 规则
+- Condition 表达式
+- Decision 决策
+- Output 结果
 
 ## 规则定义 Rule
 ```golang
@@ -20,7 +19,7 @@ type Rule struct {
 }
 ```
 
-Yaml DSL
+Yaml DSL 描述一条规则
 ```yaml
 - rule:
   name: rule_4
@@ -29,25 +28,25 @@ Yaml DSL
   depends: [feature_2, feature_3]
   conditions:
   - condition:
-	name: c4
-	feature: feature_2
-	operator: LT
-	value: 8
+    name: c4
+    feature: feature_2
+    operator: LT
+    value: 8
   - condition:
-	name: c5
-	feature: feature_3
-	operator: GT
-	value: 9
+    name: c5
+    feature: feature_3
+    operator: GT
+    value: 9
   decision:
-	depends: [c4, c5]
-	logic: c4 || c5
-	output:
-	  name:
-	  value: record
-	  kind: TypeStrategy
-	assign:
-	  feat1: aa
-	  feat2: bb
+    depends: [c4, c5]
+    logic: c4 || c5
+    output:
+      name:
+      value: record
+      kind: TypeStrategy
+    assign:
+      feat1: aa
+      feat2: bb
 ```
 
 规则解释：
@@ -60,7 +59,7 @@ Yaml DSL
      变量赋值：feat1 = aa   feat2 = bb
 ```
 
-- 规则名称全局唯一
+- 规则名称 rule.name 全局唯一
 - todo: 增加规则优先级
 
 ## 条件表达式定义 Condition
@@ -75,14 +74,15 @@ type Condition struct {
 }
 ```
 
-Yaml DSL
+Yaml DSL 描述表达式
 ```yaml
 - condition:
-	name: c4
-	feature: feature_2
-	operator: LT
-	value: 8
+  name: c4
+  feature: feature_2
+  operator: LT
+  value: 8
 ```
+- 表达式解释：feature_2 < 8
 - 条件表达式是最基础单位，由特征、阈值、操作符组成。
 - 条件表达式可以组成规则。
 
@@ -97,21 +97,22 @@ type Decision struct {
     Assign  map[string]interface{} `yaml:"assign"` //赋值更多变量
 }
 ```
-Yaml DSL
+Yaml DSL 描述决策内容
 
 ```yaml
 decision:
-	depends: [c4, c5]
-	logic: c4 || c5
-	output:
-	  name:
-	  value: record
-	  kind: TypeStrategy
-	assign:
-	  feat1: aa
-	  feat2: bb
+    depends: [c4, c5]
+    logic: c4 || c5
+    output:
+      name:
+      value: record
+      kind: string
+    assign:
+      feat1: aa
+      feat2: bb
 ```
 - 决策可以输出指定内容，也可以给特征变量赋值
+- 决策结果：输出字符串 record，赋值 feat1 = aa   feat2 = bb
 
 
 ## 输出结果 Output
@@ -124,16 +125,17 @@ type Output struct {
     Hit   bool  //是否命中
 }
 ```
+Yaml DSL 描述输出内容
 ```yaml
 output:
   name:
   value: record
-  kind: TypeStrategy
+  kind: string
 ```
 
-- kind 包括 featureType 和 NodeType 两种不同的
-- 条件/ab节点 decision.output 是分支 类型是 NodeType
-- 规则集节点。decision.output 是 featureType.TypeStrategy 策略
+- kind 包括 FeatureType 和 NodeType 两种
+- 条件/ab节点 decision.output 是分支类型 NodeType
+- 规则集节点  decision.output 是特征类型 FeatureType
 
 
 # 特征 feature
@@ -147,6 +149,7 @@ type Feature struct {
   Kind  string `yaml:"kind"`
 }
 ```
+Yaml DSL 描述特征
 
 ```yaml
 features:
@@ -187,7 +190,9 @@ features:
     label: 字典特征
     kind: map
 ```
+
 不同特征支持不同的操作符：
+
 ```
 var OperatorMap = map[string]string{
   GT:         ">",
