@@ -2,54 +2,13 @@
 完整案例参见 /demo 目录
 
 # common部分
-- NodeInfo
-- BlockStrategy
 - Rule
 - Condition
 - Decision
 - Output
+- BlockStrategy
 
-
-## NodeInfo
-```golang
-type NodeInfo struct {
-    Id      int64    `yaml:"id"`
-    Name    string   `yaml:"name"`
-    Tag     string   `yaml:"tag"`
-    Label   string   `yaml:"label"`
-    Kind    NodeType `yaml:"kind"`
-    Depends []string `yaml:"depends,flow"`
-}
-```
-```yaml
-info:
-      id: 111
-      name: ruleset_1
-      tag: internal
-      label: 内部规则集1
-      kind: ruleset
-      depends: [feature_1,feature_2,feature_e]
-```
-
-## BlockStrategy
-```golang
-type BlockStrategy struct {
-	IsBlock  bool        `yaml:"is_block"`
-    HitRule  []string    `yaml:"hit_rule,flow"`
-	Operator string      `yaml:"operator"`
-    Value    interface{} `yaml:"value"`
-}
-```
-```yaml
-block_strategy:
-      is_block: true
-      hit_rule: [rule_1] #命中该规则就中断
-      operator: EQ
-      value: reject  #=reject中断
-```
-
-
-## Rule
+## 规则定义 Rule
 ```golang
 type Rule struct {
     Name       string      `yaml:"name"`
@@ -60,38 +19,51 @@ type Rule struct {
     Depends    []string    `yaml:"depends"`
 }
 ```
-```yaml
-    - rule:
-      name: rule_4
-      tag: rule_4
-      label: 规则4
-      depends: [feature_2, feature_3]
-      conditions:
-      - condition:
-        name: c4
-        feature: feature_2
-        operator: LT
-        value: 8
-      - condition:
-        name: c5
-        feature: feature_3
-        operator: GT
-        value: 9
-      decision:
-        depends: [c4, c5]
-        logic: c4 || c5
-        output:
-          name:
-          value: record
-          kind: TypeStrategy
-        assign:
-          feat1: aa
-          feat2: bb
-```
-规则名称全局唯一
-todo: 增加规则优先级
 
-## Condition
+Yaml DSL
+```yaml
+- rule:
+  name: rule_4
+  tag: rule_4
+  label: 规则4
+  depends: [feature_2, feature_3]
+  conditions:
+  - condition:
+	name: c4
+	feature: feature_2
+	operator: LT
+	value: 8
+  - condition:
+	name: c5
+	feature: feature_3
+	operator: GT
+	value: 9
+  decision:
+	depends: [c4, c5]
+	logic: c4 || c5
+	output:
+	  name:
+	  value: record
+	  kind: TypeStrategy
+	assign:
+	  feat1: aa
+	  feat2: bb
+```
+
+规则解释：
+
+```shell
+如果：
+    feature_2 < 8  || feature_3 > 9
+那么：
+     输出结果：record
+     变量赋值：feat1 = aa   feat2 = bb
+```
+
+- 规则名称全局唯一
+- todo: 增加规则优先级
+
+## 条件表达式定义 Condition
 
 ```golang
 type Condition struct {
@@ -103,17 +75,19 @@ type Condition struct {
 }
 ```
 
+Yaml DSL
 ```yaml
- - condition:
-        name: c4
-        feature: feature_2
-        operator: LT
-        value: 8
+- condition:
+	name: c4
+	feature: feature_2
+	operator: LT
+	value: 8
 ```
+- 条件表达式是最基础单位，由特征、阈值、操作符组成。
+- 条件表达式可以组成规则。
 
-后面要扩展特征和特征比对。
 
-## Decision
+## 决策 Decision
 
 ```golang
 type Decision struct {
@@ -123,23 +97,24 @@ type Decision struct {
     Assign  map[string]interface{} `yaml:"assign"` //赋值更多变量
 }
 ```
-
-
+Yaml DSL
 
 ```yaml
 decision:
-        depends: [c4, c5]
-        logic: c4 || c5
-        output:
-          name:
-          value: record
-          kind: TypeStrategy
-        assign:
-          feat1: aa
-          feat2: bb
+	depends: [c4, c5]
+	logic: c4 || c5
+	output:
+	  name:
+	  value: record
+	  kind: TypeStrategy
+	assign:
+	  feat1: aa
+	  feat2: bb
 ```
+- 决策可以输出指定内容，也可以给特征变量赋值
 
-## Output
+
+## 输出结果 Output
 
 ```golang
 type Output struct {
@@ -150,40 +125,96 @@ type Output struct {
 }
 ```
 ```yaml
- output:
-          name:
-          value: record
-          kind: TypeStrategy
+output:
+  name:
+  value: record
+  kind: TypeStrategy
 ```
 
-kind 包括 featureType 和 NodeType 两种不同的
-条件/ab节点 decision.output 是分支 类型是 NodeType
-规则集节点。decision.output 是 featureType.TypeStrategy 策略
+- kind 包括 featureType 和 NodeType 两种不同的
+- 条件/ab节点 decision.output 是分支 类型是 NodeType
+- 规则集节点。decision.output 是 featureType.TypeStrategy 策略
 
 
+# 特征 feature
 
-
-节点返回值：
-1、是否阻断
-2、对于ab节点和条件节点，要带下个节点的信息
-3、对于规则集节点，决策节点 好像没啥重要的
 ```golang
-//节点返回内容 是否阻断 下一个节点信息(ab,条件节点）
-type NodeResult struct {
-    Id           int64
-    Name         string
-    Label        string
-    Tag          string
-    Kind         NodeType
-    IsBlock      bool
-    Score        int
-    Value        interface{}
-    NextNodeName string //ab,条件节点有用
-    NextNodeType NodeType
+type Feature struct {
+  Id    int    `yaml:"id"`
+  Name  string `yaml:"name"`
+  Tag   string `yaml:"tag"`
+  Label string `yaml:"label"`
+  Kind  string `yaml:"kind"`
 }
 ```
 
-# 各节点实现接口
+```yaml
+features:
+  - feature:
+    id: 1
+    name: num_feature
+    tag: aa
+    label: 数值特征
+    kind: int
+  - feature:
+    id: 2
+    name: str_feature
+    tag: aa
+    label: 字符串特征
+    kind: string
+  - feature:
+    id: 3
+    name: bool_feature
+    tag: aa
+    label: 布尔特征
+    kind: bool
+  - feature:
+    id: 4
+    name: date_feature
+    tag: aa
+    label: 日期特征
+    kind: date
+  - feature:
+    id: 5
+    name: array_feature
+    tag: aa
+    label: 数组特征
+    kind: array
+  - feature:
+    id: 6
+    name: map_feature
+    tag: aa
+    label: 字典特征
+    kind: map
+```
+不同特征支持不同的操作符：
+```
+var OperatorMap = map[string]string{
+  GT:         ">",
+  LT:         "<",
+  GE:         ">=",
+  LE:         "<=",
+  EQ:         "==",
+  NEQ:        "!=",
+  BETWEEN:    "between",
+  LIKE:       "like",
+  IN:         "in",
+  CONTAIN:    "contain",
+  BEFORE:     "before",
+  AFTER:      "after",
+  KEYEXIST:   "keyexist",
+  VALUEEXIST: "valueexist",
+}
+```
+- 数值型支持： >   <   >=   <=    ==   !=    between    in
+- 字符串支持： ==    !=   like   in
+- 布尔型支持： ==    !=
+- 日期型支持： ==    !=    before   after   between
+- 数组型支持： ==    !=    contain   in
+- 字典型支持： keyexist    valueexist
+
+
+# 决策流节点实现
 ```golang
 //各类型节点实现该接口
 type INode interface {
@@ -194,7 +225,7 @@ type INode interface {
 }
 ```
 
-# 规则集
+# 规则集类型节点
 ```golang
 type RulesetNode struct {
     Info          NodeInfo      `yaml:"info"`
@@ -241,7 +272,7 @@ type RulesetNode struct {
           feature_x: 111
 ```
 
-# abtest
+# 冠军挑战者类型节点 abtest
 
 ```golang
 type AbtestNode struct {
@@ -249,7 +280,6 @@ type AbtestNode struct {
     Branchs []Branch `yaml:"branchs,flow"`
 }
 ```
-
 
 ```yaml
 - abtest:
@@ -302,5 +332,42 @@ var Strategys = map[string]Strategy{
 
 //阻断策略
 var BlockStrategy = []string{"reject"}
+```
+## 阻断策略 BlockStrategy
+```golang
+type BlockStrategy struct {
+	IsBlock  bool        `yaml:"is_block"`
+    HitRule  []string    `yaml:"hit_rule,flow"`
+	Operator string      `yaml:"operator"`
+    Value    interface{} `yaml:"value"`
+}
+```
+```yaml
+block_strategy:
+      is_block: true
+      hit_rule: [rule_1] #命中该规则就中断
+      operator: EQ
+      value: reject  #=reject中断
+```
+
+
+节点返回值：
+1、是否阻断
+2、对于ab节点和条件节点，要带下个节点的信息
+3、对于规则集节点，决策节点 好像没啥重要的
+```golang
+//节点返回内容 是否阻断 下一个节点信息(ab,条件节点）
+type NodeResult struct {
+    Id           int64
+    Name         string
+    Label        string
+    Tag          string
+    Kind         NodeType
+    IsBlock      bool
+    Score        int
+    Value        interface{}
+    NextNodeName string //ab,条件节点有用
+    NextNodeType NodeType
+}
 ```
 
