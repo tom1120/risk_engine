@@ -15,7 +15,7 @@
 
 
 ### 功能列表
-- 规则
+- 规则、决策
 - 规则集
 - 决策树
 - 决策表
@@ -25,13 +25,14 @@
 - 冠军挑战者 
 - 条件分流
 - 支持特征类型：int、string、bool、date、array、map
+- 支持运算类型：>、>=、<、<=、==、!=、between、before、after、in、not in、contain、not contain、like、key exist、value exist
 
 ## 快速开始
 - 环境准备
 go version go1.13 +
 
 - 代码下载
-git clone https://github.com/skyhackvip/risk_engine
+git clone [https://github.com/skyhackvip/risk_engine](https://github.com/skyhackvip/risk_engine)
 
 
 - Make 编译执行（推荐）
@@ -121,6 +122,8 @@ docker stop risk_engine
 ![决策引擎架构图](https://i.loli.net/2021/01/21/bOR1tyVPnCZNGoi.png)
 
 ### 风控系列文章解读
+- [一款开源又好用的决策引擎](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484522&idx=1&sn=9cbd6bb463a5d5dc49da8da72e8db77a&chksm=e8215b7adf56d26cd332475a3d7fa8dc7536e526565749c282737fc8bcf7d2e57bc8161ef9da&token=2083215119&lang=zh_CN#rd)
+
 - [智能风控决策引擎系统架构设计总纲](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484064&idx=1&sn=fecd2c7379208e84e7e3cd4eb1abfb6c&chksm=e8215db0df56d4a623bd6be2a706c0220952f0e045b0d6d9646616ee3aae742c574335fa228a&token=221471496&lang=zh_CN#rd)
 
 
