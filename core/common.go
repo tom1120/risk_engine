@@ -91,6 +91,7 @@ type Condition struct {
 	Feature  string      `yaml:"feature"`
 	Operator string      `yaml:"operator"`
 	Value    interface{} `yaml:"value"`
+	Goto     string      `yaml:"goto"`
 	Result   string      `yaml:"result"`
 	Name     string      `yaml:"name"`
 }

@@ -8,14 +8,14 @@ type Dsl struct {
 	Key          string                 `yaml:"key"`
 	Version      string                 `yaml:"version"`
 	Metadata     map[string]interface{} `yaml:"metadata"`
-	Features     []Feature              `yaml:"features,flow"`
 	DecisionFlow []FlowNode             `yaml:"decision_flow,flow"`
-	Rulesets     []RulesetNode          `yaml:"rulesets,flow"`
+	Features     []Feature              `yaml:"features,flow"`
 	Abtests      []AbtestNode           `yaml:"abtests,flow"`
-	Matrixs      []MatrixNode           `yaml:"matrixs,flow"`
 	Conditionals []ConditionalNode      `yaml:"conditionals,flow"`
-	//	DecisionTrees   []DecisionTree   `yaml:"decisiontrees,flow"`
-	//	ScoreCards      []ScoreCard      `yaml:"scorecards,flow"`
+	Rulesets     []RulesetNode          `yaml:"rulesets,flow"`
+	Matrixs      []MatrixNode           `yaml:"matrixs,flow"`
+	Trees        []TreeNode             `yaml:"trees,flow"`
+	Scorecards   []ScorecardNode        `yaml:"scorecards,flow"`
 }
 
 func (dsl *Dsl) CheckValid() bool {
@@ -57,6 +57,14 @@ func (dsl *Dsl) ConvertToDecisionFlow() (*DecisionFlow, error) {
 	for _, martix := range dsl.Matrixs {
 		matrixMap[martix.GetName()] = martix
 	}
+	treeMap := make(map[string]INode)
+	for _, tree := range dsl.Trees {
+		treeMap[tree.GetName()] = tree
+	}
+	scorecardMap := make(map[string]INode)
+	for _, scorecard := range dsl.Scorecards {
+		scorecardMap[scorecard.GetName()] = scorecard
+	}
 
 	//flow
 	for _, flowNode := range dsl.DecisionFlow {
@@ -80,6 +88,12 @@ func (dsl *Dsl) ConvertToDecisionFlow() (*DecisionFlow, error) {
 			flow.AddNode(&newNode)
 		case TypeMatrix:
 			newNode.SetElem(matrixMap[newNode.NodeName])
+			flow.AddNode(&newNode)
+		case TypeTree:
+			newNode.SetElem(treeMap[newNode.NodeName])
+			flow.AddNode(&newNode)
+		case TypeScorecard:
+			newNode.SetElem(scorecardMap[newNode.NodeName])
 			flow.AddNode(&newNode)
 		default:
 			log.Printf("dsl (%s-%s) convert warning: unkown node type (%s)\n", dsl.Key, dsl.Version, newNode.NodeKind)
