@@ -51,6 +51,9 @@ func (flow *DecisionFlow) SetStartNode(startNode *FlowNode) {
 }
 
 func (flow *DecisionFlow) GetStartNode() (*FlowNode, bool) {
+	if flow.startNode == nil {
+		return &FlowNode{}, false
+	}
 	return flow.startNode, true
 }
 

@@ -108,9 +108,12 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 # 决策流案例
 demo/ 下为所有可执行决策流案例
 - [规则集决策流](#规则集决策流)
-- [矩阵决策流](#矩阵决策流)
+- [决策矩阵决策流](#决策矩阵决策流)
 - [冠军挑战者决策流](#冠军挑战者决策流)
 - [条件决策流](#条件决策流)
+- [决策树决策流](#决策树决策流)
+- [评分卡决策流](#评分卡决策流)
+- [各类型特征决策流](#各类型特征决策流)
 
 ### 规则集决策流
 
@@ -200,7 +203,7 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_ruleset", "version
 }
 ```
 
-### 矩阵决策流
+### 决策矩阵决策流
 
 - yaml 源文件: [demo/flow_matrix](../demo/flow_matrix.yaml)
 - key: flow_matrix
@@ -296,6 +299,97 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_matrix", "version"
 	}
 }
 ```
+
+### 决策树决策流
+
+- yaml 源文件: [demo/flow_tree](../demo/flow_tree.yaml)
+- key: flow_tree
+- version: 1.0
+
+
+*CURL*
+```shell
+curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_tree", "version":"1.0", "req_id":"123456789", "uid":1,"features":{"feature_num":-55,"feature_bool":false}}'
+```
+
+*执行结果*
+```json
+{
+	"code": 200,
+	"error": "",
+	"result": {
+		"key": "flow_tree",
+		"req_id": "123456789",
+		"uid": 1,
+		"features": [{
+			"isDefault": false,
+			"name": "feature_bool",
+			"value": false
+		}, {
+			"isDefault": false,
+			"name": "feature_num",
+			"value": -55
+		}, {
+			"isDefault": false,
+			"name": "tree_1",
+			"value": "f"
+		}, {
+			"isDefault": false,
+			"name": "my_tree_feature",
+			"value": "f"
+		}],
+		"tracks": [{
+			"index": 1,
+			"label": "",
+			"name": "start_1"
+		}, {
+			"index": 2,
+			"label": "测试决策树",
+			"name": "tree_1"
+		}, {
+			"index": 3,
+			"label": "",
+			"name": "end_1"
+		}],
+		"hit_rules": [],
+		"node_results": [{
+			"IsBlock": false,
+			"Kind": "start",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "start_1",
+			"tag": ""
+		}, {
+			"IsBlock": false,
+			"Kind": "tree",
+			"Score": 0,
+			"Value": "f",
+			"id": 1,
+			"label": "测试决策树",
+			"name": "tree_1",
+			"tag": "my_tree"
+		}, {
+			"IsBlock": true,
+			"Kind": "end",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "end_1",
+			"tag": ""
+		}],
+		"start_time": "2022-09-11 16:12:34",
+		"end_time": "2022-09-11 16:12:34",
+		"run_time": 1
+	}
+}
+```
+
+*执行过程分析*
+开始->测试决策树->结束
+决策树，从 block_1 开始，feature_bool = false 命中，goto block_3。feature_num < 1 命中，输出结果为 f，结束并赋值。
 
 ### 冠军挑战者决策流
 
@@ -393,6 +487,9 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version"
 	}
 }
 ```
+
+*执行过程分析*
+
 
 ### 条件决策流
 
@@ -510,3 +607,142 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_conditional", "ver
 	}
 }
 ```
+
+*执行过程分析*
+开始->分支节点->规则集3（第三个分支）->结束
+其中分支节点根据命中条件不同会进入 1-4 不同分支，由于 feature_a = false && feature_b <= 100 命中进入分支3，分支3对应规则集3。规则集3 （feature_3 LIKE xyz）命中，记录不阻塞流程。最后结束。
+
+
+
+### 各类型特征决策流
+
+- yaml 源文件: [demo/flow_multifeature](../demo/flow_multifeature.yaml)
+- key: flow_multifeature
+- version: 1.0
+
+这里决策流用于展示各种数据类型的特征，每种特征支持不同的操作符类型。
+![规则集决策流图](ruleset1.png)
+
+*CURL*
+```shell
+curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_multifeature", "version":"1.0", "req_id":"123456789", "uid":1,"features":{"num_feature":55,"str_feature":"hello_test","bool_feature":false, "date_feature": "2022-08-29 23:59:59", "array_feature":[1, 3], "map_feature": {"key": "x"}}}'
+```
+
+*执行结果*
+```json
+{
+	"code": 200,
+	"error": "",
+	"result": {
+		"key": "flow_multifeature",
+		"req_id": "123456789",
+		"uid": 1,
+		"features": [{
+			"isDefault": false,
+			"name": "num_feature",
+			"value": 55
+		}, {
+			"isDefault": false,
+			"name": "str_feature",
+			"value": "hello_test"
+		}, {
+			"isDefault": false,
+			"name": "bool_feature",
+			"value": false
+		}, {
+			"isDefault": false,
+			"name": "date_feature",
+			"value": "2022-08-29T23:59:59Z"
+		}, {
+			"isDefault": false,
+			"name": "array_feature",
+			"value": [1, 3]
+		}, {
+			"isDefault": false,
+			"name": "map_feature",
+			"value": {
+				"key": "x"
+			}
+		}],
+		"tracks": [{
+			"index": 1,
+			"label": "",
+			"name": "start_1"
+		}, {
+			"index": 2,
+			"label": "规则集",
+			"name": "ruleset_1"
+		}, {
+			"index": 3,
+			"label": "",
+			"name": "end_1"
+		}],
+		"hit_rules": [{
+			"id": "4",
+			"label": "日期规则",
+			"name": "date_rule"
+		}, {
+			"id": "5",
+			"label": "数组规则",
+			"name": "array_rule"
+		}, {
+			"id": "6",
+			"label": "字典规则",
+			"name": "map_rule"
+		}, {
+			"id": "1",
+			"label": "数值规则",
+			"name": "num_rule"
+		}, {
+			"id": "2",
+			"label": "字符串规则",
+			"name": "str_rule"
+		}, {
+			"id": "3",
+			"label": "布尔规则",
+			"name": "bool_rule"
+		}],
+		"node_results": [{
+			"IsBlock": false,
+			"Kind": "start",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "start_1",
+			"tag": ""
+		}, {
+			"IsBlock": false,
+			"Kind": "ruleset",
+			"Score": 6,
+			"Value": "record",
+			"id": 1,
+			"label": "规则集",
+			"name": "ruleset_1",
+			"tag": "internal"
+		}, {
+			"IsBlock": true,
+			"Kind": "end",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "end_1",
+			"tag": ""
+		}],
+		"start_time": "2022-09-07 13:47:03",
+		"end_time": "2022-09-07 13:47:03",
+		"run_time": 1
+	}
+}
+```
+
+*执行过程分析*
+开始->规则集->结束，其中规则集包含 5 条规则
+- 数字规则: num_feature > 50 （num_feature = 55） 命中
+- 字符串规则：str_feature LIKE test （str_feature = hello_test） 命中
+- 布尔规则：bool_feature = false  (bool_feature = false)  命中
+- 日期规则：date_feature BEFORE 2022-08-30  （date_feature = 2022-08-29 23:59:59） 命中
+- 数组规则：array_feature IN [1, 3, 5, 7, 9]  （array_feature = [1, 3]） 命中
+- 字典规则：map_feature VALUEEXIST x  （map_feature = {"key": "x"}）  命中
+

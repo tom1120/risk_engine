@@ -1,0 +1,93 @@
+key: flow_tree
+version: 1.0
+label: 决策树决策流
+metadata:
+  author: hepeng
+  group: github
+decision_flow:
+  - flow_node:
+    node_name: start_1
+    node_kind: start
+    next_node_name: tree_1
+    next_node_kind: tree
+  - flow_node:
+    node_name: tree_1
+    node_kind: tree
+    next_node_name: end_1 
+    next_node_kind: end
+  - flow_node:
+    node_name: end_1
+    node_kind: end
+    next_node_name: 
+    next_node_kind: 
+trees:
+  - tree: 
+    info:
+      id: 1
+      name: tree_1
+      tag: my_tree
+      label: 测试决策树
+      kind: tree
+      depends: [feature_bool, feature_num]
+    strategy:
+      output_name: my_tree_feature
+      output_kind: string
+      start: block_1
+    blocks: 
+    - block:
+      name: block_1
+      feature: feature_bool
+      conditions:
+      - condition:
+        operator: EQ
+        value: true
+        goto: block_2
+      - condition:
+        operator: EQ 
+        value: false
+        goto: block_3
+    - block:
+      name: block_2
+      feature: feature_num
+      conditions:
+      - condition:
+        operator: GT
+        value: 10
+        result: a
+      - condition:
+        operator: BETWEEN 
+        value: [1,10]
+        result: b
+      - condition:
+        operator: LT
+        value: 1
+        result: c
+    - block:
+      name: block_3
+      feature: feature_num
+      conditions:
+      - condition:
+        operator: GT
+        value: 10
+        result: d
+      - condition:
+        operator: BETWEEN 
+        value: [1,10]
+        result: e
+      - condition:
+        operator: LT
+        value: 1
+        result: f
+features:
+  - feature:
+    id: 1    
+    name: feature_bool
+    tag: aa
+    label: 布尔特征
+    kind: bool 
+  - feature:
+    id: 2
+    name: feature_num
+    tag: aa
+    label: 数字特征
+    kind: int
