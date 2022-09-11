@@ -30,7 +30,7 @@ trees:
       kind: tree
       depends: [feature_bool, feature_num]
     strategy:
-      output_name: my_tree_1
+      output_name: my_tree_feature
       output_kind: string
       start: block_1
     blocks: 

@@ -300,6 +300,97 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_matrix", "version"
 }
 ```
 
+### 决策树决策流
+
+- yaml 源文件: [demo/flow_tree](../demo/flow_tree.yaml)
+- key: flow_tree
+- version: 1.0
+
+
+*CURL*
+```shell
+curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_tree", "version":"1.0", "req_id":"123456789", "uid":1,"features":{"feature_num":-55,"feature_bool":false}}'
+```
+
+*执行结果*
+```json
+{
+	"code": 200,
+	"error": "",
+	"result": {
+		"key": "flow_tree",
+		"req_id": "123456789",
+		"uid": 1,
+		"features": [{
+			"isDefault": false,
+			"name": "feature_bool",
+			"value": false
+		}, {
+			"isDefault": false,
+			"name": "feature_num",
+			"value": -55
+		}, {
+			"isDefault": false,
+			"name": "tree_1",
+			"value": "f"
+		}, {
+			"isDefault": false,
+			"name": "my_tree_feature",
+			"value": "f"
+		}],
+		"tracks": [{
+			"index": 1,
+			"label": "",
+			"name": "start_1"
+		}, {
+			"index": 2,
+			"label": "测试决策树",
+			"name": "tree_1"
+		}, {
+			"index": 3,
+			"label": "",
+			"name": "end_1"
+		}],
+		"hit_rules": [],
+		"node_results": [{
+			"IsBlock": false,
+			"Kind": "start",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "start_1",
+			"tag": ""
+		}, {
+			"IsBlock": false,
+			"Kind": "tree",
+			"Score": 0,
+			"Value": "f",
+			"id": 1,
+			"label": "测试决策树",
+			"name": "tree_1",
+			"tag": "my_tree"
+		}, {
+			"IsBlock": true,
+			"Kind": "end",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "end_1",
+			"tag": ""
+		}],
+		"start_time": "2022-09-11 16:12:34",
+		"end_time": "2022-09-11 16:12:34",
+		"run_time": 1
+	}
+}
+```
+
+*执行过程分析*
+开始->测试决策树->结束
+决策树，从 block_1 开始，feature_bool = false 命中，goto block_3。feature_num < 1 命中，输出结果为 f，结束并赋值。
+
 ### 冠军挑战者决策流
 
 - yaml 源文件: [demo/flow_abtest](../demo/flow_abtest.yaml)

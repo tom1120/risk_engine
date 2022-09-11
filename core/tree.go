@@ -52,7 +52,6 @@ func (treeNode TreeNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	blockMap := treeNode.init()
 
 	depends := ctx.GetFeatures(info.Depends)
-	log.Println(depends)
 	block, gotoNext := blockMap[treeNode.Strategy.Start]
 	for gotoNext {
 		ret, gotoNext, err := treeNode.parseBlock(block, depends)
@@ -74,12 +73,15 @@ func (treeNode TreeNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	}
 
 	//save into ctx feature
-	/*feature := NewFeature(TreeNode.GetName(), GetFeatureType(kind))
-	feature.SetValue(val)
-	ctx.SetFeature(feature) if TreeNode.TreeStrategy.OutputName != "" { //extra extraFeature := NewFeature(TreeNode.TreeStrategy.OutputName, GetFeatureType(kind))
-		extraFeature.SetValue(val)
+	kind := treeNode.Strategy.OutputKind
+	feature := NewFeature(treeNode.GetName(), GetFeatureType(kind))
+	feature.SetValue(result)
+	ctx.SetFeature(feature)
+	if treeNode.Strategy.OutputName != "" { //extra
+		extraFeature := NewFeature(treeNode.Strategy.OutputName, GetFeatureType(kind))
+		extraFeature.SetValue(result)
 		ctx.SetFeature(extraFeature)
-	}*/
+	}
 
 	//output
 	nodeResult.Value = result
