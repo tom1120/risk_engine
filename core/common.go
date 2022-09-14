@@ -3,6 +3,7 @@ package core
 import (
 	"errors"
 	"fmt"
+	"github.com/skyhackvip/risk_engine/internal/errcode"
 	"github.com/skyhackvip/risk_engine/internal/operator"
 	"log"
 )
@@ -123,4 +124,39 @@ type Branch struct {
 	Conditions []Condition `yaml:"conditions"` //used by conditional
 	Percent    float64     `yaml:"percent"`    //used by abtest
 	Decision   Decision    `yaml:"decision"`
+}
+
+type Block struct {
+	Name       string      `yaml:"name"`
+	Feature    string      `yaml:"feature"`
+	Conditions []Condition `yaml:"conditions,flow"`
+}
+
+//return result, goto, error
+func (block Block) parse(depends map[string]IFeature) (interface{}, bool, error) {
+	if block.Conditions == nil || len(block.Conditions) == 0 {
+		return nil, false, nil
+	}
+	for _, condition := range block.Conditions {
+		if feature, ok := depends[block.Feature]; ok {
+			hit, err := feature.Compare(condition.Operator, condition.Value)
+			log.Println("-----5555------:", hit, err)
+			if err != nil {
+				log.Println("parse error", err)
+				continue
+			}
+			if hit {
+				if condition.Goto != "" {
+					return condition.Goto, true, nil
+				} else {
+					log.Println("here", condition.Result)
+					return condition.Result, false, nil
+				}
+			}
+		} else {
+			log.Printf("error lack of feature: %s\n", block.Feature)
+			continue
+		}
+	}
+	return nil, false, errcode.ParseErrorTreeNotMatch
 }
