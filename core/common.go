@@ -140,7 +140,6 @@ func (block Block) parse(depends map[string]IFeature) (interface{}, bool, error)
 	for _, condition := range block.Conditions {
 		if feature, ok := depends[block.Feature]; ok {
 			hit, err := feature.Compare(condition.Operator, condition.Value)
-			log.Println("-----5555------:", hit, err)
 			if err != nil {
 				log.Println("parse error", err)
 				continue
@@ -149,7 +148,6 @@ func (block Block) parse(depends map[string]IFeature) (interface{}, bool, error)
 				if condition.Goto != "" {
 					return condition.Goto, true, nil
 				} else {
-					log.Println("here", condition.Result)
 					return condition.Result, false, nil
 				}
 			}
