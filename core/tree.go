@@ -11,16 +11,11 @@ type TreeNode struct {
 	Strategy Strategy `yaml:"strategy"`
 }
 
-type Block struct {
-	Name       string      `yaml:"name"`
-	Feature    string      `yaml:"feature"`
-	Conditions []Condition `yaml:"conditions,flow"`
-}
-
 type Strategy struct {
 	OutputName string `yaml:"output_name"`
 	OutputKind string `yaml:"output_kind"`
 	Start      string `yaml:"start"`
+	Logic      string `yaml:"logic"`
 }
 
 func (treeNode TreeNode) GetName() string {
@@ -54,7 +49,7 @@ func (treeNode TreeNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	depends := ctx.GetFeatures(info.Depends)
 	block, gotoNext := blockMap[treeNode.Strategy.Start]
 	for gotoNext {
-		ret, gotoNext, err := treeNode.parseBlock(block, depends)
+		ret, gotoNext, err := block.parse(depends)
 		if err != nil {
 			log.Println(err)
 			resultErr = err
@@ -89,31 +84,7 @@ func (treeNode TreeNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	return nodeResult, resultErr
 }
 
-func (treeNode TreeNode) parseBlock(block Block, depends map[string]IFeature) (interface{}, bool, error) {
-	for _, condition := range block.Conditions {
-		if feature, ok := depends[block.Feature]; ok {
-			hit, err := feature.Compare(condition.Operator, condition.Value)
-			if err != nil {
-				log.Println("parse error", err)
-				continue
-			}
-			if hit {
-				if condition.Goto != "" {
-					return condition.Goto, true, nil
-				} else {
-					return condition.Result, false, nil
-				}
-			}
-		} else {
-			log.Printf("error lack of feature: %s\n", block.Feature)
-			continue
-		}
-	}
-	return nil, false, errcode.ParseErrorTreeNotMatch
-}
-
 func (treeNode TreeNode) init() map[string]Block {
-	log.Println("init", treeNode.Blocks)
 	blockMap := make(map[string]Block)
 	for _, block := range treeNode.Blocks {
 		blockMap[block.Name] = block

@@ -168,20 +168,22 @@ func (feature *TypeNumFeature) Compare(op string, target interface{}) (bool, err
 		rs, err := operator.Compare(op, value, target)
 		return rs, err
 	case "BETWEEN":
-		if t, ok := target.([]int); !ok {
+		if t, ok := target.([]interface{}); !ok {
 			return false, errcode.ParseErrorTargetMustBeArray
 		} else {
 			if len(t) != 2 {
 				return false, errcode.ParseErrorTargetMustBeArray
 			}
-			if t[0] > t[1] {
-				t[0], t[1] = t[1], t[0]
+			left, _ := util.ToFloat64(t[0])
+			right, _ := util.ToFloat64(t[1])
+			if left > right {
+				left, right = right, left
 			}
-			rs1, err := operator.Compare("GT", value, t[0])
+			rs1, err := operator.Compare("GT", value, left)
 			if err != nil {
 				return false, err
 			}
-			rs2, err := operator.Compare("LT", value, t[1])
+			rs2, err := operator.Compare("LT", value, right)
 			if err != nil {
 				return false, err
 			}

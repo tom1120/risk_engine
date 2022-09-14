@@ -135,7 +135,7 @@ func ToString(val interface{}) (ret string, err error) {
 	switch val.(type) {
 	case string:
 		ret = val.(string)
-	case int8, int16, int, int32, int64:
+	case int8, int16, int, int32, int64, uint8, uint16, uint32, uint64:
 		if v, err := ToInt64(val); err != nil {
 			err = errcode.ErrorTypeConvert
 		} else {
@@ -181,6 +181,29 @@ func ToInt(val interface{}) (ret int, err error) {
 	if v, err := ToInt64(val); err == nil {
 		ret = int(v)
 	} else {
+		err = errcode.ErrorTypeConvert
+	}
+	return
+}
+
+func ToFloat64(val interface{}) (ret float64, err error) {
+	switch val.(type) {
+	case uint, uint8, uint16, uint32, uint64, int, int8, int16, int32, int64:
+		if retInt, e := ToInt(val); e != nil {
+			err = e
+			return
+		} else {
+			ret = float64(retInt)
+		}
+	case float32:
+		ret = float64(val.(float32))
+	case float64:
+		ret = val.(float64)
+	case string:
+		if ret, err = strconv.ParseFloat(val.(string), 64); err != nil {
+			return
+		}
+	default:
 		err = errcode.ErrorTypeConvert
 	}
 	return

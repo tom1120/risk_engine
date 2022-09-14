@@ -1,0 +1,107 @@
+key: flow_scorecard
+version: 1.0
+label: 评分卡决策流
+metadata:
+  author: hepeng
+  group: github
+decision_flow:
+  - flow_node:
+    node_name: start_1
+    node_kind: start
+    next_node_name: scorecard_1
+    next_node_kind: scorecard
+  - flow_node:
+    node_name: scorecard_1
+    node_kind: scorecard
+    next_node_name: end_1 
+    next_node_kind: end
+  - flow_node:
+    node_name: end_1
+    node_kind: end
+    next_node_name: 
+    next_node_kind: 
+scorecards:
+  - scorecard: 
+    info:
+      id: 1
+      name: scorecard_1
+      tag: my_scorecard
+      label: 测试评分卡
+      kind: scorecard
+      depends: [num, sex, age]
+    strategy:
+      output_name: my_scorecard
+      output_kind: float
+      logic: sum
+    blocks: 
+    - block:
+      name: num_block
+      feature: num
+      conditions:
+      - condition:
+        operator: LT
+        value: 20
+        result: 1
+      - condition:
+        operator: BETWEEN 
+        value: [20,30]
+        result: 2
+      - condition:
+        operator: BETWEEN
+        value: [30,50]
+        result: 3
+      - condition:
+        operator: BETWEEN
+        value: [50,100]
+        result: 4
+      - condition:
+        operator: GT
+        value: 100
+        result: 5
+    - block:
+      name: sex_block
+      feature: sex
+      conditions:
+      - condition:
+        operator: EQ
+        value: M
+        result: 10
+      - condition:
+        operator: EQ
+        value: F
+        result: 30
+    - block:
+      name: age_block
+      feature: age
+      conditions:
+      - condition:
+        operator: LT
+        value: 18
+        result: 10
+      - condition:
+        operator: BETWEEN
+        value: [18,50]
+        result: 50
+      - condition:
+        operator: GT
+        value: 50 
+        result: 20
+features:
+  - feature:
+    id: 1    
+    name: num
+    tag: aa
+    label: 数字
+    kind: int 
+  - feature:
+    id: 2
+    name: sex
+    tag: aa
+    label: 性别
+    kind: string
+  - feature:
+    id: 3
+    name: age
+    tag: aa
+    label: 年龄
+    kind: int
