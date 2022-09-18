@@ -18,44 +18,55 @@ func GetType(val interface{}) (string, error) {
 	switch val.(type) {
 	case string:
 		if IsInt(val) {
-			return "int", nil
+			return configs.INT, nil
 		}
 		if IsFloat(val) {
-			return "float", nil
+			return configs.FLOAT, nil
 		}
 		if IsBool(val) {
-			return "bool", nil
+			return configs.BOOL, nil
 		}
 		if IsDate(val) {
-			return "date", nil
+			return configs.DATE, nil
 		}
-		return "string", nil
+		return configs.STRING, nil
 	case int:
-		return "int", nil
+		return configs.INT, nil
 	case int32:
-		return "int", nil
+		return configs.INT, nil
 	case int64:
-		return "int", nil
+		return configs.INT, nil
 	case float32:
 		if IsFloat32Int(val.(float32)) {
-			return "int", nil
+			return configs.INT, nil
 		}
-		return "float", nil
+		return configs.FLOAT, nil
 	case float64:
 		if IsFloat64Int(val.(float64)) {
-			return "int", nil
+			return configs.INT, nil
 		}
-		return "float", nil
+		return configs.FLOAT, nil
 	case bool:
-		return "bool", nil
+		return configs.BOOL, nil
 	case time.Time:
-		return "date", nil
+		return configs.DATE, nil
 	case []interface{}:
-		return "array", nil
+		return configs.ARRAY, nil
 	case map[string]interface{}:
-		return "map", nil
+		return configs.MAP, nil
 	}
-	return "default", errcode.ErrorFeatureTypeUnknow
+	return configs.DEFAULT, errcode.ErrorFeatureTypeUnknow
+}
+
+//match type  int match float
+func MatchType(typeA, typeB string) bool {
+	if typeA == configs.INT {
+		typeA = configs.FLOAT
+	}
+	if typeB == configs.INT {
+		typeB = configs.FLOAT
+	}
+	return typeA == typeB
 }
 
 //date type jundge

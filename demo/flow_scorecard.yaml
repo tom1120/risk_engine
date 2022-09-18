@@ -92,7 +92,7 @@ features:
     name: num
     tag: aa
     label: 数字
-    kind: int 
+    kind: float
   - feature:
     id: 2
     name: sex

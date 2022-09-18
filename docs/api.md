@@ -391,6 +391,28 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_tree", "version":"
 开始->测试决策树->结束
 决策树，从 block_1 开始，feature_bool = false 命中，goto block_3。feature_num < 1 命中，输出结果为 f，结束并赋值。
 
+### 评分卡决策流
+
+- yaml 源文件: [demo/flow_scorecard](../demo/flow_scorecard.yaml)
+- key: flow_scorecard
+- version: 1.0
+
+
+*CURL*
+```shell
+curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_scorecard", "version":"1.0", "req_id":"123456789", "uid":1,"features":{"num":55.5,"sex":"M", "age": 11}}'
+```
+
+*执行结果*
+```json
+```
+
+*执行过程分析*
+开始->测试决策树->结束
+决策树，从 block_1 开始，feature_bool = false 命中，goto block_3。feature_num < 1 命中，输出结果为 f，结束并赋值。
+
+
+
 ### 冠军挑战者决策流
 
 - yaml 源文件: [demo/flow_abtest](../demo/flow_abtest.yaml)

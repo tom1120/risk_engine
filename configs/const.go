@@ -1,12 +1,6 @@
 package configs
 
-//logic
-var LogicMap = map[string]string{
-	"OR":  "||",
-	"AND": "&&",
-}
-
-//operator
+//all operators
 const (
 	GT         = "GT"
 	LT         = "LT"
@@ -87,30 +81,6 @@ var DefaultSupportOperator = map[string]struct{}{
 	NEQ: struct{}{},
 }
 
-//ruleset decision
-var DecisionMap = map[string]int{
-	"reject": 100, //first priority
-	"pass":   0,
-	"record": 1,
-}
-
-const (
-	ScoreReplace = "((score))"
-)
-
-const (
-	Sum = "SUM"
-	Min = "MIN"
-	Max = "MAX"
-	Avg = "AVG"
-)
-
-//decision
-const (
-	NilDecision   = 0        //not hit rules strategy
-	BreakDecision = "reject" //if hit,break at once
-)
-
 //all support node
 const (
 	START          = "start"
@@ -129,6 +99,19 @@ const (
 	MATRIXY = "matrixY"
 )
 
+//all type
+const (
+	INT     = "int"
+	FLOAT   = "float"
+	STRING  = "string"
+	BOOL    = "bool"
+	DATE    = "date"
+	ARRAY   = "array"
+	MAP     = "map"
+	DEFAULT = "default"
+)
+
+//date type
 const (
 	DATE_FORMAT        = "2006-01-02"
 	DATE_FORMAT_DETAIL = "2006-01-02 15:04:05"
