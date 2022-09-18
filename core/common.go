@@ -156,5 +156,5 @@ func (block Block) parse(depends map[string]IFeature) (interface{}, bool, error)
 			continue
 		}
 	}
-	return nil, false, errcode.ParseErrorTreeNotMatch
+	return nil, false, errcode.ParseErrorBlockNotMatch
 }

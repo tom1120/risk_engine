@@ -23,25 +23,25 @@ const (
 )
 
 var FeatureTypeMap = map[string]FeatureType{
-	"int":     TypeInt,
-	"float":   TypeFloat,
-	"string":  TypeString,
-	"bool":    TypeBool,
-	"date":    TypeDate,
-	"array":   TypeArray,
-	"map":     TypeMap,
-	"default": TypeDefault,
+	configs.INT:     TypeInt,
+	configs.FLOAT:   TypeFloat,
+	configs.STRING:  TypeString,
+	configs.BOOL:    TypeBool,
+	configs.DATE:    TypeDate,
+	configs.ARRAY:   TypeArray,
+	configs.MAP:     TypeMap,
+	configs.DEFAULT: TypeDefault,
 }
 
 var FeatureStrMap = map[FeatureType]string{
-	TypeInt:     "int",
-	TypeFloat:   "float",
-	TypeString:  "string",
-	TypeBool:    "bool",
-	TypeDate:    "date",
-	TypeArray:   "array",
-	TypeMap:     "map",
-	TypeDefault: "default",
+	TypeInt:     configs.INT,
+	TypeFloat:   configs.FLOAT,
+	TypeString:  configs.STRING,
+	TypeBool:    configs.BOOL,
+	TypeDate:    configs.DATE,
+	TypeArray:   configs.ARRAY,
+	TypeMap:     configs.MAP,
+	TypeDefault: configs.DEFAULT,
 }
 
 func GetFeatureType(name string) FeatureType {

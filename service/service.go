@@ -44,8 +44,8 @@ func (service *EngineService) Run(c *gin.Context, req *dto.EngineRunRequest) (*d
 			if err != nil {                       //warning: unknow type
 				log.Println("type check error: ", err)
 			}
-			if core.GetFeatureType(featureType) != feature.GetType() {
-				log.Printf("request feature (%s:%s) type is not match, required %s\n", name, val, feature.GetType())
+			if !util.MatchType(featureType, feature.GetType().String()) {
+				log.Printf("request feature type is not match! [%s] type is (%s), required (%s)\n", name, core.GetFeatureType(featureType), feature.GetType())
 				continue
 			}
 			features[name] = feature
@@ -59,6 +59,7 @@ func (service *EngineService) Run(c *gin.Context, req *dto.EngineRunRequest) (*d
 			log.Println("request lack feature: ", name)
 		}
 	}
+	log.Println("======[trace]request features ======", features)
 	ctx.SetFeatures(features)
 	flow.Run(ctx)
 

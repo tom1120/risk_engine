@@ -5,6 +5,7 @@ import (
 	"github.com/skyhackvip/risk_engine/core"
 	"github.com/skyhackvip/risk_engine/internal/dto"
 	"github.com/skyhackvip/risk_engine/service"
+	"log"
 	"net/http"
 )
 
@@ -29,12 +30,14 @@ func (handler *EngineHandler) Run(c *gin.Context) {
 		})
 		return
 	}
+	log.Printf("======[trace]request start req_id (%s)======\n", request.ReqId)
 	svr := service.NewEngineService(handler.kernel)
 	result, err := svr.Run(c, &request)
 	if err != nil {
 		code = 501
 		errs = err.Error()
 	}
+	log.Printf("======[trace]request end req_id (%s)======\n", request.ReqId)
 	c.JSON(http.StatusOK, gin.H{
 		"code":   code,
 		"result": result,
