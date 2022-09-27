@@ -35,7 +35,10 @@
 go version go1.13 +
 
 - 代码下载
-git clone [https://github.com/skyhackvip/risk_engine](https://github.com/skyhackvip/risk_engine)
+git clone [git@github.com:skyhackvip/risk_engine.git](git@github.com:skyhackvip/risk_engine.git)
+
+访问下载：
+[https://github.com/skyhackvip/risk_engine/](https://github.com/skyhackvip/risk_engine/)
 
 
 - Make 编译执行（推荐）
