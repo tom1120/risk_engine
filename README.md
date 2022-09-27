@@ -19,13 +19,16 @@
 - 规则集
 - 决策树
 - 决策表
-- 决策矩阵
+- 决策矩阵(交叉决策表）
 - 评分卡
 - 决策流
 - 冠军挑战者 
 - 条件分流
 - 支持特征类型：int、string、bool、date、array、map
 - 支持运算类型：>、>=、<、<=、==、!=、between、before、after、in、not in、contain、not contain、like、key exist、value exist
+- 支持自定义函数(udf)：内建函数sum、avg、min、max
+- 支持并发执行和串行执行
+- 支持决策流执行短路（触发阻断规则或策略）
 
 ## 快速开始
 - 环境准备
