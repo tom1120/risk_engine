@@ -126,7 +126,10 @@ docker stop risk_engine
 ```
 
 ### 决策引擎架构图
+*本系统为决策引擎系统，未包含可视化管理界面部分*
+
 ![决策引擎架构图](https://i.loli.net/2021/01/21/bOR1tyVPnCZNGoi.png)
+
 ![决策引擎架构图](docs/arch1.png)
 
 ### 风控系列文章解读
