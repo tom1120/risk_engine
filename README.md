@@ -127,6 +127,7 @@ docker stop risk_engine
 
 ### 决策引擎架构图
 ![决策引擎架构图](https://i.loli.net/2021/01/21/bOR1tyVPnCZNGoi.png)
+![决策引擎架构图](docs/arch1.png)
 
 ### 风控系列文章解读
 - [一款开源又好用的决策引擎](https://mp.weixin.qq.com/s?__biz=MzIyMzMxNjYwNw==&mid=2247484522&idx=1&sn=9cbd6bb463a5d5dc49da8da72e8db77a&chksm=e8215b7adf56d26cd332475a3d7fa8dc7536e526565749c282737fc8bcf7d2e57bc8161ef9da&token=2083215119&lang=zh_CN#rd)
