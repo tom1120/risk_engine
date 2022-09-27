@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/skyhackvip/risk_engine/core"
 	"github.com/skyhackvip/risk_engine/global"
-	"log"
+	"github.com/skyhackvip/risk_engine/internal/log"
 )
 
 func Init() { //conf
@@ -20,5 +20,5 @@ func Init() { //conf
 
 	router.Run(fmt.Sprintf(":%d", global.ServerConf.Port)) //conf
 
-	log.Printf("[HTTP] Listening on: %s\n", global.ServerConf.Port)
+	log.Infof("[HTTP] Listening on %d", global.ServerConf.Port)
 }

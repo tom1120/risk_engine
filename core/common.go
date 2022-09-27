@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/skyhackvip/risk_engine/internal/errcode"
+	"github.com/skyhackvip/risk_engine/internal/log"
 	"github.com/skyhackvip/risk_engine/internal/operator"
-	"log"
 )
 
 type NodeInfo struct {
@@ -41,7 +41,7 @@ func (rule *Rule) Parse(ctx *PipelineContext, depends map[string]IFeature) (outp
 	//rule.Conditions
 	if len(rule.Conditions) == 0 {
 		err = errors.New(fmt.Sprintf("rule (%s) condition is empty", rule.Name))
-		log.Println(err)
+		log.Error(err)
 		return
 	}
 
@@ -50,13 +50,13 @@ func (rule *Rule) Parse(ctx *PipelineContext, depends map[string]IFeature) (outp
 		if feature, ok := depends[condition.Feature]; ok {
 			rs, err := feature.Compare(condition.Operator, condition.Value)
 			if err != nil {
-				log.Println(err)
+				log.Error(err)
 				return output, nil //value deafult
 			}
 			conditionRet[condition.Name] = rs
 		} else {
 			//lack of feature  whether ignore
-			log.Printf("error lack of feature: %s\n", condition.Feature)
+			log.Error("error lack of feature: %s", condition.Feature)
 			//continue
 		}
 	}
@@ -72,7 +72,7 @@ func (rule *Rule) Parse(ctx *PipelineContext, depends map[string]IFeature) (outp
 	if err != nil {
 		return
 	}
-	log.Printf("rule %s (%s) decision is: %v, output: %v\n", rule.Label, rule.Name, logicRet, rule.Decision.Output)
+	log.Infof("rule result: %v", rule.Label, rule.Name, logicRet)
 	output.SetHit(logicRet)
 
 	//assign
@@ -139,9 +139,14 @@ func (block Block) parse(depends map[string]IFeature) (interface{}, bool, error)
 	}
 	for _, condition := range block.Conditions {
 		if feature, ok := depends[block.Feature]; ok {
+			if v, _ := feature.GetValue(); v == nil {
+				log.Errorf("feature %s empty", feature.GetName())
+				continue
+			}
+
 			hit, err := feature.Compare(condition.Operator, condition.Value)
 			if err != nil {
-				log.Println("parse error", err)
+				log.Errorf("parse error %s", err)
 				continue
 			}
 			if hit {
@@ -152,7 +157,7 @@ func (block Block) parse(depends map[string]IFeature) (interface{}, bool, error)
 				}
 			}
 		} else {
-			log.Printf("error lack of feature: %s\n", block.Feature)
+			log.Errorf("lack of feature: %s", block.Feature)
 			continue
 		}
 	}

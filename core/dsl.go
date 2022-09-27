@@ -1,7 +1,7 @@
 package core
 
 import (
-	"log"
+	"github.com/skyhackvip/risk_engine/internal/log"
 )
 
 type Dsl struct {
@@ -96,7 +96,7 @@ func (dsl *Dsl) ConvertToDecisionFlow() (*DecisionFlow, error) {
 			newNode.SetElem(scorecardMap[newNode.NodeName])
 			flow.AddNode(&newNode)
 		default:
-			log.Printf("dsl (%s-%s) convert warning: unkown node type (%s)\n", dsl.Key, dsl.Version, newNode.NodeKind)
+			log.Warnf("dsl %s - %s convert warning: unkown node type %s", dsl.Key, dsl.Version, newNode.NodeKind)
 		}
 	}
 	return flow, nil

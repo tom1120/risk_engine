@@ -1,8 +1,9 @@
 package core
 
 import (
+	"github.com/skyhackvip/risk_engine/global"
+	"github.com/skyhackvip/risk_engine/internal/log"
 	"github.com/skyhackvip/risk_engine/internal/util"
-	"log"
 )
 
 type ScorecardNode struct {
@@ -33,30 +34,30 @@ func (scorecardNode ScorecardNode) AfterParse(ctx *PipelineContext, result *Node
 
 func (scorecardNode ScorecardNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	info := scorecardNode.GetInfo()
-	log.Printf("======[trace]Scorecard(%s, %s) start======\n", info.Label, scorecardNode.GetName())
+	log.Infof("======[trace] Scorecard %s start======", info.Label, scorecardNode.GetName())
 	depends := ctx.GetFeatures(info.Depends)
 	nodeResult := &NodeResult{Id: info.Id, Name: info.Name, Kind: scorecardNode.GetType(), Tag: info.Tag, Label: info.Label}
 	retArr := make([]interface{}, 0)
 	for _, block := range scorecardNode.Blocks {
 		ret, _, err := block.parse(depends)
 		if err != nil {
-			log.Println(err)
+			log.Error(err)
 			break
 		}
 		retArr = append(retArr, ret)
 	}
+
 	//total score
 	var score float64 = 0
-	if len(retArr) > 0 && scorecardNode.Strategy.Logic == "sum" {
-		for _, ret := range retArr {
-			curScore, err := util.ToFloat64(ret)
-			if err != nil {
-				log.Println(err)
-				break
-			}
-			score += curScore
+	if len(retArr) > 0 {
+		Fn := global.GetUdf(scorecardNode.Strategy.Logic)
+		if ret, err := Fn(retArr); err != nil {
+			log.Error(err)
+		} else {
+			score, err = util.ToFloat64(ret)
 		}
 	}
+
 	//save into ctx feature
 	kind := scorecardNode.Strategy.OutputKind
 	feature := NewFeature(scorecardNode.GetName(), GetFeatureType(kind))
@@ -70,6 +71,7 @@ func (scorecardNode ScorecardNode) Parse(ctx *PipelineContext) (*NodeResult, err
 
 	//output
 	nodeResult.Value = score
-	log.Printf("======[trace]Scorecard(%s, %s) end======\n", info.Label, scorecardNode.GetName())
+	nodeResult.Score = score
+	log.Infof("======[trace] Scorecard %s end======", info.Label, scorecardNode.GetName())
 	return nodeResult, nil
 }

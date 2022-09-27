@@ -10,6 +10,3 @@ var Strategys = map[string]configs.Strategy{
 	"approve": {"approve", 5, 5},
 	"record":  {"record", 1, 1},
 }
-
-//阻断策略
-var BlockStrategy = map[string]struct{}{"record": struct{}{}}

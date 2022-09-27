@@ -3,9 +3,9 @@ package core
 import (
 	"github.com/skyhackvip/risk_engine/configs"
 	"github.com/skyhackvip/risk_engine/global"
+	"github.com/skyhackvip/risk_engine/internal/log"
 	"github.com/skyhackvip/risk_engine/internal/operator"
-	"log"
-	//	"sort"
+	"github.com/skyhackvip/risk_engine/internal/util"
 	"sync"
 )
 
@@ -39,7 +39,7 @@ func (node RulesetNode) AfterParse(ctx *PipelineContext, result *NodeResult) err
 
 func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	info := rulesetNode.GetInfo()
-	log.Printf("======[trace]ruleset(%s, %s) start======\n", info.Label, rulesetNode.GetName())
+	log.Infof("======[trace] Ruleset %s start======", info.Label, rulesetNode.GetName())
 	nodeResult := &NodeResult{Id: info.Id, Name: info.Name, Kind: rulesetNode.GetType(), Tag: info.Tag, Label: info.Label}
 
 	var ruleOutputs = make(map[string]*Output, 0)
@@ -55,12 +55,11 @@ func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) 
 				defer wg.Done()
 				output, err := rule.Parse(ctx, depends)
 				if err != nil { //todo 报错如何处理
-					log.Println(err)
+					log.Error(err)
 					return
 				}
 				if !output.GetHit() { //未命中
 					return
-
 				}
 
 				//命中规则有结果
@@ -89,7 +88,7 @@ func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) 
 
 	//无规则命中
 	if len(ruleOutputs) == 0 {
-		//log.Printf("ruleset %s parse no result\n", rulesetNode.GetName())
+		log.Infof("ruleset %s hit no rule", rulesetNode.GetName())
 		return nodeResult, nil
 	}
 
@@ -101,12 +100,13 @@ func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) 
 	}
 
 	var block bool
-	var score int
+	var score float64 = 0
 	var nodeRt configs.Strategy
 	for name, output := range ruleOutputs {
 		//节点规则得分
 		if s, ok := global.Strategys[output.Value.(string)]; ok {
-			score += s.Score
+			v, _ := util.ToFloat64(s.Score)
+			score += v
 			//根据优先级获取结果
 			if nodeRt.Priority < s.Priority { //默认0
 				nodeRt = s
@@ -129,7 +129,7 @@ func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) 
 	nodeResult.IsBlock = block
 	nodeResult.Score = score
 	nodeResult.Value = nodeRt.Name
-	log.Printf("======[trace]ruleset(%s, %s) end======\n", info.Label, rulesetNode.GetName())
+	log.Infof("======[trace] Ruleset %s end======", info.Label, rulesetNode.GetName())
 	return nodeResult, nil
 }
 

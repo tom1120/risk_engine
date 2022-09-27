@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/skyhackvip/risk_engine/configs"
 	"github.com/skyhackvip/risk_engine/internal/errcode"
+	"github.com/skyhackvip/risk_engine/internal/log"
 	"github.com/skyhackvip/risk_engine/internal/operator"
 	"github.com/skyhackvip/risk_engine/internal/util"
 	"strings"
@@ -587,9 +588,11 @@ func (feature *TypeDefaultFeature) Compare(op string, target interface{}) (bool,
 func checkValue(value interface{}, featureType FeatureType) error {
 	valueType, err := util.GetType(value)
 	if err != nil {
+		log.Warnf("set value error! get value type error! %s", err)
 		return errcode.ParseErrorFeatureSetValue
 	}
-	if GetFeatureType(valueType) != featureType {
+	if !util.MatchType(valueType, featureType.String()) {
+		log.Warnf("set value not match %s", valueType, featureType.String())
 		return errcode.ParseErrorFeatureSetValue
 	}
 	return nil

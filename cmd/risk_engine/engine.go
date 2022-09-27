@@ -6,7 +6,7 @@ import (
 	"github.com/skyhackvip/risk_engine/api"
 	"github.com/skyhackvip/risk_engine/configs"
 	"github.com/skyhackvip/risk_engine/global"
-	"log"
+	"github.com/skyhackvip/risk_engine/internal/log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -23,22 +23,22 @@ func main() {
 	global.ServerConf = &conf.Server
 	global.AppConf = &conf.App
 
+	log.InitLogger(global.AppConf.LogMethod, global.AppConf.LogPath)
+
 	api.Init()
 
 	//graceful restart
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGQUIT)
 	<-quit
-	log.Println("shutdown risk engine...")
-	//cancel
+	log.Info("shutdown risk engine...")
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	/*if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("server shutdown error:", err)
-	}*/
+
 	select {
 	case <-ctx.Done():
-		log.Println("timeout of 5 seconds")
+		log.Warn("timeout of 5 seconds")
 	}
-	log.Println("server exiting")
+	log.Info("server exiting")
 }

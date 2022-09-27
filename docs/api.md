@@ -100,11 +100,6 @@ POST http://HOST/engine/run
 - tracks 流执行轨迹
 - node_results 各节点执行情况和产生值
 
-*CURL*
-```shell
-curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_abtest", "version":"1.0", "req_id":"123456", "uid":1,"features":{"feature_1":5,"feature_2":3,"feature_3":55,"feature_4":32,"feature_5":33,"feature_6":231,"feature_7":2,"feature_8":4}}'
-```
-
 # 决策流案例
 demo/ 下为所有可执行决策流案例
 - [规则集决策流](#规则集决策流)

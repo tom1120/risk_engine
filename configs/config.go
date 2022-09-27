@@ -19,8 +19,9 @@ type ServerConf struct {
 }
 
 type AppConf struct {
-	LogFile       string `yaml:"LogFile"`
-	DslLoadMethod string `yaml:"DslLoadMethod"`
+	LogMethod     string `yaml:"LogMethod"` //console,file
+	LogPath       string `yaml:"LogPath"`
+	DslLoadMethod string `yaml:"DslLoadMethod"` //file,db
 	DslLoadPath   string `yaml:"DslLoadPath"`
 }
 
@@ -43,3 +44,9 @@ func LoadConfig(path string) (*Conf, error) {
 	}
 	return conf, nil
 }
+
+const (
+	CONSOLE = "console"
+	FILE    = "file"
+	DB      = "db"
+)

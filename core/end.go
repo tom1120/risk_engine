@@ -1,8 +1,7 @@
 package core
 
 import (
-	//	"github.com/skyhackvip/risk_engine/configs"
-	"log"
+	"github.com/skyhackvip/risk_engine/internal/log"
 )
 
 type EndNode struct {
@@ -36,7 +35,7 @@ func (node EndNode) AfterParse(ctx *PipelineContext, result *NodeResult) error {
 }
 
 func (node EndNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
-	log.Println("======[trace]End======")
+	log.Info("======[trace] End======")
 	info := node.GetInfo()
 	nodeResult := &NodeResult{Id: info.Id, Name: info.Name, Kind: node.GetType(), Tag: info.Tag, Label: info.Label, IsBlock: true}
 	return nodeResult, nil

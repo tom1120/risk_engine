@@ -3,6 +3,7 @@ package util
 import (
 	"github.com/skyhackvip/risk_engine/configs"
 	"github.com/skyhackvip/risk_engine/internal/errcode"
+	"reflect"
 	"regexp"
 	"strconv"
 	"time"
@@ -50,10 +51,14 @@ func GetType(val interface{}) (string, error) {
 		return configs.BOOL, nil
 	case time.Time:
 		return configs.DATE, nil
-	case []interface{}:
+	case []interface{}: //slice
 		return configs.ARRAY, nil
-	case map[string]interface{}:
+	case map[string]interface{}: //only support map key is string
 		return configs.MAP, nil
+	}
+	//array type like [3]int
+	if reflect.TypeOf(val).Kind() == reflect.Array {
+		return configs.ARRAY, nil
 	}
 	return configs.DEFAULT, errcode.ErrorFeatureTypeUnknow
 }
@@ -212,10 +217,52 @@ func ToFloat64(val interface{}) (ret float64, err error) {
 		ret = val.(float64)
 	case string:
 		if ret, err = strconv.ParseFloat(val.(string), 64); err != nil {
+			err = errcode.ErrorTypeConvert
 			return
 		}
 	default:
 		err = errcode.ErrorTypeConvert
 	}
 	return
+}
+
+func RVToFloat64(val reflect.Value) (ret float64, err error) {
+	var num interface{}
+	switch val.Kind() {
+	case reflect.Uint8:
+		fallthrough
+	case reflect.Uint16:
+		fallthrough
+	case reflect.Uint32:
+		fallthrough
+	case reflect.Uint64:
+		fallthrough
+	case reflect.Uint:
+		num = val.Uint()
+
+	case reflect.Int8:
+		fallthrough
+	case reflect.Int16:
+		fallthrough
+	case reflect.Int32:
+		fallthrough
+	case reflect.Int64:
+		fallthrough
+	case reflect.Int:
+		num = val.Int()
+
+	case reflect.Float64:
+		fallthrough
+	case reflect.Float32:
+		num = val.Float()
+
+	case reflect.String:
+		num = val.String()
+	default:
+		err = errcode.ErrorTypeConvert
+	}
+	if err != nil {
+		return
+	}
+	return ToFloat64(num)
 }

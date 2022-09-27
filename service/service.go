@@ -1,31 +1,34 @@
 package service
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/skyhackvip/risk_engine/core"
+	"github.com/skyhackvip/risk_engine/core/udf"
+	"github.com/skyhackvip/risk_engine/global"
 	"github.com/skyhackvip/risk_engine/internal/dto"
+	"github.com/skyhackvip/risk_engine/internal/log"
 	"github.com/skyhackvip/risk_engine/internal/util"
-	"log"
 	"time"
 )
 
 type EngineService struct {
-	startTime int64
-	endTime   int64
+	startTime time.Time
 	kernel    *core.Kernel
 }
 
 func NewEngineService(kernel *core.Kernel) *EngineService {
+	builtinUdf()
 	return &EngineService{kernel: kernel}
 }
 
 //dto.DslRunResponse
 func (service *EngineService) Run(c *gin.Context, req *dto.EngineRunRequest) (*dto.EngineRunResponse, error) {
-	service.startTime = time.Now().UnixNano() / 1e6 //ms
+	service.startTime = time.Now()
 	go func() {
 		defer func() {
 			if err := recover(); err != nil {
-				log.Println(err)
+				log.Error(err)
 			}
 		}()
 	}()
@@ -42,10 +45,10 @@ func (service *EngineService) Run(c *gin.Context, req *dto.EngineRunRequest) (*d
 		if val, ok := req.Features[name]; ok { //in request params
 			featureType, err := util.GetType(val) //check data
 			if err != nil {                       //warning: unknow type
-				log.Println("type check error: ", err)
+				log.Errorf("type check error: %s", err)
 			}
 			if !util.MatchType(featureType, feature.GetType().String()) {
-				log.Printf("request feature type is not match! [%s] type is (%s), required (%s)\n", name, core.GetFeatureType(featureType), feature.GetType())
+				log.Warnf("request feature type is not match! %s", fmt.Sprintf("%s type is %s, required %s", name, core.GetFeatureType(featureType), feature.GetType()))
 				continue
 			}
 			features[name] = feature
@@ -56,10 +59,10 @@ func (service *EngineService) Run(c *gin.Context, req *dto.EngineRunRequest) (*d
 				features[name].SetValue(val)
 			}
 		} else {
-			log.Println("request lack feature: ", name)
+			log.Warn("request lack feature: %s", name)
 		}
 	}
-	log.Println("======[trace]request features ======", features)
+	log.Infof("======request features %v======", features)
 	ctx.SetFeatures(features)
 	flow.Run(ctx)
 
@@ -73,7 +76,7 @@ func (service *EngineService) dataAdapter(req *dto.EngineRunRequest, result *cor
 		Key:       req.Key,
 		ReqId:     req.ReqId,
 		Uid:       req.Uid,
-		StartTime: time.Unix(service.startTime/1000, 0).Format("2006-01-02 15:04:05"),
+		StartTime: util.TimeFormat(service.startTime),
 	}
 	features := make([]map[string]interface{}, 0)
 	for _, feature := range result.Features {
@@ -120,9 +123,11 @@ func (service *EngineService) dataAdapter(req *dto.EngineRunRequest, result *cor
 		i++
 	}
 	resp.NodeResults = nodeResults
-
-	service.endTime = time.Now().UnixNano() / 1e6
-	resp.RunTime = service.endTime - service.startTime
-	resp.EndTime = time.Unix(service.endTime/1000, 0).Format("2006-01-02 15:04:05")
+	resp.RunTime = util.TimeSince(service.startTime)
+	resp.EndTime = util.TimeFormat(time.Now())
 	return resp
+}
+
+func builtinUdf() {
+	global.RegisterUdf("sum", udf.Sum)
 }

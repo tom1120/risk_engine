@@ -2,7 +2,7 @@ package core
 
 import (
 	"github.com/skyhackvip/risk_engine/internal/errcode"
-	"log"
+	"github.com/skyhackvip/risk_engine/internal/log"
 )
 
 type TreeNode struct {
@@ -40,7 +40,7 @@ func (treeNode TreeNode) AfterParse(ctx *PipelineContext, result *NodeResult) er
 
 func (treeNode TreeNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	info := treeNode.GetInfo()
-	log.Printf("======[trace]Tree(%s, %s) start======\n", info.Label, treeNode.GetName())
+	log.Infof("======[trace] Tree %s start======", info.Label, treeNode.GetName())
 	nodeResult := &NodeResult{Id: info.Id, Name: info.Name, Kind: treeNode.GetType(), Tag: info.Tag, Label: info.Label}
 	var resultErr error = nil
 	var result interface{}
@@ -51,7 +51,7 @@ func (treeNode TreeNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	for gotoNext {
 		ret, gotoNext, err := block.parse(depends)
 		if err != nil {
-			log.Println(err)
+			log.Error(err)
 			resultErr = err
 			break
 		}
@@ -80,7 +80,7 @@ func (treeNode TreeNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 
 	//output
 	nodeResult.Value = result
-	log.Printf("======[trace]Tree(%s, %s) end======\n", info.Label, treeNode.GetName())
+	log.Infof("======[trace] Tree %s end======", info.Label, treeNode.GetName())
 	return nodeResult, resultErr
 }
 

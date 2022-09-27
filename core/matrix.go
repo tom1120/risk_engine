@@ -3,7 +3,7 @@ package core
 import (
 	"github.com/skyhackvip/risk_engine/configs"
 	"github.com/skyhackvip/risk_engine/internal/errcode"
-	"log"
+	"github.com/skyhackvip/risk_engine/internal/log"
 	"sync"
 )
 
@@ -49,7 +49,7 @@ func (matrixNode MatrixNode) AfterParse(ctx *PipelineContext, result *NodeResult
 
 func (matrixNode MatrixNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	info := matrixNode.GetInfo()
-	log.Printf("======[trace]matrix(%s, %s) start======\n", info.Label, matrixNode.GetName())
+	log.Info("======[trace] Matrix %s start======", info.Label, matrixNode.GetName())
 	nodeResult := &NodeResult{Id: info.Id, Name: info.Name, Kind: matrixNode.GetType(), Tag: info.Tag, Label: info.Label}
 
 	depends := ctx.GetFeatures(info.Depends)
@@ -77,7 +77,7 @@ func (matrixNode MatrixNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 					output, err := rule.Parse(ctx, depends)
 					//continue if error
 					if err != nil {
-						log.Println(err)
+						log.Error(err)
 						continue
 					}
 					//continue if miss hit
@@ -103,7 +103,7 @@ func (matrixNode MatrixNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 		for _, rule := range matrixNode.Rules {
 			output, err := rule.Parse(ctx, depends)
 			if err != nil {
-				log.Println(err)
+				log.Error(err)
 				continue
 			}
 			if !output.GetHit() {
@@ -141,7 +141,7 @@ func (matrixNode MatrixNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 
 	//output
 	nodeResult.Value = val
-	log.Printf("======[trace]matrix(%s, %s) end======\n", info.Label, matrixNode.GetName())
+	log.Infof("======[trace] Matrix %s end======", info.Label, matrixNode.GetName())
 	return nodeResult, nil
 }
 

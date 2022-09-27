@@ -3,7 +3,7 @@ package core
 import (
 	"errors"
 	"fmt"
-	"log"
+	"github.com/skyhackvip/risk_engine/internal/log"
 )
 
 type DecisionFlow struct {
@@ -25,7 +25,7 @@ func (flow *DecisionFlow) AddNode(node *FlowNode) {
 	if _, ok := flow.flowMap[key]; !ok {
 		flow.flowMap[key] = node
 	} else {
-		log.Println("repeat add node: " + key)
+		log.Warnf("repeat add node %s", key)
 	}
 }
 
@@ -63,7 +63,7 @@ func (flow *DecisionFlow) Run(ctx *PipelineContext) (err error) {
 		defer func() {
 			if err := recover(); err != nil {
 				err = err
-				log.Println(err)
+				log.Error(err)
 			}
 		}()
 	}()
@@ -92,7 +92,7 @@ func (flow *DecisionFlow) parseNode(curNode *FlowNode, ctx *PipelineContext) (ne
 
 	//error break
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return
 	}
 

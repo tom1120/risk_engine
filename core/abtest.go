@@ -2,7 +2,7 @@ package core
 
 import (
 	"github.com/skyhackvip/risk_engine/internal/errcode"
-	"log"
+	"github.com/skyhackvip/risk_engine/internal/log"
 	"math/rand"
 	"time"
 )
@@ -34,7 +34,7 @@ func (node AbtestNode) AfterParse(ctx *PipelineContext, result *NodeResult) erro
 
 func (abtest AbtestNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	info := abtest.GetInfo()
-	log.Printf("======[trace]abtest(%s, %s) start======\n", info.Label, abtest.GetName())
+	log.Infof("======[trace] abtest %s start======", info.Label, abtest.GetName())
 	nodeResult := &NodeResult{Id: info.Id, Name: info.Name, Kind: abtest.GetType(), Tag: info.Tag, Label: info.Label, IsBlock: false}
 
 	rand.Seed(time.Now().UnixNano())
@@ -44,7 +44,7 @@ func (abtest AbtestNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	for _, branch := range abtest.Branchs {
 		counter += branch.Percent
 		if counter > winNum {
-			log.Printf(" abtest %v : %v, %v, output:%v \n", abtest.GetName(), branch.Name, winNum, branch.Decision.Output)
+			log.Infof("abtest name %s, branch %s, randomNum %v, output %v", abtest.GetName(), branch.Name, winNum, branch.Decision.Output)
 			nodeResult.NextNodeName = branch.Decision.Output.Value.(string)
 			nodeResult.NextNodeType = GetNodeType(branch.Decision.Output.Kind)
 			matchBranch = true
@@ -53,7 +53,7 @@ func (abtest AbtestNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	}
 	nodeResult.Value = winNum
 
-	log.Printf("======[trace]abtest(%s, %s) end======\n", info.Label, abtest.GetName())
+	log.Infof("======[trace] abtest %s end======", info.Label, abtest.GetName())
 	if matchBranch {
 		return nodeResult, nil
 	}

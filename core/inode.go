@@ -18,7 +18,7 @@ type NodeResult struct {
 	Tag          string
 	Kind         NodeType
 	IsBlock      bool
-	Score        int
+	Score        float64
 	Value        interface{}
 	NextNodeName string //ab,条件节点有用
 	NextNodeType NodeType

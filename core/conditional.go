@@ -2,8 +2,8 @@ package core
 
 import (
 	"github.com/skyhackvip/risk_engine/internal/errcode"
+	"github.com/skyhackvip/risk_engine/internal/log"
 	"github.com/skyhackvip/risk_engine/internal/operator"
-	"log"
 )
 
 type ConditionalNode struct {
@@ -33,7 +33,7 @@ func (node ConditionalNode) AfterParse(ctx *PipelineContext, result *NodeResult)
 
 func (conditional ConditionalNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	info := conditional.GetInfo()
-	log.Printf("====[trace]conditional (%s, %s) start=====\n", info.Label, conditional.GetName())
+	log.Infof("====[trace] conditional %s start=====", info.Label, conditional.GetName())
 	nodeResult := &NodeResult{Id: info.Id, Name: info.Name, Kind: conditional.GetType(), Tag: info.Tag, Label: info.Label, IsBlock: false}
 
 	depends := ctx.GetFeatures(info.Depends)
@@ -48,7 +48,7 @@ func (conditional ConditionalNode) Parse(ctx *PipelineContext) (*NodeResult, err
 				}
 				conditionRet[condition.Name] = rs
 			} else { //get feature fail
-				log.Printf("error lack of feature: %s\n", condition.Feature)
+				log.Errorf("error lack of feature: %s", condition.Feature)
 				continue
 			}
 		}
@@ -60,7 +60,7 @@ func (conditional ConditionalNode) Parse(ctx *PipelineContext) (*NodeResult, err
 			continue
 		}
 		if logicRs { //if true, choose the branch and break
-			log.Printf("conditional %v : %v,  output:%v \n", conditional.GetName(), branch.Name, branch.Decision.Output)
+			log.Infof("conditional name %s, branch %s, output %s", conditional.GetName(), branch.Name, branch.Decision.Output)
 			nodeResult.Value = branch.Name
 			nodeResult.NextNodeName = branch.Decision.Output.Value.(string)
 			nodeResult.NextNodeType = GetNodeType(branch.Decision.Output.Kind)
@@ -68,7 +68,7 @@ func (conditional ConditionalNode) Parse(ctx *PipelineContext) (*NodeResult, err
 			break
 		}
 	}
-	log.Printf("====[trace]conditional (%s, %s) end=====\n", info.Label, conditional.GetName())
+	log.Infof("====[trace] conditional %s end=====", info.Label, conditional.GetName())
 	if matchBranch {
 		return nodeResult, nil
 	}

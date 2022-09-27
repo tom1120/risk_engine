@@ -3,12 +3,12 @@ package operator
 import (
 	"errors"
 	"github.com/Knetic/govaluate"
-	"log"
+	"github.com/skyhackvip/risk_engine/internal/log"
 )
 
 func Evaluate(exprStr string, params map[string]interface{}) (bool, error) {
 	expr, err := govaluate.NewEvaluableExpression(exprStr)
-	log.Println("base evaluate:", expr, params)
+	log.Infof("base evaluate: %v", expr, params)
 	if err != nil {
 		return false, err
 	}
