@@ -400,11 +400,86 @@ curl -XPOST http://localhost:8889/engine/run -d '{"key":"flow_scorecard", "versi
 
 *执行结果*
 ```json
+{
+	"code": 200,
+	"error": "",
+	"result": {
+		"key": "flow_scorecard",
+		"req_id": "123456789",
+		"uid": 1,
+		"features": [{
+			"isDefault": false,
+			"name": "num",
+			"value": 55.5
+		}, {
+			"isDefault": false,
+			"name": "sex",
+			"value": "M"
+		}, {
+			"isDefault": false,
+			"name": "age",
+			"value": 11
+		}, {
+			"isDefault": false,
+			"name": "scorecard_1",
+			"value": 24
+		}, {
+			"isDefault": false,
+			"name": "my_scorecard",
+			"value": 24
+		}],
+		"tracks": [{
+			"index": 1,
+			"label": "",
+			"name": "start_1"
+		}, {
+			"index": 2,
+			"label": "测试评分卡",
+			"name": "scorecard_1"
+		}, {
+			"index": 3,
+			"label": "",
+			"name": "end_1"
+		}],
+		"hit_rules": [],
+		"node_results": [{
+			"IsBlock": false,
+			"Kind": "scorecard",
+			"Score": 24,
+			"Value": 24,
+			"id": 1,
+			"label": "测试评分卡",
+			"name": "scorecard_1",
+			"tag": "my_scorecard"
+		}, {
+			"IsBlock": true,
+			"Kind": "end",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "end_1",
+			"tag": ""
+		}, {
+			"IsBlock": false,
+			"Kind": "start",
+			"Score": 0,
+			"Value": null,
+			"id": 0,
+			"label": "",
+			"name": "start_1",
+			"tag": ""
+		}],
+		"start_time": "2022-10-01 16:32:35",
+		"end_time": "2022-10-01 16:32:35",
+		"run_time": 1
+	}
+}
 ```
 
 *执行过程分析*
-开始->测试决策树->结束
-决策树，从 block_1 开始，feature_bool = false 命中，goto block_3。feature_num < 1 命中，输出结果为 f，结束并赋值。
+开始->测试评分卡->结束
+评分卡: num(55.5) BETWEEN [50,100] 分值为 4 ，sex = M 分值为 10，age(11) < 18 分值为 10，sum 加和后为 24。
 
 
 
