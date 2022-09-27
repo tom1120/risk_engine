@@ -97,10 +97,14 @@ docker stop risk_engine
 ## 支持 HTTP 接口执行
 - 获取决策流列表
 - 执行决策流
-- 决策流案例
 
 [接口文档详情](docs/api.md)
 
+## 实践案例（测试样例）
+[测试样例](docs/demo.md)
+
+## DSL 语法结构
+[Dsl 语法详解](docs/dsl.md)
 
 ## 代码结构
 ```
@@ -111,18 +115,15 @@ docker stop risk_engine
 ├── service 执行逻辑
 ├── cmd 启动文件
 ├── global 全局配置
-├── demo 测试yaml文件
+├── demo 测试样例 dsl 文件
 ├── internal
 │  ├── dto 数据传输对象
 │  ├── errcode 错误异常定义
 │  ├── util 工具包
-│  └── operator 操作算子
+│  ├── udf 内建自定义函数
+│  └── operator 表达式操作算子
 ├── test 测试用例
 ```
-
-## DSL 语法结构
-[Dsl 语法详解](docs/dsl.md)
-
 
 ### 决策引擎架构图
 ![决策引擎架构图](https://i.loli.net/2021/01/21/bOR1tyVPnCZNGoi.png)
