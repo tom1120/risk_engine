@@ -168,7 +168,7 @@ func (feature *TypeNumFeature) Compare(op string, target interface{}) (bool, err
 	case "NEQ":
 		rs, err := operator.Compare(op, value, target)
 		return rs, err
-	case "BETWEEN":
+	case "BETWEEN": //todo: [ ( ) ]
 		if t, ok := target.([]interface{}); !ok {
 			return false, errcode.ParseErrorTargetMustBeArray
 		} else {
@@ -189,7 +189,6 @@ func (feature *TypeNumFeature) Compare(op string, target interface{}) (bool, err
 				return false, err
 			}
 			return rs1 && rs2, nil
-
 		}
 	case "IN":
 		if t, ok := target.([]interface{}); !ok {
@@ -358,7 +357,7 @@ func (feature *TypeDateFeature) Compare(op string, target interface{}) (bool, er
 	var err error
 	switch target.(type) {
 	case string:
-		targetTime, err = util.StringToDate(target.(string))
+		targetTime, err = util.ToDate(target.(string))
 		if err != nil {
 			return false, err
 		}
@@ -368,11 +367,11 @@ func (feature *TypeDateFeature) Compare(op string, target interface{}) (bool, er
 		if targetArr := target.([]string); len(targetArr) != 2 {
 			return false, errcode.ParseErrorTargetNotSupport
 		} else {
-			targetTimeLeft, err = util.StringToDate(targetArr[0])
+			targetTimeLeft, err = util.ToDate(targetArr[0])
 			if err != nil {
 				return false, err
 			}
-			targetTimeRight, err = util.StringToDate(targetArr[1])
+			targetTimeRight, err = util.ToDate(targetArr[1])
 			if err != nil {
 				return false, err
 			}
@@ -466,9 +465,9 @@ func (feature *TypeArrayFeature) Compare(op string, target interface{}) (bool, e
 	}
 	switch op {
 	case configs.EQ:
-		return operator.CompareArray(valueArr, targetArr), nil
+		return operator.Compare(op, valueArr, targetArr)
 	case configs.NEQ:
-		return !operator.CompareArray(valueArr, targetArr), nil
+		return operator.Compare(op, valueArr, targetArr)
 	case configs.IN:
 		return operator.AInB(valueArr, targetArr), nil
 	case configs.CONTAIN:
