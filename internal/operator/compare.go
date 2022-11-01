@@ -1,26 +1,108 @@
 package operator
 
 import (
-	"errors"
-	"fmt"
 	"github.com/skyhackvip/risk_engine/configs"
+	"github.com/skyhackvip/risk_engine/internal/errcode"
+	"github.com/skyhackvip/risk_engine/internal/log"
+	"github.com/skyhackvip/risk_engine/internal/util"
 )
 
-//compare expression:left [><=] right
+//compare operator expression
+//left [operator] right
+//operator: [eq,neq,gt,lt,ge,le]
 func Compare(operator string, left interface{}, right interface{}) (bool, error) {
-	var params = make(map[string]interface{})
-	params["left"] = left
-	params["right"] = right
-
-	if _, ok := configs.OperatorMap[operator]; !ok {
-		return false, errors.New("not support operator")
+	log.Infof("compare operator: %v", operator, left, right)
+	if _, ok := configs.CompareOperators[operator]; !ok {
+		log.Errorf("not compare operator: %v", operator)
+		return false, errcode.ErrorNotSupportOperator
 	}
-	expr := fmt.Sprintf("left %s right", configs.OperatorMap[operator])
 
-	return Evaluate(expr, params)
+	switch operator {
+	case configs.EQ:
+		return equal(left, right)
+	case configs.NEQ:
+		rs, err := equal(left, right)
+		return !rs, err
+
+	//only number can compare(gt,lt,ge,le)
+	case configs.GT:
+		return numCompare(left, right, operator)
+	case configs.LT:
+		return numCompare(left, right, operator)
+	case configs.GE:
+		return numCompare(left, right, operator)
+	case configs.LE:
+		return numCompare(left, right, operator)
+	}
+	return false, errcode.ErrorNotSupportOperator
 }
 
-func CompareArray(a, b []interface{}) bool {
+//jundge left == right
+func equal(left, right interface{}) (bool, error) {
+	leftType, err := util.GetType(left)
+	if err != nil {
+		log.Errorf("left type unknow: %v", left, err)
+		return false, err //unknow type
+	}
+	rightType, err := util.GetType(right)
+	if err != nil {
+		log.Errorf("right type unknow: %v", right, err)
+		return false, err
+	}
+	if !util.MatchType(leftType, rightType) {
+		return false, nil
+	}
+	if leftType == configs.ARRAY {
+		return arrayEqual(left.([]interface{}), right.([]interface{})), nil
+	}
+	if leftType == configs.MAP {
+		return false, errcode.ErrorNotSupportOperator
+	}
+	if leftType == configs.STRING {
+		return left.(string) == right.(string), nil
+	}
+	if leftType == configs.BOOL {
+		leftBool, err := util.ToBool(left)
+		if err != nil {
+			return false, err
+		}
+		rightBool, err := util.ToBool(right)
+		if err != nil {
+			return false, err
+		}
+		return leftBool == rightBool, nil
+	}
+	if leftType == configs.INT || leftType == configs.FLOAT {
+		leftNum, err := util.ToFloat64(left)
+		if err != nil {
+			return false, err
+		}
+		rightNum, err := util.ToFloat64(right)
+		if err != nil {
+			return false, err
+		}
+		return numCompare(leftNum, rightNum, configs.EQ)
+	}
+	if leftType == configs.DATE {
+		leftDate, err := util.ToDate(left)
+		if err != nil {
+			return false, err
+		}
+		rightDate, err := util.ToDate(right)
+		if err != nil {
+			return false, err
+		}
+		return leftDate.Equal(rightDate), nil
+	}
+	if leftType == configs.DEFAULT {
+		return left == right, nil
+	}
+	return false, errcode.ErrorNotSupportOperator
+}
+
+//a == b true
+//a != b false
+func arrayEqual(a, b []interface{}) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -38,4 +120,33 @@ func CompareArray(a, b []interface{}) bool {
 		}
 	}
 	return true
+}
+
+//compare number (lt, gt, le, ge, eq, neq)
+//only number can compare
+func numCompare(left, right interface{}, op string) (bool, error) {
+	leftNum, err := util.ToFloat64(left)
+	if err != nil {
+		return false, errcode.ErrorNotANumber
+	}
+	rightNum, err := util.ToFloat64(right)
+	if err != nil {
+		return false, errcode.ErrorNotANumber
+	}
+	switch op {
+	case configs.EQ:
+		return leftNum == rightNum, nil
+	case configs.NEQ:
+		return leftNum != rightNum, nil
+	case configs.GT:
+		return leftNum > rightNum, nil
+	case configs.LT:
+		return leftNum < rightNum, nil
+	case configs.GE:
+		return leftNum >= rightNum, nil
+	case configs.LE:
+		return leftNum <= rightNum, nil
+	default:
+		return false, errcode.ErrorNotSupportOperator
+	}
 }

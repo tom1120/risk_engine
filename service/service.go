@@ -53,7 +53,7 @@ func (service *EngineService) Run(c *gin.Context, req *dto.EngineRunRequest) (*d
 			}
 			features[name] = feature
 			if feature.GetType() == core.TypeDate {
-				valDate, _ := util.StringToDate(val.(string))
+				valDate, _ := util.ToDate(val.(string))
 				features[name].SetValue(valDate)
 			} else {
 				features[name].SetValue(val)

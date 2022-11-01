@@ -16,6 +16,8 @@ const (
 	AFTER      = "AFTER"
 	KEYEXIST   = "KEYEXIST"
 	VALUEEXIST = "VALUEEXIST"
+	AND        = "and"
+	OR         = "or"
 )
 
 var OperatorMap = map[string]string{
@@ -33,6 +35,8 @@ var OperatorMap = map[string]string{
 	AFTER:      "after",
 	KEYEXIST:   "keyexist",
 	VALUEEXIST: "valueexist",
+	AND:        "&&",
+	OR:         "||",
 }
 
 var NumSupportOperator = map[string]struct{}{
@@ -79,6 +83,20 @@ var MapSupportOperator = map[string]struct{}{
 var DefaultSupportOperator = map[string]struct{}{
 	EQ:  struct{}{},
 	NEQ: struct{}{},
+}
+
+var CompareOperators = map[string]struct{}{
+	EQ:  struct{}{},
+	NEQ: struct{}{},
+	GT:  struct{}{},
+	LT:  struct{}{},
+	GE:  struct{}{},
+	LE:  struct{}{},
+}
+
+var BooleanOperators = map[string]string{
+	AND: OperatorMap[AND],
+	OR:  OperatorMap[OR],
 }
 
 //all support node

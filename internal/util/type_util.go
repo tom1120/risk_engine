@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -15,6 +16,10 @@ var floatPattern = regexp.MustCompile(`^(\d+)(\.+)(\d+)$`)
 var shortTimePattern = regexp.MustCompile(`^(\d){4}-(\d){2}-(\d){2}$`)
 var longTimePattern = regexp.MustCompile(`^(\d){4}-(\d){2}-(\d){2} (\d){2}:(\d){2}:(\d){2}$`)
 
+var TRUE = "true"
+var FALSE = "false"
+
+//infer type according to value
 func GetType(val interface{}) (string, error) {
 	switch val.(type) {
 	case string:
@@ -74,7 +79,12 @@ func MatchType(typeA, typeB string) bool {
 	return typeA == typeB
 }
 
-//date type jundge
+//is number type
+func isNum(val interface{}) bool {
+	return IsInt(val) || IsFloat(val)
+}
+
+//is int type
 func IsInt(val interface{}) bool {
 	switch val.(type) {
 	case int8, int16, int, int32, int64:
@@ -90,14 +100,17 @@ func IsInt(val interface{}) bool {
 	}
 }
 
+//1.0 = 1
 func IsFloat64Int(val float64) bool {
 	return val == float64(int(val))
 }
 
+//1.0 = 1
 func IsFloat32Int(val float32) bool {
 	return val == float32(int(val))
 }
 
+//is float type
 func IsFloat(val interface{}) bool {
 	switch val.(type) {
 	case float32:
@@ -111,12 +124,13 @@ func IsFloat(val interface{}) bool {
 	}
 }
 
+//is bool type
 func IsBool(val interface{}) bool {
 	switch val.(type) {
 	case bool:
 		return true
 	case string:
-		if val.(string) == "true" || val.(string) == "false" {
+		if strings.ToLower(val.(string)) == TRUE || strings.ToLower(val.(string)) == FALSE { //true, True, TRUE
 			return true
 		}
 		return false
@@ -125,6 +139,7 @@ func IsBool(val interface{}) bool {
 	}
 }
 
+//is date type
 func IsDate(val interface{}) bool {
 	switch val.(type) {
 	case time.Time:
@@ -136,17 +151,45 @@ func IsDate(val interface{}) bool {
 	}
 }
 
-//data type covert
-func StringToDate(val string) (time.Time, error) {
-	if shortTimePattern.MatchString(val) {
-		return time.Parse(configs.DATE_FORMAT, val)
+//other type convert to bool
+func ToBool(val interface{}) (bool, error) {
+	if !IsBool(val) {
+		return false, errcode.ErrorTypeConvert
 	}
-	if longTimePattern.MatchString(val) {
-		return time.Parse(configs.DATE_FORMAT_DETAIL, val)
+	switch val.(type) {
+	case bool:
+		return val.(bool), nil
+	case string:
+		if strings.ToLower(val.(string)) == TRUE {
+			return true, nil
+		}
+		if strings.ToLower(val.(string)) == FALSE {
+			return false, nil
+		}
+	}
+	return false, errcode.ErrorTypeConvert
+}
+
+//other type convert to data
+func ToDate(val interface{}) (time.Time, error) {
+	if !IsDate(val) {
+		return time.Time{}, errcode.ErrorTypeConvert
+	}
+	switch val.(type) {
+	case time.Time:
+		return val.(time.Time), nil
+	case string:
+		if shortTimePattern.MatchString(val.(string)) {
+			return time.Parse(configs.DATE_FORMAT, val.(string))
+		}
+		if longTimePattern.MatchString(val.(string)) {
+			return time.Parse(configs.DATE_FORMAT_DETAIL, val.(string))
+		}
 	}
 	return time.Time{}, errcode.ErrorTypeConvert
 }
 
+//other type convert to string
 func ToString(val interface{}) (ret string, err error) {
 	switch val.(type) {
 	case string:
@@ -167,6 +210,7 @@ func ToString(val interface{}) (ret string, err error) {
 	return
 }
 
+//other type convert to int64
 func ToInt64(val interface{}) (ret int64, err error) {
 	switch val.(type) {
 	case int8:
@@ -193,6 +237,7 @@ func ToInt64(val interface{}) (ret int64, err error) {
 	return
 }
 
+//other type convert to int
 func ToInt(val interface{}) (ret int, err error) {
 	if v, err := ToInt64(val); err == nil {
 		ret = int(v)
@@ -202,6 +247,7 @@ func ToInt(val interface{}) (ret int, err error) {
 	return
 }
 
+//other type convert to float64
 func ToFloat64(val interface{}) (ret float64, err error) {
 	switch val.(type) {
 	case uint, uint8, uint16, uint32, uint64, int, int8, int16, int32, int64:
@@ -220,12 +266,16 @@ func ToFloat64(val interface{}) (ret float64, err error) {
 			err = errcode.ErrorTypeConvert
 			return
 		}
+	//case reflect.Value:
+	//	ret, err = RVToFloat64(val.(reflect.Value))
+	//	return
 	default:
 		err = errcode.ErrorTypeConvert
 	}
 	return
 }
 
+//reflect value convert to float64
 func RVToFloat64(val reflect.Value) (ret float64, err error) {
 	var num interface{}
 	switch val.Kind() {
