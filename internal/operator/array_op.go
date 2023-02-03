@@ -1,19 +1,19 @@
 package operator
 
-//jundge val in arr
+// jundge val in arr
 func InArray(arr []interface{}, val interface{}) bool {
 	if len(arr) == 0 {
 		return false
 	}
 	for _, v := range arr {
-		if ok, err := Compare("EQ", v, val); err != nil && ok {
+		if ok, err := Compare("EQ", v, val); err == nil && ok {
 			return true
 		}
 	}
 	return false
 }
 
-//jundge array A in Array B
+// jundge array A in Array B
 func AInB(a []interface{}, b []interface{}) bool {
 	if len(b) == 0 {
 		return false
