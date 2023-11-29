@@ -39,7 +39,7 @@ func (conditional ConditionalNode) Parse(ctx *PipelineContext) (*NodeResult, err
 	depends := ctx.GetFeatures(info.Depends)
 	var matchBranch bool
 	for _, branch := range conditional.Branchs { //loop all the branch
-		var conditionRet = make(map[string]interface{}, 0)
+		var conditionRet = make(map[string]bool, 0)
 		for _, condition := range branch.Conditions {
 			if feature, ok := depends[condition.Feature]; ok {
 				rs, err := feature.Compare(condition.Operator, condition.Value)
@@ -55,7 +55,7 @@ func (conditional ConditionalNode) Parse(ctx *PipelineContext) (*NodeResult, err
 		if len(conditionRet) == 0 { //current branch not match
 			continue
 		}
-		logicRs, err := operator.Evaluate(branch.Decision.Logic, conditionRet)
+		logicRs, err := operator.EvaluateBoolExpr(branch.Decision.Logic, conditionRet)
 		if err != nil {
 			continue
 		}

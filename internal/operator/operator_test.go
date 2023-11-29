@@ -44,3 +44,34 @@ func TestCompare(t *testing.T) {
 	t.Log(Compare("EQ", []interface{}{3, 8, 7, 6, 9}, []interface{}{9, 6, 7, 3, 8}))
 	t.Log(Compare("EQ", []interface{}{"a", "b", "d", "c", "e"}, []interface{}{"a", "b", "c", "d", "e"}))
 }
+
+func TestBoolExpr(t *testing.T) {
+	variables := map[string]bool{
+		"foo": true,
+		"bar": false,
+		"a1":  true,
+	}
+	expr := " foo && bar"
+	result, err := EvaluateBoolExpr(expr, variables)
+	t.Log(expr, result, err)
+	t.Log(EvaluateBoolExpr("!(foo&&bar)||!a1", variables))
+}
+
+func TestSplit(t *testing.T) {
+	//t.Log(splitExpression("max(foo,bar)"))
+	//	t.Log(splitExpression("tmax(foo,bar)"))
+	//	t.Log(splitExpression("!max(foo,bar)"))
+	variables := map[string]bool{
+		"foo": true,
+		"bar": false,
+	}
+	t.Log(EvaluateExpr("max(foo,bar)", variables))
+}
+
+func TestEval(t *testing.T) {
+	variables := map[string]interface{}{
+		"foo": 1,
+		"bar": 2,
+	}
+	t.Log(Evaluate("max(foo, bar)", variables))
+}
