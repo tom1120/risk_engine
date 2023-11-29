@@ -1,24 +1,15 @@
+// Copyright (c) 2023
+//
+// @author 贺鹏Kavin
+// 微信公众号:技术岁月
+// https://github.com/skyhackvip/risk_engine
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
 package udf
 
-import (
-//	"sync"
-)
-
 type Udf func(interface{}) (interface{}, error)
-
-/*
-var udfMap map[string]Udf = make(map[string]Udf)
-var mu sync.RWMutex
-
-func RegisterUdf(key string, fn Udf) {
-	mu.Lock()
-	defer mu.Unlock()
-	udfMap[key] = fn //override if exists
-}
-
-func GetUdf(key string) Udf {
-	mu.RLock()
-	defer mu.RUnlock()
-	return udfMap[key]
-}
-*/
