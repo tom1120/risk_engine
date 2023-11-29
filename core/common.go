@@ -45,7 +45,7 @@ func (rule *Rule) Parse(ctx *PipelineContext, depends map[string]IFeature) (outp
 		return
 	}
 
-	var conditionRet = make(map[string]interface{}, 0)
+	var conditionRet = make(map[string]bool, 0)
 	for _, condition := range rule.Conditions {
 		if feature, ok := depends[condition.Feature]; ok {
 			rs, err := feature.Compare(condition.Operator, condition.Value)
@@ -67,7 +67,7 @@ func (rule *Rule) Parse(ctx *PipelineContext, depends map[string]IFeature) (outp
 
 	//rule.Decision
 	expr := rule.Decision.Logic
-	logicRet, err := operator.Evaluate(expr, conditionRet)
+	logicRet, err := operator.EvaluateBoolExpr(expr, conditionRet)
 	//某个表达式执行失败会导致最终逻辑执行失败
 	if err != nil {
 		return

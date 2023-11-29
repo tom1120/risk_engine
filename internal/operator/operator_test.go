@@ -56,3 +56,22 @@ func TestBoolExpr(t *testing.T) {
 	t.Log(expr, result, err)
 	t.Log(EvaluateBoolExpr("!(foo&&bar)||!a1", variables))
 }
+
+func TestSplit(t *testing.T) {
+	//t.Log(splitExpression("max(foo,bar)"))
+	//	t.Log(splitExpression("tmax(foo,bar)"))
+	//	t.Log(splitExpression("!max(foo,bar)"))
+	variables := map[string]bool{
+		"foo": true,
+		"bar": false,
+	}
+	t.Log(EvaluateExpr("max(foo,bar)", variables))
+}
+
+func TestEval(t *testing.T) {
+	variables := map[string]interface{}{
+		"foo": 1,
+		"bar": 2,
+	}
+	t.Log(Evaluate("max(foo, bar)", variables))
+}

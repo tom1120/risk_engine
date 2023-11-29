@@ -7,16 +7,12 @@ import (
 
 // evaluate 计算逻辑表达式的值
 func EvaluateBoolExpr(expr string, variables map[string]bool) (bool, error) {
-	expr = strings.ReplaceAll(expr, " ", "") // 去除空格
-	if len(expr) == 0 {
-		return false, fmt.Errorf("empty expression")
-	}
-	if !isValid(expr) {
-		return false, fmt.Errorf("invalid expression")
-	}
 
 	// 将表达式拆分成一个个token
-	tokens := splitExpression(expr)
+	tokens, err := splitExpression(expr)
+	if err != nil {
+		return false, err
+	}
 
 	// 开始执行逻辑运算
 	stack := make([]bool, 0)
@@ -126,7 +122,10 @@ func evaluateOp(b1, b2 bool, op string) bool {
 
 // isValid 检查表达式是否合法
 func isValid(expr string) bool {
-	allowed := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!()+-*%/|&"
+	if len(expr) == 0 {
+		return false
+	}
+	allowed := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!()+-_*%/|&,"
 	stack := make([]rune, 0)
 	for _, ch := range expr {
 		if ch == '(' {
@@ -144,9 +143,14 @@ func isValid(expr string) bool {
 }
 
 // splitExpression 将表达式拆分为token
-func splitExpression(expr string) []string {
+func splitExpression(expr string) ([]string, error) {
+	expr = strings.ReplaceAll(expr, " ", "") // 去除空格
+	if !isValid(expr) {
+		return nil, fmt.Errorf("invalid expression")
+	}
 	tokens := make([]string, 0)
 	buf := make([]rune, 0)
+
 	for i := 0; i < len(expr); i++ {
 		ch := rune(expr[i])
 		if ch == '&' && i < len(expr)-1 && rune(expr[i+1]) == '&' {
@@ -169,6 +173,12 @@ func splitExpression(expr string) []string {
 				buf = []rune{}
 			}
 			tokens = append(tokens, string(ch))
+		} else if ch == ',' {
+			if len(buf) > 0 {
+				tokens = append(tokens, string(buf))
+				buf = []rune{}
+			}
+			tokens = append(tokens, string(ch))
 		} else {
 			buf = append(buf, ch)
 		}
@@ -176,5 +186,5 @@ func splitExpression(expr string) []string {
 	if len(buf) > 0 {
 		tokens = append(tokens, string(buf))
 	}
-	return tokens
+	return tokens, nil
 }
