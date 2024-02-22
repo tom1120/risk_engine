@@ -12,6 +12,10 @@
 //
 package core
 
+import (
+	"github.com/skyhackvip/risk_engine/configs"
+)
+
 //各类型节点实现该接口
 type INode interface {
 	GetName() string
@@ -51,14 +55,14 @@ const (
 )
 
 var nodeStrMap = map[NodeType]string{
-	TypeStart:       "start",
-	TypeEnd:         "end",
-	TypeRuleset:     "ruleset",
-	TypeAbtest:      "abtest",
-	TypeConditional: "conditional",
-	TypeTree:        "tree",
-	TypeMatrix:      "matrix",
-	TypeScorecard:   "scorecard",
+	TypeStart:       configs.START,
+	TypeEnd:         configs.END,
+	TypeRuleset:     configs.RULESET,
+	TypeAbtest:      configs.ABTEST,
+	TypeConditional: configs.CONDITIONAL,
+	TypeTree:        configs.DECISIONTREE,
+	TypeMatrix:      configs.DECISIONMATRIX,
+	TypeScorecard:   configs.SCORECARD,
 }
 
 func (nodeType NodeType) String() string {
@@ -66,14 +70,14 @@ func (nodeType NodeType) String() string {
 }
 
 var nodeTypeMap map[string]NodeType = map[string]NodeType{
-	"start":       TypeStart,
-	"end":         TypeEnd,
-	"ruleset":     TypeRuleset,
-	"abtest":      TypeAbtest,
-	"conditional": TypeConditional,
-	"tree":        TypeTree,
-	"matrix":      TypeMatrix,
-	"scorecard":   TypeScorecard,
+	configs.START:          TypeStart,
+	configs.END:            TypeEnd,
+	configs.RULESET:        TypeRuleset,
+	configs.ABTEST:         TypeAbtest,
+	configs.CONDITIONAL:    TypeConditional,
+	configs.DECISIONTREE:   TypeTree,
+	configs.DECISIONMATRIX: TypeMatrix,
+	configs.SCORECARD:      TypeScorecard,
 }
 
 func GetNodeType(name string) NodeType {

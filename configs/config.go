@@ -37,13 +37,6 @@ type AppConf struct {
 	DslLoadPath   string `yaml:"DslLoadPath"`
 }
 
-//策略
-type Strategy struct {
-	Name     string `yaml:"name"`
-	Priority int    `yaml:"priority"` //越大越优先
-	Score    int    `yaml:"score"`    //策略分
-}
-
 func LoadConfig(path string) (*Conf, error) {
 	conf := new(Conf)
 	file, err := ioutil.ReadFile(path)
@@ -57,8 +50,17 @@ func LoadConfig(path string) (*Conf, error) {
 	return conf, nil
 }
 
+//策略
+type Strategy struct {
+	Name     string `yaml:"name"`
+	Priority int    `yaml:"priority"` //越大越优先
+	Score    int    `yaml:"score"`    //策略分
+}
+
+//keywords for execute
 const (
-	CONSOLE = "console"
-	FILE    = "file"
-	DB      = "db"
+	CONSOLE  = "console"
+	FILE     = "file"
+	DB       = "db"
+	PARALLEL = "parallel"
 )

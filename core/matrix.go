@@ -70,7 +70,7 @@ func (matrixNode MatrixNode) Parse(ctx *PipelineContext) (*NodeResult, error) {
 	var xResult string
 	var yResult string
 
-	if matrixNode.ExecPlan == "parallel" { //并发分组执行
+	if matrixNode.ExecPlan == configs.PARALLEL { //并发分组执行
 		ruleMap := make(map[string][]Rule)
 		for _, rule := range matrixNode.Rules {
 			if rule.Kind == configs.MATRIXX {

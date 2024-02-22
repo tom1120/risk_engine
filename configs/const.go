@@ -118,8 +118,8 @@ const (
 	RULESET        = "ruleset"
 	ABTEST         = "abtest"
 	CONDITIONAL    = "conditional"
-	DECISIONTREE   = "decisiontree"
-	DECISIONMATRIX = "decisionmatrix"
+	DECISIONTREE   = "tree"
+	DECISIONMATRIX = "matrix"
 	SCORECARD      = "scorecard"
 )
 
