@@ -71,13 +71,11 @@ func (flow *DecisionFlow) GetStartNode() (*FlowNode, bool) {
 
 func (flow *DecisionFlow) Run(ctx *PipelineContext) (err error) {
 	//recover
-	go func() {
-		defer func() {
-			if err := recover(); err != nil {
-				err = err
-				log.Error(err)
-			}
-		}()
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("recovered from panic: %v", r)
+			log.Error(err)
+		}
 	}()
 
 	//find StartNode
