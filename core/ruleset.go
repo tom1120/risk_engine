@@ -58,7 +58,7 @@ func (rulesetNode RulesetNode) Parse(ctx *PipelineContext) (*NodeResult, error) 
 	//ruleset 批量调用特征
 	depends := ctx.GetFeatures(info.Depends)
 
-	if rulesetNode.ExecPlan == "parallel" { //并发执行规则
+	if rulesetNode.ExecPlan == configs.PARALLEL { //并发执行规则
 		var wg sync.WaitGroup
 		var mu sync.Mutex
 		for _, rule := range rulesetNode.Rules {
